@@ -2,7 +2,7 @@
 
 P3 is a modern, lean and mean PostgreSQL client for Pharo.
 
-P3Client uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later), implementing the simple query cycle. It supports plaintext and md5 password authentication. When SQL queries return row data, it efficiently converts incoming data to objects. P3Client supports most common PostgreSQL types.
+**P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later), implementing the simple query cycle. It supports plaintext and md5 password authentication. When SQL queries return row data, it efficiently converts incoming data to objects. P3Client supports most common PostgreSQL types.
 
 P3Client can be configured manually or through a URL.
 
@@ -23,17 +23,17 @@ P3Client also supports SSL connections. Use #connectSSL to initiate such a conne
 
 Here is how to create a simple table with some rows in it.
 
-	(P3Client new url: 'psql://sven@localhost') in: [ :client |
-		client execute: 'DROP TABLE IF EXISTS table1'.
-		client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
-		client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (1, ''foo'', true)'.
-		client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (2, ''bar'', false)'.
-		client close ].
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+       client execute: 'DROP TABLE IF EXISTS table1'.
+       client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
+       client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (1, ''foo'', true)'.
+       client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (2, ''bar'', false)'.
+       client close ].
 	
 Now we can query the contents of the simple table we just created.
 
-	(P3Client new url: 'psql://sven@localhost') in: [ :client |
-		[ client query: 'SELECT * FROM table1' ] ensure: [ client close ] ].
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+       [ client query: 'SELECT * FROM table1' ] ensure: [ client close ] ].
 
 The result is a triplet, { result. descriptions. data }
 
@@ -48,20 +48,20 @@ Data is a collection of rows with fully converted field values as objects.
 
 Finally we can clean up.
 
-	(P3Client new url: 'psql://sven@localhost') in: [ :client |
-		[ client execute: 'DROP TABLE table1' ] ensure: [ client close ] ].
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+       [ client execute: 'DROP TABLE table1' ] ensure: [ client close ] ].
 
 
 ## References 
 
-  https://postgresql.org
-  https://en.wikipedia.org/wiki/PostgreSQL
-  https://www.postgresql.org/docs/9.6/static/protocol.html
+-  https://postgresql.org
+-  https://en.wikipedia.org/wiki/PostgreSQL
+-  https://www.postgresql.org/docs/9.6/static/protocol.html
 
 
 ## Glorp
 
-Included is P3DatabaseDriver, an interface between Glorp, an advanved object-relational mapper, and P3Client.
+Included is **P3DatabaseDriver**, an interface between Glorp, an advanved object-relational mapper, and P3Client.
 
 To install this driver (after loading Glorp itself), do
 
@@ -80,7 +80,19 @@ Configure your session using a Glorp Login object
 
 ## Code loading
 
-For this is an alpha release with no configuration. You need to load manually. Dependencies are ZTimestamp and NeoJSON (which can be loaded from the catalog).
+For now this is an alpha release with no configuration. You need to load manually. Dependencies are ZTimestamp and NeoJSON (which can be loaded from the catalog).
 
 To load the code in Pharo 6, open World > Tools > Iceberg, click + Clone repository, enter Remote URL git@github.com:svenvc/P3.git and click the Create repository button. With the new repository selected, go to the tab Packages and select Load package from the command menu.
 
+
+## Unit tests
+
+**P3ClientTests** holds unit tests for the P3 PSQL client.
+
+Configure it by setting its class side's connection URL.
+
+    P3ClientTests url: 'psql://sven:secret@localhost:5432/database'.
+
+The minimal being the following:
+
+    P3ClientTests url: 'psql://sven@localhost'. 
