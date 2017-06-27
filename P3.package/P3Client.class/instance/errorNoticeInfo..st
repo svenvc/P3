@@ -4,5 +4,7 @@ errorNoticeInfo: payload
 	info := Dictionary new.
 	[ (fieldType := payload next) isZero ] 
 		whileFalse: [ 
-			info at: fieldType asCharacter put: (self converter asciiCStringFrom: payload) ].
+			info 
+				at: fieldType asCharacter 
+				put: (self converter asciiCStringFrom: payload) ].
 	^ info

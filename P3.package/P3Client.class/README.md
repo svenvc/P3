@@ -18,6 +18,8 @@ Opening a connection to the server (#open) and running the authentication and st
 
 I also support SSL connections. Use #connectSSL to initiate such a connection.
 
+I represent a single database connection or session, I am not thread safe.
+
 
 Examples 
 
@@ -59,4 +61,4 @@ References
   https://www.postgresql.org/docs/9.6/static/protocol.html
 
 
-See also P3DatabaseDriver, a interface between Glorp, an advanved object-relational mapper, and me.
+See also P3DatabaseDriver, an interface between Glorp, an advanved object-relational mapper, and me.

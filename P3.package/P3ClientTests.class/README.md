@@ -7,3 +7,9 @@ Configure by setting my class side's connection URL.
 The minimal being the following:
 
   P3ClientTests url: 'psql://sven@localhost'.
+
+Benchmarks
+
+  P3ClientTests new runBenchmark1.
+  P3ClientTests new runBenchmark1Bench.
+  P3ClientTests new runAllTests.
