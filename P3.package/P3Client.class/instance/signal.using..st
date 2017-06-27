@@ -1,4 +1,4 @@
-private
+error handling
 signal: exceptionClass using: info
 	exceptionClass new 
 		info: info; 

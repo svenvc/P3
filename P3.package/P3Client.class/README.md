@@ -61,4 +61,4 @@ References
   https://www.postgresql.org/docs/9.6/static/protocol.html
 
 
-See also P3DatabaseDriver, an interface between Glorp, an advanved object-relational mapper, and me.
+See also P3DatabaseDriver, an interface between Glorp, an advanced object-relational mapper, and me.

@@ -1,4 +1,4 @@
-private
+error handling
 errorNoticeInfo: payload
 	| info fieldType |
 	info := Dictionary new.

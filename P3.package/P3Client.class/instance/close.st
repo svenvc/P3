@@ -1,5 +1,7 @@
 initialize-release
 close
+	"Cleanly close my connection with the server"
+
 	connection
 		ifNotNil: [ 
 			[ 
