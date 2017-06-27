@@ -1,0 +1,23 @@
+accessing
+typeMap
+	^ IdentityDictionary newFromPairs: #(
+			16 #(bool #convertBooleanFrom:length:description:) 
+			17 #(bytea #convertByteArrayFrom:length:description:) 
+			20 #(int8 #convertIntegerFrom:length:description:) 
+			21 #(int2 #convertIntegerFrom:length:description:) 
+			23 #(int4 #convertIntegerFrom:length:description:) 
+			26 #(oid #convertIntegerFrom:length:description:) 
+			700 #(float4 #convertFloatFrom:length:description:) 
+			701 #(float8 #convertFloatFrom:length:description:) 
+			1700 #(numeric #convertScaledDecimalFrom:length:description:) 
+			19 #(name #convertStringFrom:length:description:) 
+			25 #(text #convertStringFrom:length:description:) 
+			1042 #(bpchar #convertStringFrom:length:description:) 
+			1043 #(varchar #convertStringFrom:length:description:) 
+			1082 #(date #convertDateFrom:length:description:) 
+			1083 #(time #convertTimeFrom:length:description:) 
+			1114 #(timestamp #convertDateAndTimeWithoutTimezoneFrom:length:description:) 
+			1184 #(timestamptz #convertDateAndTimeFrom:length:description:)
+			114 #(json #convertJsonFrom:length:description:)
+			3802 #(jsonb #convertJsonFrom:length:description:)
+		)

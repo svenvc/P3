@@ -1,0 +1,18 @@
+{
+	"commentStamp" : "SvenVanCaekenberghe 6/21/2017 14:57",
+	"super" : "Object",
+	"category" : "P3",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"encoder",
+		"timezone",
+		"map",
+		"stringWriteStream",
+		"asciiReadStream",
+		"asciiWriteStream"
+	],
+	"name" : "P3Converter",
+	"type" : "normal"
+}
