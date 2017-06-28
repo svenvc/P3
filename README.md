@@ -35,16 +35,14 @@ Now we can query the contents of the simple table we just created.
     (P3Client new url: 'psql://sven@localhost') in: [ :client |
        [ client query: 'SELECT * FROM table1' ] ensure: [ client close ] ].
 
-The result is a triplet, { result. descriptions. data }
+The result is an instance of P3Result
 
-    an Array(
-       'SELECT 2' 
-       an Array(a P3RowFieldDescription(id int4) a P3RowFieldDescription(name text) a P3RowFieldDescription(enabled bool)) 
-       #(#(1 'foo' true) #(2 'bar' false)))
+	a P3Result('SELECT 2' 2 records 3 colums)
 
-Result is a string (collection of strings for multiple embedded queries) indicating successful execution.
-Descriptions is a collection of row field description objects.
-Data is a collection of rows with fully converted field values as objects.
+P3Result contains 3 elements,  results, descriptions & data:
+- Results is a string (collection of strings for multiple embedded queries) indicating successful execution.
+- Descriptions is a collection of row field description objects.
+- Data is a collection of rows with fully converted field values as objects.
 
 Finally we can clean up.
 
