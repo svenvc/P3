@@ -4,15 +4,15 @@ baselineOf: spec
 	spec for: #common do: [ 
 		spec configuration: 'NeoJSON' with: [
 			spec 
-				versionStatus: #stable;
+				versionString: #stable;
 				repository: 'http://mc.stfx.eu/Neo' ]. 
 		spec configuration: 'ZTimestamp' with: [
 			spec 
-				versionStatus: #stable;
+				versionString: #stable;
 				repository: 'http://mc.stfx.eu/Neo' ]. 
 		spec configuration: 'Glorp' with: [
 			spec 
-				versionStatus: #stable;
+				versionString: #stable;
 				repository: 'http://www.smalltalkhub.com/mc/DBXTalk/Configurations/main' ].
 		spec package: 'P3' with: [ spec requires: #('NeoJSON' 'ZTimestamp') ].
 		spec package: 'P3-Glorp' with: [ spec requires: #('P3' 'Glorp') ].
