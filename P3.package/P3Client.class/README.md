@@ -26,7 +26,7 @@ Examples
 Here is the simplest test that does an actual query, it should return true.
 
     (P3Client new url: 'psql://sven@localhost') in: [ :client |
-       [ client isWorking  ] ensure: [ client close ] ].
+       [ client isWorking ] ensure: [ client close ] ].
 
 Here is how to create a simple table with some rows in it.
 
