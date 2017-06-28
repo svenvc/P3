@@ -6,4 +6,4 @@ isWorking
 	| n result |
 	n := 999 atRandom.
 	result := self query: ('SELECT {1} AS N' format: { n }).
-	^ result first = 'SELECT 1' and: [ result third first first = n ]
+	^ result result = 'SELECT 1' and: [ result firstFieldOfFirstRecord = n ]

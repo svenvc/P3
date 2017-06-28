@@ -2,5 +2,5 @@ executing
 basicExecuteSQLString: aString
 	| result |
 	result := connection query: aString.
-	self updateRowCountFrom: result first.
-	^ (result third ifNil: [ #() ]) readStream
+	rowCount := result totalRowCount.
+	^ (result hasData ifTrue: [ result data ] ifFalse: [ #() ]) readStream

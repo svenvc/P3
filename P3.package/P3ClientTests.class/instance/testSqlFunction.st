@@ -6,5 +6,5 @@ testSqlFunction
 	x := 99 atRandom.
 	y := 99 atRandom.
 	result := client query: ('SELECT my_add({1},{2}) AS answer' format: { x. y }).
-	self assert: result third first first equals: x + y.
+	self assert: result firstFieldOfFirstRecord equals: x + y.
 	client execute: 'DROP FUNCTION my_add(x INTEGER, y INTEGER)'.

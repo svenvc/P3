@@ -1,0 +1,3 @@
+testing
+hasData
+	^ data notNil

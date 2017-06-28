@@ -6,4 +6,4 @@ execute: query
 	
 	| result |
 	result := self query: query.
-	^ result first
+	^ result results

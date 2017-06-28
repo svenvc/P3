@@ -1,0 +1,3 @@
+testing
+hasResults
+	^ results notNil

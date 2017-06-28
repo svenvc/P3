@@ -1,6 +1,6 @@
 {
 	"commentStamp" : "SvenVanCaekenberghe 6/23/2017 14:36",
-	"super" : "Object",
+	"super" : "DatabaseDriver",
 	"category" : "P3",
 	"classinstvars" : [ ],
 	"pools" : [ ],

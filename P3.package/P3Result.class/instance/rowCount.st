@@ -1,0 +1,3 @@
+accessing
+rowCount
+	^ self firstRowCount

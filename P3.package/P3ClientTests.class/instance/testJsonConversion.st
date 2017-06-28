@@ -8,6 +8,6 @@ testJsonConversion
 		bar: #(true nil -123); 
 		yourself.
 	result := client query: ('SELECT ''{1}''::json' format: { data printString }).
-	self assert: result third first first equals: data.
+	self assert: result firstFieldOfFirstRecord equals: data.
 	result := client query: ('SELECT ''{1}''::jsonb' format: { data printString }).
-	self assert: result third first first equals: data
+	self assert: result firstFieldOfFirstRecord equals: data
