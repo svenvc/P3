@@ -20,7 +20,12 @@ P3Client also supports SSL connections. Use #connectSSL to initiate such a conne
 
 
 ## Usage 
-Here is the simplest test that does an actual query, it should return true.    (P3Client new url: 'psql://sven@localhost') in: [ :client |       [ client isWorking  ] ensure: [ client close ] ].
+
+Here is the simplest test that does an actual query, it should return true.
+
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+       [ client isWorking ] ensure: [ client close ] ].
+
 This is how to create a simple table with some rows in it.
 
     (P3Client new url: 'psql://sven@localhost') in: [ :client |
@@ -77,9 +82,21 @@ Configure your session using a Glorp Login object
 
 
 ## Code loading
-The default group loads P3Client and its basic dependencies NeoJSON and ZTimestamp
-	Metacello new		baseline: 'P3';		repository: 'github://svenvc/P3';		load.
-The glorp group loads P3DatabaseDriver and the whole of Glorp (warning: large download) 	Metacello new		baseline: 'P3';		repository: 'github://svenvc/P3';		load: 'glorp'.
+
+The default group loads P3Client and its basic dependencies NeoJSON and ZTimestamp
+
+    Metacello new
+      baseline: 'P3';
+      repository: 'github://svenvc/P3';
+      load.
+
+The glorp group loads P3DatabaseDriver and the whole of Glorp (warning: large download)
+ 
+    Metacello new
+      baseline: 'P3';
+      repository: 'github://svenvc/P3';
+      load: 'glorp'.
+
 ## Unit tests
 
 **P3ClientTests** holds unit tests for the P3 PSQL client.
