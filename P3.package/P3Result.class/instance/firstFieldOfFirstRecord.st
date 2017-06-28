@@ -1,3 +1,3 @@
-accessing
+convenience
 firstFieldOfFirstRecord
 	^ self firstRecord first

@@ -1,3 +1,3 @@
-accessing
+convenience
 records
 	^ data
