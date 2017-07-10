@@ -85,17 +85,21 @@ Configure your session using a Glorp Login object
 
 The default group loads P3Client and its basic dependencies NeoJSON and ZTimestamp
 
-    Metacello new
-      baseline: 'P3';
-      repository: 'github://svenvc/P3';
-      load.
+```smalltalk
+Metacello new
+   baseline: 'P3';
+   repository: 'github://svenvc/P3';
+   load.
+```
 
 The glorp group loads P3DatabaseDriver and the whole of Glorp (warning: large download)
- 
-    Metacello new
-      baseline: 'P3';
-      repository: 'github://svenvc/P3';
-      load: 'glorp'.
+
+```smalltalk 
+Metacello new
+   baseline: 'P3';
+   repository: 'github://svenvc/P3';
+   load: 'glorp'.
+```
 
 ## Unit tests
 
