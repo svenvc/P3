@@ -26,42 +26,46 @@ Examples
 Here is the simplest test that does an actual query, it should return true.
 
     (P3Client new url: 'psql://sven@localhost') in: [ :client |
-       [ client isWorking ] ensure: [ client close ] ].
+        [ client isWorking ] ensure: [ client close ] ].
 
 Here is how to create a simple table with some rows in it.
 
-	(P3Client new url: 'psql://sven@localhost') in: [ :client |
-		client execute: 'DROP TABLE IF EXISTS table1'.
-		client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
-		client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (1, ''foo'', true)'.
-		client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (2, ''bar'', false)'.
-		client close ].
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+        client execute: 'DROP TABLE IF EXISTS table1'.
+        client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
+        client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (1, ''foo'', true)'.
+        client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (2, ''bar'', false)'.
+        client close ].
 	
 Now we can query the contents of the simple table we just created.
 
-	(P3Client new url: 'psql://sven@localhost') in: [ :client |
-		[ client query: 'SELECT * FROM table1' ] ensure: [ client close ] ].
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+        [ client query: 'SELECT * FROM table1' ] ensure: [ client close ] ].
 
 The result is an instance of P3Result
 
-	a P3Result('SELECT 2' 2 records 3 colums)
+    a P3Result('SELECT 2' 2 records 3 colums)
 
 P3Result contains 3 elements,  results, descriptions & data:
 - Results is a string (collection of strings for multiple embedded queries) indicating successful execution.
 - Descriptions is a collection of row field description objects.
 - Data is a collection of rows with fully converted field values as objects.
 
+The data itself is an array with 2 sub arrays, one for each record.
+
+    #( #(1 'foo' true) #(2 'bar' false) )
+
 Finally we can clean up.
 
-	(P3Client new url: 'psql://sven@localhost') in: [ :client |
-		[ client execute: 'DROP TABLE table1' ] ensure: [ client close ] ].
+    (P3Client new url: 'psql://sven@localhost') in: [ :client |
+        [ client execute: 'DROP TABLE table1' ] ensure: [ client close ] ].
 
 
 References 
 
-  https://postgresql.org
-  https://en.wikipedia.org/wiki/PostgreSQL
-  https://www.postgresql.org/docs/9.6/static/protocol.html
+-  https://postgresql.org
+-  https://en.wikipedia.org/wiki/PostgreSQL
+-  https://www.postgresql.org/docs/9.6/static/protocol.html
 
 
 See also P3DatabaseDriver, an interface between Glorp, an advanced object-relational mapper, and me.
