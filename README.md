@@ -68,7 +68,7 @@ P3Result contains 3 elements,  results, descriptions & data:
 The data itself is an array with 2 sub arrays, one for each record.
 
 ```smalltalk
-#( #( 1 'foo' true) #( 2 'bar' false) )
+#( #(1 'foo' true) #(2 'bar' false) )
 ```
 
 Finally we can clean up.
