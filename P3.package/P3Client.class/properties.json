@@ -6,11 +6,6 @@
 	"pools" : [ ],
 	"classvars" : [ ],
 	"instvars" : [
-		"host",
-		"port",
-		"user",
-		"password",
-		"database",
 		"connection",
 		"properties",
 		"converter",

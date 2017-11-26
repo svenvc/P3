@@ -1,5 +1,7 @@
 accessing
 url
+	"Return my connection URL"
+	
 	^ ZnUrl new
 		scheme: #psql;
 		host: self host;

@@ -4,4 +4,5 @@ open
 	
 	self close.
 	connection := ZdcSocketStream openConnectionToHostNamed: self host port: self port.
+	connection timeout: self timeout.
 	message := P3MessageBuffer new
