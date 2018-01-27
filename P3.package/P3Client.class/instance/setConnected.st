@@ -1,3 +1,4 @@
 private
 setConnected
-	properties at: 'connected' put: 'true'
+
+	settings at: #connected put: true

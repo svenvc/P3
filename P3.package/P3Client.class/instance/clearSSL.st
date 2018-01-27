@@ -1,3 +1,3 @@
 private
 clearSSL
-	properties removeKey: 'ssl' ifAbsent: [ ]
+	settings removeKey: #ssl ifAbsent: [ ]

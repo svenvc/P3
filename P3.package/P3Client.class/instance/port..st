@@ -3,4 +3,4 @@ port: integer
 	"Set the port to connect to.
 	If not set, defaults to 5432."
 	
-	properties at: #port put: integer
+	settings at: #port put: integer

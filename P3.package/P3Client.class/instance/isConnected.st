@@ -4,4 +4,4 @@ isConnected
 
 	^ connection notNil 
 		and: [ connection isConnected 
-			and: [ (properties at: 'connected' ifAbsent: [ 'false' ]) = 'true' ] ]
+			and: [ (settings at: #connected ifAbsent: [ false ]) ] ]

@@ -1,4 +1,6 @@
 initialize-release
 initialize
 	super initialize.
-	properties := Dictionary new
+	
+	settings := IdentityDictionary new.
+	properties := Dictionary new.
