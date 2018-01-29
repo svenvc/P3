@@ -1,3 +1,3 @@
 private
 setSSL
-	properties at: 'ssl' put: 'true'
+	settings at: #ssl put: true

@@ -1,6 +1,8 @@
 testing
 testJsonConversion
 	| data result |
+	
+	self supportsJsonB ifFalse: [ ^ self skip ].
 	data := NeoJSONObject new 
 		x: 1; 
 		str: 'les élève Français'; 
