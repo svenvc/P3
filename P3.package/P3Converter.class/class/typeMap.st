@@ -21,4 +21,6 @@ typeMap
 			114 #(json #convertJsonFrom:length:description:)
 			3802 #(jsonb #convertJsonFrom:length:description:)
 			2278 #(void #convertVoidFrom:length:description:)
+			2950 #(uuid #convertUuidFrom:length:description:)
+			
 		)
