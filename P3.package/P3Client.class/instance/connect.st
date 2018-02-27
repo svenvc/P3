@@ -9,5 +9,5 @@ connect
 	self runAuthentication.
 	self runStartup.
 	self converter initializeFrom: properties.
-	self setConnected.
+	self setSession.
 	self clearSSL

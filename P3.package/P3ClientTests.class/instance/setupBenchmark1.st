@@ -1,6 +1,6 @@
 benchmarking
 setupBenchmark1
-	self setUp.
+	self setUp. 
 	client query: 'DROP TABLE IF EXISTS benchmark1'.
 	client query: 'CREATE TABLE benchmark1 (n_int INTEGER, n_float FLOAT, hex TEXT, roman TEXT, words TEXT)'.
 	1 to: self benchmark1Size do: [ :n |
