@@ -7,5 +7,5 @@ close
 			[ 
 				self writeMessage: #[] tag: $X. 
 				connection close ] on: Error do: [  ].
-			settings at: #connected put: false.
+				self clearSession.
 			connection := nil ]

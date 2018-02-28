@@ -1,5 +1,6 @@
 private
 reset
+
+	self clearSession.
 	properties removeAll.
-	settings at: #connected put: false.
 	converter := nil
