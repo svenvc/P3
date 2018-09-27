@@ -4,6 +4,6 @@ runBenchmark1
 	result := nil.
 	self setUp.
 	timeToRun := [ result := client query: 'SELECT * FROM benchmark1' ] timeToRun.
-	self assert: result third size equals: self benchmark1Size.
+	self assert: result numberOfRecords equals: self benchmark1Size.
 	self tearDown.
 	^ timeToRun 

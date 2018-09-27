@@ -10,6 +10,7 @@ The minimal being the following:
 
 Benchmarks
 
+  P3ClientTests new setupBenchmark1.
   P3ClientTests new runBenchmark1.
   P3ClientTests new runBenchmark1Bench.
   P3ClientTests new runAllTests.
