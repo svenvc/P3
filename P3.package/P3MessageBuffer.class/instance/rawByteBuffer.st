@@ -1,3 +1,0 @@
-accessing
-rawByteBuffer
-	^ payload originalContents

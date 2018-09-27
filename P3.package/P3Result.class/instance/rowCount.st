@@ -1,3 +1,0 @@
-accessing
-rowCount
-	^ self firstRowCount

@@ -1,4 +1,0 @@
-private
-clearSession
-
-	session := nil

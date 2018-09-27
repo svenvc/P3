@@ -1,3 +1,0 @@
-testing
-hasData
-	^ data notNil

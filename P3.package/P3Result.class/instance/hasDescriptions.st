@@ -1,3 +1,0 @@
-testing
-hasDescriptions
-	^ descriptions notNil
