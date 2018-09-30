@@ -273,7 +273,9 @@ P3ClientTests >> testNotification [
 		on: P3Notification 
 		do: [ :notification | 
 			raised := true.
-			self assert: (notification description includesSubstring: 'abcdef').
+			self 
+				assert: (notification description includesSubstring: 'abcdef')
+				description: ('{1} does not contain abcdef' format: {notification description}).
 			notification resume ].
 	self assert: raised
 ]
