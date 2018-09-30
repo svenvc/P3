@@ -1,0 +1,13 @@
+language: smalltalk
+sudo: enabled
+
+os:
+  - linux
+
+smalltalk:
+  - Pharo-7.0
+  - Pharo-6.1
+  - Pharo64-7.0
+  
+services:
+  - postgresql
