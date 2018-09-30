@@ -146,3 +146,5 @@ The minimal being the following:
 ```smalltalk
 P3ClientTests url: 'psql://sven@localhost'. 
 ```
+
+The default connection URL for **P3ClientTests** is psql://postgres@localhost and corresponds with the default on Travis CI's postgresql service, namely user postgres with a blank password on localhost. 
