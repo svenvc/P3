@@ -23,19 +23,28 @@ Class {
 		'client'
 	],
 	#classVars : [
-		'url'
+		'Url'
 	],
-	#category : 'P3'
+	#category : #P3
 }
 
 { #category : #accessing }
 P3ClientTests class >> url [
-	^ url
+	"Return the default connection URL to use for P3 clients in the unit tests.
+	Note that the default here corresponds to the default on Travis CI's postgresql service,
+	user postgres with a blank password on localhost.
+	You should set an appropriate connection string yourself, see #url:"
+	
+	^ Url ifNil: [ Url := 'psql://postgres@localhost' ]
 ]
 
 { #category : #accessing }
 P3ClientTests class >> url: stringOrUrl [
-	url := stringOrUrl 
+	"Set the connection URL to be used for P3 Clients in the unit tests.
+	The general syntax is psql://sven:secret@localhost:5432/database
+	The minimal form is psql://user@localhost (a user, blank password, localhost)"
+	
+	Url := stringOrUrl asUrl
 ]
 
 { #category : #benchmarking }
@@ -79,9 +88,9 @@ P3ClientTests >> runBenchmark1Bench [
 
 { #category : #running }
 P3ClientTests >> setUp [
+	super setUp.
 	client := P3Client new.
-	url ifNil: [ self error: 'You have to specify a connection URL (see my class comment)' ].
-	client url: url.
+	client url: self class url.
 	client connect
 ]
 
@@ -116,7 +125,8 @@ P3ClientTests >> supportsJsonB [
 
 { #category : #running }
 P3ClientTests >> tearDown [
-	client close
+	client close.
+	super tearDown
 ]
 
 { #category : #testing }
@@ -368,7 +378,7 @@ P3ClientTests >> testStringEscaping [
 P3ClientTests >> testTimeout [
 	"Reconnect with an explicit timeout"
 	client close.
-	client url: url.
+	client url: Url.
 	client timeout: 1. "second"
 	self assert: client isWorking.
 	"The following (sleeping for 0.5 seconds) should just pass successfully"
