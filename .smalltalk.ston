@@ -1,0 +1,8 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'P3',
+      #platforms : [ #pharo ]
+    }
+  ]
+}
