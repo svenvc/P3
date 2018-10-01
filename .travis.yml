@@ -16,4 +16,4 @@ addons:
   postgresql: "9.6"
 
 before_script:
-  - psql -U postgres -c 'DROP TABLE IF EXISTS abcdef'
+  - psql -U postgres -c 'SHOW client_min_messages; SET client_min_messages TO notice; DROP TABLE IF EXISTS abcdef'
