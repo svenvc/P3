@@ -269,7 +269,7 @@ P3ClientTests >> testNonAsciiStrings [
 P3ClientTests >> testNotification [
 	| raised |
 	raised := false.
-	[ client query: 'DROP TABLE IF EXISTS abcdef' ] 
+	[ client query: 'SET client_min_messages TO notice; DROP TABLE IF EXISTS abcdef' ] 
 		on: P3Notification 
 		do: [ :notification | 
 			raised := true.
@@ -277,7 +277,7 @@ P3ClientTests >> testNotification [
 				assert: (notification description includesSubstring: 'abcdef')
 				description: ('{1} does not contain abcdef' format: {notification description}).
 			notification resume ].
-	self assert: raised
+	self assert: raised description: 'no notification triggered'
 ]
 
 { #category : #testing }
