@@ -311,6 +311,12 @@ P3Client >> md5PasswordMessage: salt [
 	^ self asCString: 'md5' , salted
 ]
 
+{ #category : #private }
+P3Client >> newMessageBuilder [
+
+	^ P3MessageBuilder newWithEncoder: self converter encoder
+]
+
 { #category : #'initialize-release' }
 P3Client >> open [
 	"Open my connection with the server (do not yet #connect)"
@@ -352,6 +358,27 @@ P3Client >> port: integer [
 	If not set, defaults to 5432."
 	
 	settings at: #port put: integer
+]
+
+{ #category : #public }
+P3Client >> prepare: query [
+
+	| queryName |
+	
+	queryName := query.
+
+	self 
+		ensureConnected;
+		writeParseMessage: query name: queryName types: #();
+		writeSyncMessage.
+
+	"Check for ParseComplete and ReadyForQuery message"
+	self readMessage tag = $1
+		ifFalse: [ ^ self error: 'Unexpected message during parse of extended query' ].
+	self readMessage tag = $Z
+		ifFalse: [ ^ self error: 'Unexpected message during parse of extended query' ].
+
+	^ P3PreparedStatement newWith: self name: queryName
 ]
 
 { #category : #printing }
@@ -489,6 +516,28 @@ P3Client >> runAuthentication [
 					self writeMessage: (self md5PasswordMessage: salt) tag: $p ] ]
 		ifFalse: [ 
 			^ self error: 'Unexpected message during authentication' ] ] repeat
+]
+
+{ #category : #protocol }
+P3Client >> runExtendedQueryResult [
+	| result |
+	result := P3Result new.
+	"Check for BindComplete message"
+	self readMessage tag = $2
+		ifFalse: [ ^ self error: 'Unexpected message. BindComplete expected' ].
+	self readMessage tag = $T
+		ifTrue: [ result descriptions: (self processRowDescription: message readStream) ].
+
+	[ 	message tag = $C ifFalse: [ 
+			result data: (Array streamContents: [ :out |
+				[ self readMessage tag = $C ] whileFalse: [ 
+					self assert: message tag = $D.
+					out nextPut: (self processDataRowUsing: result descriptions) ] ]) ].
+
+		result addResult: (self converter asciiCStringFrom: message readStream).
+		self readMessage tag = $Z ] whileFalse.
+
+	^ result
 ]
 
 { #category : #protocol }
@@ -657,6 +706,35 @@ P3Client >> writeMessage: payload tag: tag [
 ]
 
 { #category : #'input/output' }
+P3Client >> writeMessageNoFlush: payload [
+	| size |
+	size := payload size + 4.
+	4 to: 1 by: -1 do: [ :index | connection nextPut: (size digitAt: index) ].
+	connection nextPutAll: payload.
+
+]
+
+{ #category : #'input/output' }
+P3Client >> writeMessageNoFlush: payload tag: tag [
+	connection nextPut: tag asInteger.
+	self writeMessageNoFlush: payload
+]
+
+{ #category : #'input/output' }
+P3Client >> writeParseMessage: queryString name: statementName types: paramDataTypes [
+	| msgBuilder |
+	msgBuilder := self newMessageBuilder.
+	msgBuilder
+		nextPutString: statementName;
+		nextPutString: queryString;
+		nextPutInt16: paramDataTypes size.
+	paramDataTypes do: [ :each | msgBuilder nextPutInt32: each ].
+	self writeMessage: msgBuilder asBytes tag: $P 
+
+	
+]
+
+{ #category : #'input/output' }
 P3Client >> writeQueryMessage: queryString [
 	| encoder size |
 	connection nextPut: $Q asInteger.
@@ -666,4 +744,11 @@ P3Client >> writeQueryMessage: queryString [
 	queryString do: [ :each | encoder nextPut: each toStream: connection ].
 	connection nextPut: 0.
 	connection flush
+]
+
+{ #category : #'input/output' }
+P3Client >> writeSyncMessage [
+
+	self writeMessage: #[] tag: $S. 
+
 ]
