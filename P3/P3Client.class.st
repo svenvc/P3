@@ -363,22 +363,42 @@ P3Client >> port: integer [
 { #category : #public }
 P3Client >> prepare: query [
 
-	| queryName |
+	| queryName paramDescriptions rowDescriptions |
 	
 	queryName := query.
 
 	self 
 		ensureConnected;
 		writeParseMessage: query name: queryName types: #();
+		writeDescribeMessage: queryName type: $S;
 		writeSyncMessage.
 
-	"Check for ParseComplete and ReadyForQuery message"
 	self readMessage tag = $1
-		ifFalse: [ ^ self error: 'Unexpected message during parse of extended query' ].
-	self readMessage tag = $Z
-		ifFalse: [ ^ self error: 'Unexpected message during parse of extended query' ].
+		ifFalse: [ ^ self error: 'ParseComplete message expecyted' ].
 
-	^ P3PreparedStatement newWith: self name: queryName
+	self readMessage.
+	message tag = $t
+		ifTrue: [ paramDescriptions := self processParameterDescription: message readStream ]
+		ifFalse: [ 
+			paramDescriptions := #().
+			message tag = $n 
+				ifFalse: [ self error: 'NoData message expected' ] ].
+
+	self readMessage.
+	message tag = $T
+		ifTrue: [ rowDescriptions := self processRowDescription: message readStream ]
+		ifFalse: [ 
+			rowDescriptions := #().
+			message tag = $n
+				ifFalse: [ self error: 'NoData message expected' ] ].
+
+	self readMessage tag = $Z
+		ifFalse: [ ^ self error: 'ReadyForQuery message expected' ].
+
+	^ P3PreparedStatement newWith: self 
+			name: queryName 
+			parameters: paramDescriptions 
+			fields: rowDescriptions
 ]
 
 { #category : #printing }
@@ -411,6 +431,17 @@ P3Client >> processDataRowUsing: description [
 				object := (description at: index) convert: readStream length: size using: converter.
 				record at: index put: object ] ].
 	^ record
+]
+
+{ #category : #private }
+P3Client >> processParameterDescription: payload [
+	| count |
+	count := payload uint16.
+	^ Array new: count streamContents: [ :out |
+			count timesRepeat: [ 
+				out nextPut: (P3ParameterDescription new
+					typeOid: payload int32;
+					yourself) ] ]
 ]
 
 { #category : #private }
@@ -519,20 +550,20 @@ P3Client >> runAuthentication [
 ]
 
 { #category : #protocol }
-P3Client >> runExtendedQueryResult [
+P3Client >> runExtendedQueryResult: fieldDescriptions [
 	| result |
 	result := P3Result new.
+	result descriptions: fieldDescriptions.
+	
 	"Check for BindComplete message"
 	self readMessage tag = $2
 		ifFalse: [ ^ self error: 'Unexpected message. BindComplete expected' ].
-	self readMessage tag = $T
-		ifTrue: [ result descriptions: (self processRowDescription: message readStream) ].
 
 	[ 	message tag = $C ifFalse: [ 
 			result data: (Array streamContents: [ :out |
 				[ self readMessage tag = $C ] whileFalse: [ 
 					self assert: message tag = $D.
-					out nextPut: (self processDataRowUsing: result descriptions) ] ]) ].
+					out nextPut: (self processDataRowUsing: fieldDescriptions) ] ]) ].
 
 		result addResult: (self converter asciiCStringFrom: message readStream).
 		self readMessage tag = $Z ] whileFalse.
@@ -688,6 +719,17 @@ P3Client >> user: string [
 	Set to nil or don't set to use the default."
 	
 	settings at: #user put: string
+]
+
+{ #category : #'input/output' }
+P3Client >> writeDescribeMessage: aName type: aChar [
+	"Type $S to describe a prepared statement; or $P to describe a portal."
+	| msgBuilder |
+	msgBuilder := self newMessageBuilder.
+	msgBuilder
+		nextPutByte: aChar asInteger;
+		nextPutString: aName.
+	self writeMessageNoFlush: msgBuilder asBytes tag: $D
 ]
 
 { #category : #'input/output' }

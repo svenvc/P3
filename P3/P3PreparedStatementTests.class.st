@@ -76,15 +76,18 @@ P3PreparedStatementTests >> testSelectStatement [
 	statement executeBatch: #(
 		( 123 'Hello World' true )
 		( 345 'Greetings' false )
-		( 567 'From Mars' true )
-	).
+		( 567 'From Mars' true )	).
 	
-	statement := client prepare: 'SELECT name, enabled FROM table1 where id >= $1'.
+	statement := client prepare: 'SELECT name, enabled FROM table1 where id >= $1 order by id'.
 
 	result := statement query: #( 345 ).
-
-	result inspect.
-
+	self assert: result equals: #( ('Greetings' false) ('From Mars' true ) ).
+	
+	result := statement query: #( 567 ).
+	self assert: result equals: #( ('From Mars' true ) ).
+	
+	result := statement query: #( 800 ).
+	self assert: result equals: #( ).
 ]
 
 { #category : #tests }

@@ -4,18 +4,19 @@ Class {
 	#instVars : [
 		'client',
 		'name',
-		'descriptions'
+		'paramDescriptions',
+		'fieldDescriptions'
 	],
 	#category : #P3
 }
 
 { #category : #'instance creation' }
-P3PreparedStatement class >> newWith: aClient name: aString [
+P3PreparedStatement class >> newWith: aClient name: aString parameters: paramDescriptions fields: rowDescriptions [
 
-	^ self new initializeWith: aClient name: aString
+	^ self new initializeWith: aClient name: aString parameters: paramDescriptions fields: rowDescriptions
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'input/output' }
 P3PreparedStatement >> bindStrings: inputValues [
 
 	| msgBuilder |
@@ -43,7 +44,7 @@ P3PreparedStatement >> execute: inputRow [
 	self writeExecuteMessage: 0.
 	client writeSyncMessage.
 	
-	^ client runExtendedQueryResult
+	^ client runExtendedQueryResult: fieldDescriptions
 ]
 
 { #category : #public }
@@ -54,33 +55,46 @@ P3PreparedStatement >> executeBatch: inputRows [
 		self writeExecuteMessage: 0 ].
 	client writeSyncMessage.
 	
-	^ client runExtendedQueryResult
+	^ client runExtendedQueryResult: fieldDescriptions
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> fieldDescriptions [
+	^ fieldDescriptions
 ]
 
 { #category : #initialization }
-P3PreparedStatement >> initializeWith: aClient name: aString [
+P3PreparedStatement >> initializeWith: aClient name: aString parameters: aParamDescriptions fields: aRowFieldDescriptions [
 
 	client := aClient.
 	name := aString.
+	paramDescriptions := aParamDescriptions.
+	fieldDescriptions := aRowFieldDescriptions
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> name [
+	^ name
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> paramDescriptions [
+	^ paramDescriptions
 ]
 
 { #category : #public }
 P3PreparedStatement >> query: inputRow [
 
+	| result |
 	self bindStrings: inputRow.
-	descriptions isNil
-		ifTrue: [ self writeDescribeMessage: '' type: $P ].
 	self writeExecuteMessage: 0.
 	client writeSyncMessage.
 	
-	"Check for BindComplete message"
-	client readMessage tag = $2
-		ifFalse: [ ^ self error: 'Unexpected message. BindComplete expected' ].
-
-	^ client runQueryResult
+	result := client runExtendedQueryResult: fieldDescriptions.
+	^ result data
 ]
 
-{ #category : #writing }
+{ #category : #'input/output' }
 P3PreparedStatement >> writeDescribeMessage: aName type: aChar [
 	"Type $S to describe a prepared statement; or $P to describe a portal."
 	| msgBuilder |
@@ -91,7 +105,7 @@ P3PreparedStatement >> writeDescribeMessage: aName type: aChar [
 	client writeMessageNoFlush: msgBuilder asBytes tag: $D
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'input/output' }
 P3PreparedStatement >> writeExecuteMessage: rowLimit [
 
 	| msgBuilder |
