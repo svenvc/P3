@@ -38,13 +38,30 @@ P3PreparedStatement >> bindStrings: inputValues [
 ]
 
 { #category : #public }
+P3PreparedStatement >> close [
+
+	client isNil 
+		ifTrue: [ ^ self ].
+
+	self writeCloseMessage: name type: $S.
+	self writeFlushMessage.
+	
+	"Check for CloseComplete message"
+	client readMessage tag = $3
+		ifFalse: [ self error: 'CloseComplete message expected' ].
+	
+	"This prepared statement can no longer be used."
+	client := nil
+]
+
+{ #category : #public }
 P3PreparedStatement >> execute: inputRow [
 
 	self bindStrings: inputRow.
 	self writeExecuteMessage: 0.
 	client writeSyncMessage.
 	
-	^ client runExtendedQueryResult: fieldDescriptions
+	^ (client runExtendedQueryResults: fieldDescriptions) first result
 ]
 
 { #category : #public }
@@ -55,7 +72,7 @@ P3PreparedStatement >> executeBatch: inputRows [
 		self writeExecuteMessage: 0 ].
 	client writeSyncMessage.
 	
-	^ client runExtendedQueryResult: fieldDescriptions
+	^ (client runExtendedQueryResults: fieldDescriptions) collect: [ :each | each result ]
 ]
 
 { #category : #accessing }
@@ -85,13 +102,33 @@ P3PreparedStatement >> paramDescriptions [
 { #category : #public }
 P3PreparedStatement >> query: inputRow [
 
-	| result |
 	self bindStrings: inputRow.
 	self writeExecuteMessage: 0.
 	client writeSyncMessage.
 	
-	result := client runExtendedQueryResult: fieldDescriptions.
-	^ result data
+	^ (client runExtendedQueryResults: fieldDescriptions) first
+]
+
+{ #category : #public }
+P3PreparedStatement >> queryAll: inputRows [
+
+	inputRows do: [ :eachRow |
+		self bindStrings: eachRow.
+		self writeExecuteMessage: 0 ].
+	client writeSyncMessage.
+	
+	^ client runExtendedQueryResults: fieldDescriptions
+]
+
+{ #category : #'input/output' }
+P3PreparedStatement >> writeCloseMessage: aName type: aChar [
+
+	| msgBuilder |
+	msgBuilder := client newMessageBuilder.
+	msgBuilder 
+		nextPutByte: aChar asInteger;
+		nextPutString: aName.
+	client writeMessageNoFlush: msgBuilder asBytes tag: $C
 ]
 
 { #category : #'input/output' }
@@ -115,4 +152,9 @@ P3PreparedStatement >> writeExecuteMessage: rowLimit [
 		nextPutInt32: rowLimit.
 
 	client writeMessageNoFlush: msgBuilder asBytes tag: $E
+]
+
+{ #category : #'input/output' }
+P3PreparedStatement >> writeFlushMessage [
+	client writeMessage: #[] tag: $H
 ]

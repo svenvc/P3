@@ -34,16 +34,45 @@ P3PreparedStatementTests >> testBatchInsertStatement [
 	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
 	
 	statement := client prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'.
-	"self assert: client isWorking."
-	
 	result := statement executeBatch: #(
 		( 123 'Hello World' true )
 		( 345 'Greetings' false )
 		( 567 'From Mars' true )
 	).
 	
-	result inspect.
+	self assert: result size equals: 3.
+	result do: [ :each |
+		self assert: each equals: 'INSERT 0 1' ].
+	
+	statement close.
+]
 
+{ #category : #tests }
+P3PreparedStatementTests >> testBulkInsertAndSelect [
+
+	| insertStatement result selectStatement |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, created_at TIMESTAMP DEFAULT NOW(), name TEXT)'.
+	
+	insertStatement := client prepare: 'INSERT INTO table1 (name) VALUES ($1) RETURNING id, created_at'.
+	result := insertStatement queryAll: ((1 to: 200) collect: [ :index | Array with: ('Text #', index printString) ]).
+	
+	self assert: result size equals: 200.
+	result do: [ :each |
+		self assert: each data size equals: 1.
+		self assert: each firstRecord size equals: 2 ].
+	
+	selectStatement := client prepare: 'SELECT name FROM table1 WHERE id = $1 AND created_at = $2'.
+	result := selectStatement queryAll: (result collect: [ :each | each firstRecord ]).
+	
+	self assert: result size equals: 200.
+	result doWithIndex: [ :each :index |
+		self assert: each data size equals: 1.
+		self assert: each firstRecord equals: (Array with: 'Text #', index printString) ].
+
+	insertStatement close.
+	selectStatement close.
 ]
 
 { #category : #tests }
@@ -77,17 +106,20 @@ P3PreparedStatementTests >> testSelectStatement [
 		( 123 'Hello World' true )
 		( 345 'Greetings' false )
 		( 567 'From Mars' true )	).
+	statement close.
 	
 	statement := client prepare: 'SELECT name, enabled FROM table1 where id >= $1 order by id'.
 
 	result := statement query: #( 345 ).
-	self assert: result equals: #( ('Greetings' false) ('From Mars' true ) ).
+	self assert: result records equals: #( ('Greetings' false) ('From Mars' true ) ).
 	
 	result := statement query: #( 567 ).
-	self assert: result equals: #( ('From Mars' true ) ).
+	self assert: result records equals: #( ('From Mars' true ) ).
 	
 	result := statement query: #( 800 ).
-	self assert: result equals: #( ).
+	self assert: result records equals: #( ).
+	
+	statement close.
 ]
 
 { #category : #tests }
@@ -99,27 +131,15 @@ P3PreparedStatementTests >> testSimpleInsertStatement [
 	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
 	
 	statement := client prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'.
-	"self assert: client isWorking."
+
+	statement execute: #( 123 'Hello World' true ).
+	statement execute: #( 345 'Greetings' false ).
 	
-	result := statement execute: #( 123 'Hello World' true ).
-	result := statement execute: #( 345 'Greetings' false ).
+	statement executeBatch: #(
+		#( 111 'Hello Mars' true )
+		#( 333 'Hello Moon' false ) ).
+	statement close.
 	
-	result inspect.
-
-]
-
-{ #category : #tests }
-P3PreparedStatementTests >> testSimpleSelectStatement [
-
-	| statement result |
-	client execute: 'DROP TABLE IF EXISTS table1'.
-	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
-	client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (1, ''foo'', true)'.
-	client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (2, ''bar'', false)'.
-	client execute: 'INSERT INTO table1 (id, name, enabled) VALUES (NULL, NULL, NULL)'.
-
-	statement := client prepare: 'SELECT id, name, enabled FROM table1'.
-
-	result := statement query: #().
-
+	result := client query: 'SELECT id, name, enabled FROM table1 ORDER BY id'.
+	self assert: result records size equals: 4.
 ]

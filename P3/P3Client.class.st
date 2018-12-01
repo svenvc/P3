@@ -550,25 +550,39 @@ P3Client >> runAuthentication [
 ]
 
 { #category : #protocol }
-P3Client >> runExtendedQueryResult: fieldDescriptions [
-	| result |
-	result := P3Result new.
-	result descriptions: fieldDescriptions.
+P3Client >> runExtendedQueryResult: descriptions [
+	"Read DataRow ($D) messages until either a CommandComplete ($C) or PortalSuspended ($s) message is received."
+
+	| rows |
+
+			"Check for BindComplete message"
+	message tag = $2
+		ifFalse: [ ^ self error: 'BindComplete message expected' ].
+	self readMessage.
+
+	rows := Array streamContents: [ :out |
+		[ 'Cs' includes: message tag ] whileFalse: [ 
+			self assert: message tag = $D.
+			out nextPut: (self processDataRowUsing: descriptions).
+			self readMessage ] ].
 	
-	"Check for BindComplete message"
-	self readMessage tag = $2
-		ifFalse: [ ^ self error: 'Unexpected message. BindComplete expected' ].
+	^ P3SingleResult descriptions: descriptions
+			rows: rows 
+			message: (self converter asciiCStringFrom: message readStream)
+]
 
-	[ 	message tag = $C ifFalse: [ 
-			result data: (Array streamContents: [ :out |
-				[ self readMessage tag = $C ] whileFalse: [ 
-					self assert: message tag = $D.
-					out nextPut: (self processDataRowUsing: fieldDescriptions) ] ]) ].
+{ #category : #protocol }
+P3Client >> runExtendedQueryResults: fieldDescriptions [
+	
+	| results |
 
-		result addResult: (self converter asciiCStringFrom: message readStream).
-		self readMessage tag = $Z ] whileFalse.
-
-	^ result
+	self readMessage.
+	results := Array streamContents: [ :out |
+		[
+			out nextPut: (self runExtendedQueryResult: fieldDescriptions).
+			self readMessage tag = $Z ] whileFalse ].
+	
+	^ results
 ]
 
 { #category : #protocol }
