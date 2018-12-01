@@ -2,7 +2,7 @@
 
 P3 is a modern, lean and mean PostgreSQL client for Pharo.
 
-[![Build Status](https://travis-ci.org/svenvc/P3.svg?branch=master)](https://travis-ci.org/svenvc/P3)
+[![Build Status](https://travis-ci.org/jvdsandt/P3.svg?branch=master)](https://travis-ci.org/jvdsandt/P3)
 
 **P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later), 
 implementing the simple query cycle. It supports plaintext and md5 password authentication. 
