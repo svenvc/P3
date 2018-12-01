@@ -56,9 +56,9 @@ P3PreparedStatementTests >> testBulkInsertAndSelect [
 	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, created_at TIMESTAMP DEFAULT NOW(), name TEXT)'.
 	
 	insertStatement := client prepare: 'INSERT INTO table1 (name) VALUES ($1) RETURNING id, created_at'.
-	result := insertStatement queryAll: ((1 to: 200) collect: [ :index | Array with: ('Text #', index printString) ]).
+	result := insertStatement queryAll: ((1 to: 100) collect: [ :index | Array with: ('Text #', index printString) ]).
 	
-	self assert: result size equals: 200.
+	self assert: result size equals: 100.
 	result do: [ :each |
 		self assert: each data size equals: 1.
 		self assert: each firstRecord size equals: 2 ].
@@ -66,7 +66,7 @@ P3PreparedStatementTests >> testBulkInsertAndSelect [
 	selectStatement := client prepare: 'SELECT name FROM table1 WHERE id = $1 AND created_at = $2'.
 	result := selectStatement queryAll: (result collect: [ :each | each firstRecord ]).
 	
-	self assert: result size equals: 200.
+	self assert: result size equals: 100.
 	result doWithIndex: [ :each :index |
 		self assert: each data size equals: 1.
 		self assert: each firstRecord equals: (Array with: 'Text #', index printString) ].
@@ -76,19 +76,23 @@ P3PreparedStatementTests >> testBulkInsertAndSelect [
 ]
 
 { #category : #tests }
-P3PreparedStatementTests >> testMultipleInsertStatement [
+P3PreparedStatementTests >> testMultipleInsertStatements [
 
-	| result statement1 statement2 |
+	| statement1 statement2 |
 	client execute: 'DROP TABLE IF EXISTS table1'.
-	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT)'.
 
 	client execute: 'DROP TABLE IF EXISTS table2'.
-	client execute: 'CREATE TABLE table2 (id INTEGER, name TEXT, enabled BOOLEAN)'.
+	client execute: 'CREATE TABLE table2 (id INTEGER, enabled BOOLEAN)'.
 
-	statement1 := client prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'.
-	statement2 := client prepare: 'INSERT INTO table2 (id, name, enabled) VALUES ($1,$2,$3)'.
-	self assert: client isWorking.
+	statement1 := client prepare: 'INSERT INTO table1 (id, name) VALUES ($1,$2)'.
+	statement2 := client prepare: 'INSERT INTO table2 (id, enabled) VALUES ($1,$2)'.
+	
+	statement1 execute: #( 22 'Hi!' ).
+	statement2 executeBatch: #( ( 44 false ) ( 55 true ) ).
 
+	statement1 close.
+	statement2 close.
 	
 
 ]

@@ -22,6 +22,16 @@ Class {
 	#category : 'P3'
 }
 
+{ #category : #'instance creation' }
+P3Result class >> descriptions: descriptions rows: aRowArray message: aString [
+
+	^ self new
+			descriptions: descriptions;
+			data: aRowArray;
+			results: aString;
+			yourself
+]
+
 { #category : #accessing }
 P3Result >> addResult: subResult [
 	results := results

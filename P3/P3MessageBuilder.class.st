@@ -25,32 +25,32 @@ P3MessageBuilder >> initWithEncoder: anEncoder [
 	encoder := anEncoder
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #writing }
 P3MessageBuilder >> nextPutByte: anInteger [
 
 	byteStream nextPut: anInteger
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #writing }
 P3MessageBuilder >> nextPutInt16: anInteger [
 
 	2 to: 1 by: -1 do: [ :index | byteStream nextPut: (anInteger digitAt: index) ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #writing }
 P3MessageBuilder >> nextPutInt32: anInteger [
 
 	4 to: 1 by: -1 do: [ :index | byteStream nextPut: (anInteger digitAt: index) ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #writing }
 P3MessageBuilder >> nextPutString: aString [
 
 	aString do: [ :each | encoder nextPut: each toStream: byteStream ].
 	byteStream nextPut: 0
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #writing }
 P3MessageBuilder >> nextPutStringParameter: aValueOrNil [
 	"Write a Parameter in the text format."
 

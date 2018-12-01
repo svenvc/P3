@@ -1,3 +1,30 @@
+"
+I am P3PreparedStatement. Use me if you need to execute a query multiple times.
+
+Create an instance of me via P3Client>>#prepare: The argument to this method is a query string that can contain one or more placeholders. When executing the statement an array should be provided with a value for each placeholder.
+
+Examples:
+
+Prepare an insert statement and execute it two times with different parameters:
+
+	statement := client prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'.
+	result := statement execute: #( 123 'Hello World' true ).
+	result := statement execute: #( 45 'Greetings' false ).
+
+It's also possible to execute the two inserts in a single network roundtrip:
+
+	statement := client prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'.
+	results := statement executeBatch: #( 
+		( 123 'Hello World' true )
+		( 45 'Greetings' false ) ).
+
+Select query:
+
+	statement := client prepare: 'SELECT name, enabled FROM table1 WHERE id = $1'.
+	result := statement query: #( 123 ).
+
+When I'm no longer needed I should be closed so that the PostgreSQL server side resources for this prepared statemed are freed.
+"
 Class {
 	#name : #P3PreparedStatement,
 	#superclass : #Object,

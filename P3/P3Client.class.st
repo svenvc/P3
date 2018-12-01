@@ -566,7 +566,7 @@ P3Client >> runExtendedQueryResult: descriptions [
 			out nextPut: (self processDataRowUsing: descriptions).
 			self readMessage ] ].
 	
-	^ P3SingleResult descriptions: descriptions
+	^ P3Result descriptions: descriptions
 			rows: rows 
 			message: (self converter asciiCStringFrom: message readStream)
 ]
