@@ -1,3 +1,10 @@
+"
+P3PreparedStatementTests holds unit tests for the P3PreparedStatement class.
+
+I reuse the configuration of P3ClientTests. Example:
+
+  P3ClientTests url: 'psql://sven:secret@localhost:5432/database'.
+"
 Class {
 	#name : #P3PreparedStatementTests,
 	#superclass : #TestCase,
