@@ -14,16 +14,16 @@ You could then try (general URL psql://username:password@localhost:5432/database
 		[ client isWorking  ] ensure: [ client close ] ].
 
 The glorp group loads P3DatabaseDriver and the whole of Glorp (warning: large download)
- 
+
 	Metacello new
 		baseline: 'P3';
 		repository: 'github://svenvc/P3';
 		load: 'glorp'.
 
-Manually install the driver 
+Manually install the driver
 
 	PharoDatabaseAccessor DefaultDriver: P3DatabaseDriver.
-	
+
 Use a login that looks as follows
 
 	Login new
@@ -46,15 +46,10 @@ BaselineOfP3 >> baselineOf: spec [
 	<baseline>
 	spec
 		for: #common
-		do: [ 
+		do: [
 			spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON:master/repository' ].
 			spec baseline: 'ZTimestamp' with: [ spec repository: 'github://svenvc/ztimestamp:master/repository' ].
-			spec
-				configuration: 'Glorp'
-				with: [ 
-					spec
-						versionString: #stable;
-						repository: 'http://www.smalltalkhub.com/mc/DBXTalk/Configurations/main' ].
+			spec baseline: 'Glorp' with: [ spec repository: 'github://pharo-rdbms/glorp:master/'].
 			spec package: 'P3' with: [ spec requires: #('NeoJSON' 'ZTimestamp') ].
 			spec package: 'P3-Glorp' with: [ spec requires: #('P3' 'Glorp') ].
 			spec group: 'default' with: #('P3').
