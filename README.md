@@ -4,9 +4,9 @@ P3 is a modern, lean and mean PostgreSQL client for Pharo.
 
 [![Build Status](https://travis-ci.org/svenvc/P3.svg?branch=master)](https://travis-ci.org/svenvc/P3)
 
-**P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later), 
-implementing the simple query cycle. It supports plaintext and md5 password authentication. 
-When SQL queries return row data, it efficiently converts incoming data to objects. 
+**P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later),
+implementing the simple query cycle. It supports plaintext and md5 password authentication.
+When SQL queries return row data, it efficiently converts incoming data to objects.
 P3Client supports most common PostgreSQL types.
 
 P3Client can be configured manually or through a URL.
@@ -23,13 +23,13 @@ P3Client new url: 'psql://user@localhost'.
 
 P3Client has a minimal public protocol, basically #query: (#execute: is an alias).
 
-Opening a connection to the server (#open) and running the authentication 
+Opening a connection to the server (#open) and running the authentication
 and startup protocols (#connect) are done automatically when needed from #query.
 
 P3Client also supports SSL connections. Use #connectSSL to initiate such a connection.
 
 
-## Usage 
+## Usage
 
 Here is the simplest test that does an actual query, it should return true.
 
@@ -81,7 +81,7 @@ Finally we can clean up.
 ```
 
 
-## References 
+## References
 
 -  https://postgresql.org
 -  https://en.wikipedia.org/wiki/PostgreSQL
@@ -124,7 +124,7 @@ Metacello new
 
 The glorp group loads P3DatabaseDriver and the whole of Glorp (warning: large download)
 
-```smalltalk 
+```smalltalk
 Metacello new
    baseline: 'P3';
    repository: 'github://svenvc/P3';
@@ -144,5 +144,5 @@ P3ClientTests url: 'psql://sven:secret@localhost:5432/database'.
 The minimal being the following:
 
 ```smalltalk
-P3ClientTests url: 'psql://sven@localhost'. 
+P3ClientTests url: 'psql://sven@localhost'.
 ```
