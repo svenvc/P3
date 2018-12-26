@@ -66,6 +66,7 @@ P3PreparedStatement >> bindStrings: inputValues [
 
 { #category : #public }
 P3PreparedStatement >> close [
+	"Close this query and release server side resources."
 
 	client isNil 
 		ifTrue: [ ^ self ].
@@ -83,6 +84,8 @@ P3PreparedStatement >> close [
 
 { #category : #public }
 P3PreparedStatement >> execute: inputRow [
+	"Execute this SQL query with inputRow as the ordered collection of parameters.
+	Assume no rows will be returned."
 
 	self bindStrings: inputRow.
 	self writeExecuteMessage: 0.
@@ -93,6 +96,8 @@ P3PreparedStatement >> execute: inputRow [
 
 { #category : #public }
 P3PreparedStatement >> executeBatch: inputRows [
+	"Execute this SQL query mutiple (inputRow size) times in a single network roundtrip.
+	Assume no rows will be returned."
 
 	inputRows do: [ :eachRow |
 		self bindStrings: eachRow.
@@ -128,6 +133,8 @@ P3PreparedStatement >> paramDescriptions [
 
 { #category : #public }
 P3PreparedStatement >> query: inputRow [
+	"Execute this SQL query with inputRow as the ordered collection of parameters.
+	Answer a P3Result object with the field descriptions and rows."
 
 	self bindStrings: inputRow.
 	self writeExecuteMessage: 0.
@@ -138,6 +145,8 @@ P3PreparedStatement >> query: inputRow [
 
 { #category : #public }
 P3PreparedStatement >> queryAll: inputRows [
+	"Execute this SQL query multiple times.
+	Answer a collection of P3Result objects with the field descriptions and rows."
 
 	inputRows do: [ :eachRow |
 		self bindStrings: eachRow.
