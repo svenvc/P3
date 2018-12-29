@@ -1,3 +1,8 @@
+"
+I am P3MessageBuilder.
+
+I am a helper class used to construct binary messages.
+"
 Class {
 	#name : #P3MessageBuilder,
 	#superclass : #Object,

@@ -1,3 +1,9 @@
+"
+I am P3ParameterDescription.
+
+I am used to support the extended query protocol.
+In particular, after the prepare/parse phase, my instances describe the type of each binding parameter.
+"
 Class {
 	#name : #P3ParameterDescription,
 	#superclass : #Object,
