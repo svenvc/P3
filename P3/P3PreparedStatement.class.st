@@ -99,6 +99,9 @@ P3PreparedStatement >> executeBatch: inputRows [
 	"Execute this SQL query mutiple (inputRow size) times in a single network roundtrip.
 	Assume no rows will be returned."
 
+	inputRows isEmpty
+		ifTrue: [ ^ #() ].
+
 	inputRows do: [ :eachRow |
 		self bindStrings: eachRow.
 		self writeExecuteMessage: 0 ].
@@ -147,6 +150,9 @@ P3PreparedStatement >> query: inputRow [
 P3PreparedStatement >> queryAll: inputRows [
 	"Execute this SQL query multiple times.
 	Answer a collection of P3Result objects with the field descriptions and rows."
+
+	inputRows isEmpty
+		ifTrue: [ ^ #() ].
 
 	inputRows do: [ :eachRow |
 		self bindStrings: eachRow.
