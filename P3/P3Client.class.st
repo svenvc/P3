@@ -362,6 +362,10 @@ P3Client >> port: integer [
 
 { #category : #public }
 P3Client >> prepare: query [
+	"Create and return an instance of P3PreparedStatement by parsing query, 
+	which can contain one or more placeholders, once. Later the prepared statement can be executed 
+	multiple times by providing an array with a value for each placeholder. 
+	When no longer needed, the prepared statement should be closed. See P3PreparedStatement."
 
 	| queryName paramDescriptions rowDescriptions |
 	
