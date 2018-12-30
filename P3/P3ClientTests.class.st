@@ -130,6 +130,26 @@ P3ClientTests >> tearDown [
 ]
 
 { #category : #testing }
+P3ClientTests >> testArrayTypes [
+	| result |
+	client execute: 'DROP TABLE IF EXISTS table_a'.
+	client execute: 'CREATE TABLE table_a (id INTEGER, name TEXT, text_a TEXT[], int_a INTEGER[])'.
+	client execute: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES (1, ''foo'', ARRAY[''foo'',''bar''], ARRAY[1,2])'.
+	client execute: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES (2, ''null'', ''{"NULL",NULL}'', ''{0,NULL}'')'.
+	client execute: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES (3, ''zero'', ''{}'', ''{}'')'.
+	client execute: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES (4, ''escape'', ARRAY[''a"b'',''c\d''], ''{1,2}'')'.
+	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 1'.
+	self assert: result firstRecord equals: #(1 'foo' #('foo' 'bar') #(1 2)).
+	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 2'.
+	self assert: result firstRecord equals: #(2 'null' #('NULL' nil) #(0 nil)).
+	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 3'.
+	self assert: result firstRecord equals: #(3 'zero' #() #()).
+	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 4'.
+	self assert: result firstRecord equals: #(4 'escape' #('a"b' 'c\d') #(1 2)).
+	client execute: 'DROP TABLE table_a'
+]
+
+{ #category : #testing }
 P3ClientTests >> testBooleanConversion [
 	| result |
 	result := client query: 'SELECT b::boolean FROM (VALUES (true), (false), (NULL)) t(b)'.

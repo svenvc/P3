@@ -50,7 +50,11 @@ P3Converter class >> typeMap [
 			3802 #(jsonb #convertJsonFrom:length:description:)
 			2278 #(void #convertVoidFrom:length:description:)
 			2950 #(uuid #convertUuidFrom:length:description:)
-			
+			1000 #(#'_bool' #convertBooleanArrayFrom:length:description:)
+			1007 #(#'_int4' #convertIntegerArrayFrom:length:description:)
+			1009 #(#'_text' #convertStringArrayFrom:length:description:)
+			1015 #(#'_varchar' #convertStringArrayFrom:length:description:)
+			1022 #(#'_float8' #convertFloatArrayFrom:length:description:)
 		)
 ]
 
@@ -88,6 +92,17 @@ P3Converter >> convert: bytes length: length description: description [
 	^ lambda isSymbol 
 		ifTrue: [ self perform: type second with: bytes with: length with: description ]
 		ifFalse: [ lambda value: bytes value: length value: description ]
+]
+
+{ #category : #converting }
+P3Converter >> convertBooleanArrayFrom: bytes length: length description: description [
+	| input |
+	input := ZnLimitedReadStream on: bytes limit: length.
+	input := ZnCharacterReadStream on: input encoding: self encoder. 
+	^ P3ArrayValueParser new 
+		on: input;
+		converter: [ :string | string first = $t ];
+		next
 ]
 
 { #category : #converting }
@@ -133,8 +148,30 @@ P3Converter >> convertDateFrom: bytes length: length description: description [
 ]
 
 { #category : #converting }
+P3Converter >> convertFloatArrayFrom: bytes length: length description: description [
+	| input |
+	input := ZnLimitedReadStream on: bytes limit: length.
+	input := ZnCharacterReadStream on: input encoding: self encoder. 
+	^ P3ArrayValueParser new 
+		on: input;
+		converter: [ :string | Float readFrom: string ];
+		next
+]
+
+{ #category : #converting }
 P3Converter >> convertFloatFrom: bytes length: length description: description [
 	^ Float readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #converting }
+P3Converter >> convertIntegerArrayFrom: bytes length: length description: description [
+	| input |
+	input := ZnLimitedReadStream on: bytes limit: length.
+	input := ZnCharacterReadStream on: input encoding: self encoder. 
+	^ P3ArrayValueParser new 
+		on: input;
+		converter: [ :string | Integer readFrom: string base: 10 ];
+		next
 ]
 
 { #category : #converting }
@@ -156,6 +193,16 @@ P3Converter >> convertJsonFrom: bytes length: length description: description [
 { #category : #converting }
 P3Converter >> convertScaledDecimalFrom: bytes length: length description: description [
 	^ ScaledDecimal readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #converting }
+P3Converter >> convertStringArrayFrom: bytes length: length description: description [
+	| input |
+	input := ZnLimitedReadStream on: bytes limit: length.
+	input := ZnCharacterReadStream on: input encoding: self encoder. 
+	^ P3ArrayValueParser new 
+		on: input;
+		next
 ]
 
 { #category : #converting }
