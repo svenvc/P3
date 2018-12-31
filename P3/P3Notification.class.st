@@ -1,5 +1,7 @@
 "
-I am P3Notification
+I am P3Notification.
+
+I get signalled when the PostgreSQL database backend server signals a notification, a kind of harmless warning.
 "
 Class {
 	#name : #P3Notification,
@@ -7,7 +9,7 @@ Class {
 	#instVars : [
 		'info'
 	],
-	#category : 'P3'
+	#category : #P3
 }
 
 { #category : #accessing }

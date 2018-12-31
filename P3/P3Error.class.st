@@ -1,5 +1,7 @@
 "
-I am P3Error
+I am P3Error.
+
+I get signalled when something goes wrong in using P3Client, either an error inside the driver itself, or an error signalled by the PostgreSQL database backend server.
 "
 Class {
 	#name : #P3Error,
@@ -7,7 +9,7 @@ Class {
 	#instVars : [
 		'info'
 	],
-	#category : 'P3'
+	#category : #P3
 }
 
 { #category : #accessing }

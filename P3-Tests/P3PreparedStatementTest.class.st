@@ -1,12 +1,12 @@
 "
-P3PreparedStatementTests holds unit tests for the P3PreparedStatement class.
+P3PreparedStatementTest holds unit tests for the P3PreparedStatement class.
 
 I reuse the configuration of P3ClientTests. Example:
 
   P3ClientTests url: 'psql://sven:secret@localhost:5432/database'.
 "
 Class {
-	#name : #P3PreparedStatementTests,
+	#name : #P3PreparedStatementTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'client'
@@ -14,26 +14,26 @@ Class {
 	#classVars : [
 		'Url'
 	],
-	#category : #P3
+	#category : #'P3-Tests'
 }
 
 { #category : #running }
-P3PreparedStatementTests >> setUp [
+P3PreparedStatementTest >> setUp [
 	super setUp.
 	client := P3Client new.
-	client url: P3ClientTests url.
+	client url: P3ClientTest url.
 	client timeout: 10. "second"
 	client connect
 ]
 
 { #category : #running }
-P3PreparedStatementTests >> tearDown [
+P3PreparedStatementTest >> tearDown [
 	client close.
 	super tearDown
 ]
 
 { #category : #tests }
-P3PreparedStatementTests >> testBatchInsertStatement [
+P3PreparedStatementTest >> testBatchInsertStatement [
 
 	| statement result |
 	
@@ -55,7 +55,7 @@ P3PreparedStatementTests >> testBatchInsertStatement [
 ]
 
 { #category : #tests }
-P3PreparedStatementTests >> testBulkInsertAndSelect [
+P3PreparedStatementTest >> testBulkInsertAndSelect [
 
 	| insertStatement result selectStatement |
 	
@@ -83,7 +83,7 @@ P3PreparedStatementTests >> testBulkInsertAndSelect [
 ]
 
 { #category : #tests }
-P3PreparedStatementTests >> testMultipleInsertStatements [
+P3PreparedStatementTest >> testMultipleInsertStatements [
 
 	| statement1 statement2 |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -105,7 +105,7 @@ P3PreparedStatementTests >> testMultipleInsertStatements [
 ]
 
 { #category : #tests }
-P3PreparedStatementTests >> testSelectStatement [
+P3PreparedStatementTest >> testSelectStatement [
 
 	| statement result |
 	
@@ -134,7 +134,7 @@ P3PreparedStatementTests >> testSelectStatement [
 ]
 
 { #category : #tests }
-P3PreparedStatementTests >> testSimpleInsertStatement [
+P3PreparedStatementTest >> testSimpleInsertStatement [
 
 	| statement result |
 	

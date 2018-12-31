@@ -1,14 +1,14 @@
 "
-P3ArrayValueParserTests holds unit tests for P3ArrayValueParser.
+P3ArrayValueParserTest holds unit tests for P3ArrayValueParser.
 "
 Class {
-	#name : #P3ArrayValueParserTests,
+	#name : #P3ArrayValueParserTest,
 	#superclass : #TestCase,
-	#category : #P3
+	#category : #'P3-Tests'
 }
 
 { #category : #tests }
-P3ArrayValueParserTests >> testIntegers [
+P3ArrayValueParserTest >> testIntegers [
 	self 
 		assert: (P3ArrayValueParser new 
 			on: '{{1,2},{3,4},{0,-1}}' readStream;
@@ -18,7 +18,7 @@ P3ArrayValueParserTests >> testIntegers [
 ]
 
 { #category : #tests }
-P3ArrayValueParserTests >> testPlain [
+P3ArrayValueParserTest >> testPlain [
 	self 
 		assert: (P3ArrayValueParser new 
 			on: '{{one,two},{three,four},{NULL,""}' readStream;
@@ -27,7 +27,7 @@ P3ArrayValueParserTests >> testPlain [
 ]
 
 { #category : #tests }
-P3ArrayValueParserTests >> testSpecial [
+P3ArrayValueParserTest >> testSpecial [
 	self 
 		assert: (P3ArrayValueParser new 
 			on: '{{one,two},{"\"","\\"},{NULL,""},{"NULL",1}' readStream;

@@ -1,5 +1,5 @@
 "
-P3ClientTests holds unit tests for the P3 PSQL client.
+P3ClientTest holds unit tests for the P3 PSQL client.
 
 Configure by setting my class side's connection URL.
 
@@ -17,7 +17,7 @@ Benchmarks
   P3ClientTests new runAllTests.
 "
 Class {
-	#name : #P3ClientTests,
+	#name : #P3ClientTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'client'
@@ -25,11 +25,11 @@ Class {
 	#classVars : [
 		'Url'
 	],
-	#category : #P3
+	#category : #'P3-Tests'
 }
 
 { #category : #accessing }
-P3ClientTests class >> url [
+P3ClientTest class >> url [
 	"Return the default connection URL to use for P3 clients in the unit tests.
 	Note that the default here corresponds to the default on Travis CI's postgresql service,
 	user postgres with a blank password on localhost.
@@ -39,7 +39,7 @@ P3ClientTests class >> url [
 ]
 
 { #category : #accessing }
-P3ClientTests class >> url: stringOrUrl [
+P3ClientTest class >> url: stringOrUrl [
 	"Set the connection URL to be used for P3 Clients in the unit tests.
 	The general syntax is psql://sven:secret@localhost:5432/database
 	The minimal form is psql://user@localhost (a user, blank password, localhost)"
@@ -48,12 +48,12 @@ P3ClientTests class >> url: stringOrUrl [
 ]
 
 { #category : #benchmarking }
-P3ClientTests >> benchmark1Size [
+P3ClientTest >> benchmark1Size [
 	^ 10000
 ]
 
 { #category : #benchmarking }
-P3ClientTests >> runAllTests [
+P3ClientTest >> runAllTests [
 	"Runs all tests on the same connection/session"
 	
 	| testSelectors timeToRun |
@@ -65,7 +65,7 @@ P3ClientTests >> runAllTests [
 ]
 
 { #category : #benchmarking }
-P3ClientTests >> runBenchmark1 [
+P3ClientTest >> runBenchmark1 [
 	| result timeToRun |
 	result := nil.
 	self setUp.
@@ -76,7 +76,7 @@ P3ClientTests >> runBenchmark1 [
 ]
 
 { #category : #benchmarking }
-P3ClientTests >> runBenchmark1Bench [
+P3ClientTest >> runBenchmark1Bench [
 	| result timeToRun |
 	result := nil.
 	self setUp.
@@ -87,7 +87,7 @@ P3ClientTests >> runBenchmark1Bench [
 ]
 
 { #category : #running }
-P3ClientTests >> setUp [
+P3ClientTest >> setUp [
 	super setUp.
 	client := P3Client new.
 	client url: self class url.
@@ -95,7 +95,7 @@ P3ClientTests >> setUp [
 ]
 
 { #category : #benchmarking }
-P3ClientTests >> setupBenchmark1 [
+P3ClientTest >> setupBenchmark1 [
 	| timeToRun |
 	self setUp. 
 	timeToRun := [
@@ -111,7 +111,7 @@ P3ClientTests >> setupBenchmark1 [
 ]
 
 { #category : #versionInfo }
-P3ClientTests >> supportsJsonB [
+P3ClientTest >> supportsJsonB [
 
 	| record version |
 	
@@ -124,13 +124,13 @@ P3ClientTests >> supportsJsonB [
 ]
 
 { #category : #running }
-P3ClientTests >> tearDown [
+P3ClientTest >> tearDown [
 	client close.
 	super tearDown
 ]
 
 { #category : #testing }
-P3ClientTests >> testArrayTypes [
+P3ClientTest >> testArrayTypes [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table_a'.
 	client execute: 'CREATE TABLE table_a (id INTEGER, name TEXT, text_a TEXT[], int_a INTEGER[])'.
@@ -150,14 +150,14 @@ P3ClientTests >> testArrayTypes [
 ]
 
 { #category : #testing }
-P3ClientTests >> testBooleanConversion [
+P3ClientTest >> testBooleanConversion [
 	| result |
 	result := client query: 'SELECT b::boolean FROM (VALUES (true), (false), (NULL)) t(b)'.
 	self assert: result data equals: #((true) (false) (nil))
 ]
 
 { #category : #testing }
-P3ClientTests >> testChronology [
+P3ClientTest >> testChronology [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, date_created DATE DEFAULT CURRENT_DATE, time_created TIME DEFAULT CURRENT_TIME)'.
@@ -180,13 +180,13 @@ P3ClientTests >> testChronology [
 ]
 
 { #category : #testing }
-P3ClientTests >> testConnection [
+P3ClientTest >> testConnection [
 	self assert: client isConnected.
 	self assert: client isWorking.
 ]
 
 { #category : #testing }
-P3ClientTests >> testEmptyString [
+P3ClientTest >> testEmptyString [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id INTEGER, string VARCHAR)'.
@@ -200,7 +200,7 @@ P3ClientTests >> testEmptyString [
 ]
 
 { #category : #testing }
-P3ClientTests >> testEnum [
+P3ClientTest >> testEnum [
 
 	| result ooid |
 
@@ -227,19 +227,19 @@ P3ClientTests >> testEnum [
 ]
 
 { #category : #testing }
-P3ClientTests >> testError [
+P3ClientTest >> testError [
 	self should: [ client query: 'SELECT * FROM abcdef' ] raise: P3Error
 ]
 
 { #category : #testing }
-P3ClientTests >> testIntegerConversion [
+P3ClientTest >> testIntegerConversion [
 	| result |
 	result := client query: 'SELECT i::integer FROM (VALUES (-1), (1), (NULL), (1234567890)) t(i)'.
 	self assert: result data equals: #((-1) (1) (nil) (1234567890))
 ]
 
 { #category : #testing }
-P3ClientTests >> testJsonConversion [
+P3ClientTest >> testJsonConversion [
 	| data result |
 	
 	self supportsJsonB ifFalse: [ ^ self skip ].
@@ -256,7 +256,7 @@ P3ClientTests >> testJsonConversion [
 ]
 
 { #category : #testing }
-P3ClientTests >> testMultiStatement [
+P3ClientTest >> testMultiStatement [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
@@ -272,7 +272,7 @@ P3ClientTests >> testMultiStatement [
 ]
 
 { #category : #testing }
-P3ClientTests >> testNonAsciiStrings [
+P3ClientTest >> testNonAsciiStrings [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id INTEGER, string VARCHAR)'.
@@ -286,7 +286,7 @@ P3ClientTests >> testNonAsciiStrings [
 ]
 
 { #category : #testing }
-P3ClientTests >> testNotification [
+P3ClientTest >> testNotification [
 	| raised |
 	raised := false.
 	[ client query: 'SET client_min_messages TO notice; DROP TABLE IF EXISTS abcdef' ] 
@@ -301,7 +301,7 @@ P3ClientTests >> testNotification [
 ]
 
 { #category : #testing }
-P3ClientTests >> testQueryCatalog [
+P3ClientTest >> testQueryCatalog [
 	| result |
 	result := client query: 'SELECT schemaname,tablename FROM pg_catalog.pg_tables'.
 	"there are two columns"
@@ -315,7 +315,7 @@ P3ClientTests >> testQueryCatalog [
 ]
 
 { #category : #testing }
-P3ClientTests >> testSession [
+P3ClientTest >> testSession [
 
 	| session |
 	
@@ -351,7 +351,7 @@ P3ClientTests >> testSession [
 ]
 
 { #category : #testing }
-P3ClientTests >> testSimpleTable [
+P3ClientTest >> testSimpleTable [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
@@ -372,7 +372,7 @@ P3ClientTests >> testSimpleTable [
 ]
 
 { #category : #testing }
-P3ClientTests >> testSqlFunction [
+P3ClientTest >> testSqlFunction [
 	| x y result |
 	client execute: 'DROP FUNCTION IF EXISTS my_add(x INTEGER, y INTEGER)'.
 	client execute: 'CREATE FUNCTION my_add(x INTEGER, y INTEGER) RETURNS INTEGER AS $$ SELECT x + y $$ LANGUAGE SQL'.
@@ -384,7 +384,7 @@ P3ClientTests >> testSqlFunction [
 ]
 
 { #category : #testing }
-P3ClientTests >> testStringEscaping [
+P3ClientTest >> testStringEscaping [
 	| result string |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id INTEGER, string VARCHAR)'.
@@ -397,7 +397,7 @@ P3ClientTests >> testStringEscaping [
 ]
 
 { #category : #testing }
-P3ClientTests >> testTimeout [
+P3ClientTest >> testTimeout [
 	"Reconnect with an explicit timeout"
 	client close.
 	client url: Url.
@@ -410,7 +410,7 @@ P3ClientTests >> testTimeout [
 ]
 
 { #category : #testing }
-P3ClientTests >> testTimezone [
+P3ClientTest >> testTimezone [
 	| result originalTimezone |
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, t1 TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP, t2 TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP)'.
@@ -441,7 +441,7 @@ P3ClientTests >> testTimezone [
 ]
 
 { #category : #testing }
-P3ClientTests >> testUuid [
+P3ClientTest >> testUuid [
 
 	| result uuid num |
 	
