@@ -55,6 +55,28 @@ P3PreparedStatementTest >> testBatchInsertStatement [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testBinaryColumn [
+
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, bytes BYTEA)'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, bytes) VALUES ($1,$2)'.
+	statement execute: #( 123 #[ 100 102 104 106 108 ] ).
+	statement execute: #( 345 #[ 100 102 104 106 108 100 102 104 106 108 ]  ).
+	statement close.
+	
+	statement := client prepare: 'SELECT bytes from table1 WHERE id = $1'.
+	result := statement queryAll: #( ( 123 ) ( 345 ) ).
+	statement close.
+
+	self assert: #( #[ 100 102 104 106 108 ] ) equals: (result at: 1) firstRecord.
+	self assert: #( #[ 100 102 104 106 108 100 102 104 106 108 ] ) equals: (result at: 2) firstRecord.
+	
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testBulkInsertAndSelect [
 
 	| insertStatement result selectStatement |
