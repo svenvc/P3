@@ -63,7 +63,7 @@ P3PreparedStatementTest >> testBinaryColumn [
 	client execute: 'CREATE TABLE table1 (id INTEGER, bytes BYTEA)'.
 	
 	statement := client prepare: 'INSERT INTO table1 (id, bytes) VALUES ($1,$2)'.
-	statement execute: #( 123 #[ 100 102 104 106 108 ] ).
+	statement execute: #( 123 #[ 100 102 104 200 255 0 1 2 ] ).
 	statement execute: #( 345 #[ 100 102 104 106 108 100 102 104 106 108 ]  ).
 	statement close.
 	
@@ -71,7 +71,7 @@ P3PreparedStatementTest >> testBinaryColumn [
 	result := statement queryAll: #( ( 123 ) ( 345 ) ).
 	statement close.
 
-	self assert: #( #[ 100 102 104 106 108 ] ) equals: (result at: 1) firstRecord.
+	self assert: #( #[ 100 102 104 200 255 0 1 2 ] ) equals: (result at: 1) firstRecord.
 	self assert: #( #[ 100 102 104 106 108 100 102 104 106 108 ] ) equals: (result at: 2) firstRecord.
 	
 ]

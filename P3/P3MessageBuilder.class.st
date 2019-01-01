@@ -49,6 +49,13 @@ P3MessageBuilder >> nextPutInt32: anInteger [
 ]
 
 { #category : #writing }
+P3MessageBuilder >> nextPutNullParameter [
+	"Write a NULL Parameter"
+
+	self nextPutInt32: -1
+]
+
+{ #category : #writing }
 P3MessageBuilder >> nextPutString: aString [
 
 	aString do: [ :each | encoder nextPut: each toStream: byteStream ].
@@ -56,17 +63,13 @@ P3MessageBuilder >> nextPutString: aString [
 ]
 
 { #category : #writing }
-P3MessageBuilder >> nextPutStringParameter: aValueOrNil [
-	"Write a Parameter in the text format."
+P3MessageBuilder >> nextPutStringParameter: aString [
 
-	aValueOrNil isNil
-		ifTrue: [ 
-			self nextPutInt32: -1 ]
-		ifFalse: [ 
-			| bytes |
-			bytes := encoder encodeString: aValueOrNil asString.
-			self nextPutInt32: bytes size.
-			byteStream nextPutAll: bytes ]
+	| bytes |
+	
+	bytes := encoder encodeString: aString.
+	self nextPutInt32: bytes size.
+	byteStream nextPutAll: bytes
 ]
 
 { #category : #writing }

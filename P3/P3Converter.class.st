@@ -12,12 +12,24 @@ Class {
 		'encoder',
 		'timezone',
 		'map',
+		'parameterMap',
 		'stringWriteStream',
 		'asciiReadStream',
 		'asciiWriteStream'
 	],
-	#category : 'P3'
+	#category : #P3
 }
+
+{ #category : #accessing }
+P3Converter class >> parameterConverterMap [
+	"Answer a map with methods that convert a parameter value to its correct
+	text representation. For types without a specific converter method the
+	asString method will be used."
+
+	^ IdentityDictionary newFromPairs: #(
+			17 #convertByteArrayParameter:description:
+		)
+]
 
 { #category : #accessing }
 P3Converter class >> supportedTypes [
@@ -125,6 +137,17 @@ P3Converter >> convertByteArrayFrom: bytes length: length description: descripti
 	^ byteArray 
 ]
 
+{ #category : #'converting-parameters' }
+P3Converter >> convertByteArrayParameter: aByteArray description: paramDescription [
+	"Binary data is encoded as text using hexadecimal digits, e.g. \x1a43fe"
+
+	^ String streamContents: [ :s |
+		s 
+			nextPut: $\; 
+			nextPut: $x;
+			nextPutAll: aByteArray hex ]
+]
+
 { #category : #converting }
 P3Converter >> convertDateAndTimeFrom: bytes length: length description: description [
 	"TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ) is stored internally in Postgres as UTC, but represented in the timezone of the connection, with a correct offset added. In other words, Postgres does the necessary shifting, we just have to read the result"
@@ -188,6 +211,22 @@ P3Converter >> convertJsonFrom: bytes length: length description: description [
 			mapClass: NeoJSONObject;
 			propertyNamesAsSymbols: true;
 			next
+]
+
+{ #category : #'converting-parameters' }
+P3Converter >> convertParameter: aValue description: paramDescription [
+	"Convert the paramemer value to its text representation. This converter can
+	have a type specific converter in its parameterMap. If no specific converter
+	is present use asString."
+
+	| lambda |
+	
+	lambda := parameterMap at: paramDescription typeOid
+		ifAbsent: [ ^ aValue asString ].
+
+	^ lambda isSymbol 
+		ifTrue: [ self perform: lambda with: aValue with: paramDescription ]
+		ifFalse: [ lambda value: aValue value: paramDescription ]
 ]
 
 { #category : #converting }
@@ -273,7 +312,8 @@ P3Converter >> initializeFrom: properties [
 
 { #category : #initalize }
 P3Converter >> initializeTypeMap [
-	map := self class typeMap
+	map := self class typeMap.
+	parameterMap := self class parameterConverterMap
 ]
 
 { #category : #accessing }
