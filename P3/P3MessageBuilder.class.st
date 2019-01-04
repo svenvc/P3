@@ -52,7 +52,7 @@ P3MessageBuilder >> nextPutInt32: anInteger [
 P3MessageBuilder >> nextPutNullParameter [
 	"Write a NULL Parameter"
 
-	self nextPutInt32: -1
+	byteStream nextPutAll: #[255 255 255 255]
 ]
 
 { #category : #writing }

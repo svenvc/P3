@@ -120,6 +120,11 @@ P3PreparedStatement >> executeBatch: inputRows [
 ]
 
 { #category : #accessing }
+P3PreparedStatement >> fieldCount [
+	^ fieldDescriptions size
+]
+
+{ #category : #accessing }
 P3PreparedStatement >> fieldDescriptions [
 	^ fieldDescriptions
 ]
@@ -136,6 +141,11 @@ P3PreparedStatement >> initializeWith: aClient name: aString parameters: aParamD
 { #category : #accessing }
 P3PreparedStatement >> name [
 	^ name
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> paramCount [
+	^ paramDescriptions size
 ]
 
 { #category : #accessing }

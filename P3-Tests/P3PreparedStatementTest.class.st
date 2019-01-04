@@ -105,6 +105,27 @@ P3PreparedStatementTest >> testBulkInsertAndSelect [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testInsertNull [
+
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT)'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, name) VALUES ($1,$2)'.
+	result := statement executeBatch: #(
+		( 123 'Hello World' )
+		( 345 nil )
+	).
+	
+	self assert: result size equals: 2.
+	result do: [ :each |
+		self assert: each equals: 'INSERT 0 1' ].
+	
+	statement close.
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testMultipleInsertStatements [
 
 	| statement1 statement2 |
