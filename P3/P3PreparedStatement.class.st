@@ -47,6 +47,7 @@ P3PreparedStatement class >> newWith: aClient name: aString parameters: paramDes
 P3PreparedStatement >> bindStrings: inputValues [
 
 	| msgBuilder |
+
 	msgBuilder := client newMessageBuilder.
 	msgBuilder
 		nextPutString: '';
@@ -56,11 +57,8 @@ P3PreparedStatement >> bindStrings: inputValues [
 		
 	inputValues with: paramDescriptions do: [ :eachValue :paramDescription |
 		eachValue isNil
-			ifTrue: [ 
-				msgBuilder nextPutNullParameter ]
-			ifFalse: [ 
-				msgBuilder nextPutStringParameter: (
-					self converter convertParameter: eachValue description: paramDescription) ] ].
+			ifTrue: [ msgBuilder nextPutNullParameter ]
+			ifFalse: [ msgBuilder nextPutParameterAsText: eachValue description: paramDescription ] ].
 
 	msgBuilder 
 		nextPutInt16: 0.	"All result columns use the text format"		

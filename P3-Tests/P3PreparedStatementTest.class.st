@@ -148,6 +148,33 @@ P3PreparedStatementTest >> testMultipleInsertStatements [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testScaledDecimal [
+
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, nr NUMERIC(10,2))'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, nr) VALUES ($1,$2)'.
+	statement execute: #( 10 100 ).
+	statement execute: #( 20 100.12 ).
+	statement execute: #( 30 100.12s2 ).
+	statement execute: #( 40 100.123s2 ).
+	statement execute: #( 50 100.129s2 ).
+	statement close.
+	
+	statement := client prepare: 'SELECT nr FROM table1 ORDER BY id'.
+	result := statement query: #( ).
+	statement close.
+	
+	self assert: (result data collect: [ :row | row first asScaledDecimal ]) asArray
+		equals: #( 100 100.12s2 100.12s2 100.12s2 100.13s2 ).
+	
+
+
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testSelectStatement [
 
 	| statement result |

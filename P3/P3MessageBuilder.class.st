@@ -56,20 +56,26 @@ P3MessageBuilder >> nextPutNullParameter [
 ]
 
 { #category : #writing }
+P3MessageBuilder >> nextPutParameterAsText: aValue description: paramDescription [
+
+	| sizePosition endPosition |
+	
+	sizePosition := byteStream position.
+	byteStream nextPutAll: #[ 0 0 0 0 ]. "placeholder"
+	aValue printAsP3TextOn: (ZnCharacterWriteStream on: byteStream encoding: encoder).
+	endPosition := byteStream position.
+
+	"Go back and set the correct size"
+	byteStream position: sizePosition.
+	byteStream uint32: (endPosition - sizePosition - 4).
+	byteStream position: endPosition
+]
+
+{ #category : #writing }
 P3MessageBuilder >> nextPutString: aString [
 
 	aString do: [ :each | encoder nextPut: each toStream: byteStream ].
 	byteStream nextPut: 0
-]
-
-{ #category : #writing }
-P3MessageBuilder >> nextPutStringParameter: aString [
-
-	| bytes |
-	
-	bytes := encoder encodeString: aString.
-	self nextPutInt32: bytes size.
-	byteStream nextPutAll: bytes
 ]
 
 { #category : #writing }
