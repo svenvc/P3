@@ -299,6 +299,29 @@ P3Client >> isWorking [
 	^ result result = 'SELECT 1' and: [ result firstFieldOfFirstRecord = n ]
 ]
 
+{ #category : #convenience }
+P3Client >> listDatabases [
+	"Return the list of known database names"
+	
+	^ (self query: 'SELECT datname FROM pg_database ORDER BY 1') data collect: #first
+]
+
+{ #category : #convenience }
+P3Client >> listSchemas [
+	"Return the list of known schema or namespace names"
+	
+	^ (self query: 'SELECT nspname FROM pg_namespace ORDER BY 1') data collect: #first
+]
+
+{ #category : #convenience }
+P3Client >> listTablesInSchema: schemaName [
+	"Return the list of known table names in a given schema"
+	
+	| query |
+	query := 'SELECT tablename FROM pg_tables WHERE schemaname=''{1}'' ORDER BY 1' format: { schemaName }.
+	^ (self query: query) data collect: #first
+]
+
 { #category : #'private messages' }
 P3Client >> md5PasswordMessage: salt [
 	"concat('md5', md5(concat(md5(concat(password, username)), random-salt))).

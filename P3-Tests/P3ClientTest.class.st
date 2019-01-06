@@ -208,6 +208,13 @@ P3ClientTest >> testConnection [
 ]
 
 { #category : #testing }
+P3ClientTest >> testConvenienceMetaAccess [
+	self deny: client listDatabases isEmpty.
+	self assert: (client listSchemas includes: 'public').
+	self assert: (client listTablesInSchema: 'public') isCollection.
+]
+
+{ #category : #testing }
 P3ClientTest >> testEmptyString [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
