@@ -13,6 +13,16 @@ Class {
 	#category : #P3
 }
 
+{ #category : #converting }
+P3ParameterDescription >> convertToString: paramValue using: converter [
+	"Convert the paramValue to a String representation that Postgres understands."
+	
+	typeOid = 17
+		ifTrue: [ ^ 'X''', paramValue hex, '''' ].
+		
+	^ paramValue asString
+]
+
 { #category : #printing }
 P3ParameterDescription >> printOn: stream [
 	super printOn: stream.

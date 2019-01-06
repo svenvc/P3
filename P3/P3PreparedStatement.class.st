@@ -47,6 +47,7 @@ P3PreparedStatement class >> newWith: aClient name: aString parameters: paramDes
 P3PreparedStatement >> bindStrings: inputValues [
 
 	| msgBuilder |
+
 	msgBuilder := client newMessageBuilder.
 	msgBuilder
 		nextPutString: '';
@@ -54,14 +55,15 @@ P3PreparedStatement >> bindStrings: inputValues [
 		nextPutInt16: 0;
 		nextPutInt16: inputValues size.
 		
-	inputValues do: [ :eachValue |
-		msgBuilder nextPutStringParameter: eachValue ].
+	inputValues with: paramDescriptions do: [ :eachValue :paramDescription |
+		eachValue isNil
+			ifTrue: [ msgBuilder nextPutNullParameter ]
+			ifFalse: [ msgBuilder nextPutParameterAsText: eachValue description: paramDescription ] ].
 
 	msgBuilder 
 		nextPutInt16: 0.	"All result columns use the text format"		
 		
-	client writeMessageNoFlush: msgBuilder asBytes tag: $B 
-
+	client writeMessageNoFlush: msgBuilder asBytes tag: $B
 ]
 
 { #category : #public }
@@ -80,6 +82,11 @@ P3PreparedStatement >> close [
 	
 	"This prepared statement can no longer be used."
 	client := nil
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> converter [ 
+	^ client converter
 ]
 
 { #category : #public }
@@ -111,6 +118,11 @@ P3PreparedStatement >> executeBatch: inputRows [
 ]
 
 { #category : #accessing }
+P3PreparedStatement >> fieldCount [
+	^ fieldDescriptions size
+]
+
+{ #category : #accessing }
 P3PreparedStatement >> fieldDescriptions [
 	^ fieldDescriptions
 ]
@@ -127,6 +139,11 @@ P3PreparedStatement >> initializeWith: aClient name: aString parameters: aParamD
 { #category : #accessing }
 P3PreparedStatement >> name [
 	^ name
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> paramCount [
+	^ paramDescriptions size
 ]
 
 { #category : #accessing }

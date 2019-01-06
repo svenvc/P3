@@ -55,6 +55,28 @@ P3PreparedStatementTest >> testBatchInsertStatement [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testBinaryColumn [
+
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, bytes BYTEA)'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, bytes) VALUES ($1,$2)'.
+	statement execute: #( 123 #[ 100 102 104 200 255 0 1 2 ] ).
+	statement execute: #( 345 #[ 100 102 104 106 108 100 102 104 106 108 ]  ).
+	statement close.
+	
+	statement := client prepare: 'SELECT bytes from table1 WHERE id = $1'.
+	result := statement queryAll: #( ( 123 ) ( 345 ) ).
+	statement close.
+
+	self assert: #( #[ 100 102 104 200 255 0 1 2 ] ) equals: (result at: 1) firstRecord.
+	self assert: #( #[ 100 102 104 106 108 100 102 104 106 108 ] ) equals: (result at: 2) firstRecord.
+	
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testBulkInsertAndSelect [
 
 	| insertStatement result selectStatement |
@@ -83,6 +105,27 @@ P3PreparedStatementTest >> testBulkInsertAndSelect [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testInsertNull [
+
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT)'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, name) VALUES ($1,$2)'.
+	result := statement executeBatch: #(
+		( 123 'Hello World' )
+		( 345 nil )
+	).
+	
+	self assert: result size equals: 2.
+	result do: [ :each |
+		self assert: each equals: 'INSERT 0 1' ].
+	
+	statement close.
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testMultipleInsertStatements [
 
 	| statement1 statement2 |
@@ -101,6 +144,33 @@ P3PreparedStatementTest >> testMultipleInsertStatements [
 	statement1 close.
 	statement2 close.
 	
+
+]
+
+{ #category : #tests }
+P3PreparedStatementTest >> testScaledDecimal [
+
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, nr NUMERIC(10,2))'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, nr) VALUES ($1,$2)'.
+	statement execute: #( 10 100 ).
+	statement execute: #( 20 100.12 ).
+	statement execute: #( 30 100.12s2 ).
+	statement execute: #( 40 100.123s2 ).
+	statement execute: #( 50 100.129s2 ).
+	statement close.
+	
+	statement := client prepare: 'SELECT nr FROM table1 ORDER BY id'.
+	result := statement query: #( ).
+	statement close.
+	
+	self assert: (result data collect: [ :row | row first asScaledDecimal ]) asArray
+		equals: #( 100 100.12s2 100.12s2 100.12s2 100.13s2 ).
+	
+
 
 ]
 

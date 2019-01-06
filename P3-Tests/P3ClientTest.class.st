@@ -157,6 +157,28 @@ P3ClientTest >> testBooleanConversion [
 ]
 
 { #category : #testing }
+P3ClientTest >> testByteArrayConversion [
+
+	| result bytes |
+	
+	client execute: 'DROP TABLE IF EXISTS testBytea'.
+	client execute: 'CREATE TABLE testBytea (id int, bytes bytea)'.
+	
+	bytes := #[ 0 1 2 3 4 254 255 ].	
+	client execute: ('INSERT INTO testBytea (id, bytes) VALUES (100, ''{1}'')' format: { '\x', bytes hex }).
+
+	"Read the bytes back as a hex string"
+	result := client query: 'SELECT encode(bytes, ''hex'') FROM testBytea WHERE id = 100'.
+	self assert: result firstRecord first asLowercase equals: bytes hex asLowercase.
+
+	"Read the bytes back as binary data"	
+	result := client query: 'SELECT bytes FROM testBytea WHERE id = 100'.
+	self assert: result firstRecord first equals: bytes.
+
+	client execute: 'DROP TABLE testBytea'
+]
+
+{ #category : #testing }
 P3ClientTest >> testChronology [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
