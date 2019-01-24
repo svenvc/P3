@@ -240,6 +240,19 @@ P3Client >> execute: query [
 	^ result results
 ]
 
+{ #category : #public }
+P3Client >> format: anSQLTemplateString [
+	"Create and return a P3FormattedStatement based on anSQLTemplateString and bound to me.
+	The template contains numbered placeholders, $1, $2, etc, that are filled with concrete
+	arguments when the statement is executed. 
+	This should be safer and more correct than building a query manually."
+	
+	^ P3FormattedStatement new
+		client: self;
+		sql: anSQLTemplateString;
+		yourself
+]
+
 { #category : #accessing }
 P3Client >> host [
 	"Return the host name I (want to) connect to.

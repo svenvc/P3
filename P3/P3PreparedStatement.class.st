@@ -24,6 +24,11 @@ Select query:
 	result := statement query: #( 123 ).
 
 When I'm no longer needed I should be closed so that the PostgreSQL server side resources for this prepared statemed are freed.
+
+See also https://en.wikipedia.org/wiki/Prepared_statement
+
+A prepared statement can be more efficient, especially if it is used multiple times. Prepared statements are also resilient against SQL injection attacks. On the server, prepared statements are bound to the current session.
+
 "
 Class {
 	#name : #P3PreparedStatement,
@@ -149,6 +154,12 @@ P3PreparedStatement >> paramCount [
 { #category : #accessing }
 P3PreparedStatement >> paramDescriptions [
 	^ paramDescriptions
+]
+
+{ #category : #printing }
+P3PreparedStatement >> printOn: stream [
+	super printOn: stream.
+	stream nextPut: $(; << name; nextPut: $)
 ]
 
 { #category : #public }
