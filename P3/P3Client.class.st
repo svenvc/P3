@@ -303,14 +303,14 @@ P3Client >> isWorking [
 P3Client >> listDatabases [
 	"Return the list of known database names"
 	
-	^ (self query: 'SELECT datname FROM pg_database ORDER BY 1') data collect: #first
+	^ (self query: 'SELECT datname FROM pg_database ORDER BY 1') firstColumnData
 ]
 
 { #category : #convenience }
 P3Client >> listSchemas [
 	"Return the list of known schema or namespace names"
 	
-	^ (self query: 'SELECT nspname FROM pg_namespace ORDER BY 1') data collect: #first
+	^ (self query: 'SELECT nspname FROM pg_namespace ORDER BY 1') firstColumnData
 ]
 
 { #category : #convenience }
@@ -318,8 +318,9 @@ P3Client >> listTablesInSchema: schemaName [
 	"Return the list of known table names in a given schema"
 	
 	| query |
-	query := 'SELECT tablename FROM pg_tables WHERE schemaname=''{1}'' ORDER BY 1' format: { schemaName }.
-	^ (self query: query) data collect: #first
+	query := 'SELECT tablename FROM pg_tables WHERE schemaname=''{1}'' ORDER BY 1' 
+		format: { schemaName }.
+	^ (self query: query) firstColumnData
 ]
 
 { #category : #'private messages' }

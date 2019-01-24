@@ -3,18 +3,18 @@ P3ClientTest holds unit tests for the P3 PSQL client.
 
 Configure by setting my class side's connection URL.
 
-  P3ClientTests url: 'psql://sven:secret@localhost:5432/database'.
+  P3ClientTest url: 'psql://sven:secret@localhost:5432/database'.
 
 The minimal being the following:
 
-  P3ClientTests url: 'psql://sven@localhost'.
+  P3ClientTest url: 'psql://sven@localhost'.
 
 Benchmarks
 
-  P3ClientTests new setupBenchmark1.
-  P3ClientTests new runBenchmark1.
-  P3ClientTests new runBenchmark1Bench.
-  P3ClientTests new runAllTests.
+  P3ClientTest new setupBenchmark1.
+  P3ClientTest new runBenchmark1.
+  P3ClientTest new runBenchmark1Bench.
+  P3ClientTest new runAllTests.
 "
 Class {
 	#name : #P3ClientTest,

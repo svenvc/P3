@@ -32,7 +32,7 @@ P3Result class >> descriptions: descriptions rows: aRowArray message: aString [
 			yourself
 ]
 
-{ #category : #accessing }
+{ #category : #'private-accessing' }
 P3Result >> addResult: subResult [
 	results := results
 		ifNil: [ subResult ]
@@ -43,51 +43,78 @@ P3Result >> addResult: subResult [
 
 { #category : #convenience }
 P3Result >> columnNames [
+	"Return the names of the columns of the data that I hold"
+	
 	^ descriptions collect: #fieldName
 ]
 
 { #category : #convenience }
 P3Result >> columns [
+	"Return the P3RowFieldDescriptions of the columns of the data that I hold"
+
 	^ descriptions
 ]
 
 { #category : #accessing }
 P3Result >> data [
+	"Return the data that I represent, 
+	an Array containing equal sized Arrays for each record in the result"
+	
 	^ data
 ]
 
-{ #category : #accessing }
+{ #category : #'private-accessing' }
 P3Result >> data: collection [
 	data := collection
 ]
 
 { #category : #accessing }
 P3Result >> descriptions [
+	"Return the P3RowFieldDescriptions of the result that I represent.
+	There will be one such description for each column."
+	
 	^ descriptions
 ]
 
-{ #category : #accessing }
+{ #category : #'private-accessing' }
 P3Result >> descriptions: collectionOfRowFieldDescriptions [
 	descriptions := collectionOfRowFieldDescriptions
 ]
 
 { #category : #convenience }
+P3Result >> firstColumnData [
+	"Return a flat collection of the data in the first column that I hold"
+	
+	^ data collect: #first
+]
+
+{ #category : #convenience }
 P3Result >> firstFieldOfFirstRecord [
+	"Return the value of the first field of the first record that I hold"
+	
 	^ self firstRecord first
 ]
 
 { #category : #accessing }
 P3Result >> firstRecord [
+	"Return the first record of the result, which will be an Array"
+	
 	^ self records first
 ]
 
 { #category : #accessing }
 P3Result >> firstResult [
+	"Return the SQL query execution result, or the first one if there are multiple results.
+	Among other things, the result indicates how many rows were returned or modified."
+	
 	^ results isString ifTrue: [ results ] ifFalse: [ results first ]
 ]
 
 { #category : #accessing }
 P3Result >> firstRowCount [
+	"Return the row count for the first result that I hold.
+	This is the integer count of the the number of records returned or modified"
+	
 	^ self rowCountFromCommandResultTag: self firstResult
 ]
 
@@ -108,11 +135,17 @@ P3Result >> hasResults [
 
 { #category : #accessing }
 P3Result >> numberOfColumns [
+	"Return the number of columns that I hold.
+	Each record in my data will be of this size."
+	
 	^ self hasDescriptions ifTrue: [ self descriptions size ] ifFalse: [ 0 ]
 ]
 
 { #category : #accessing }
 P3Result >> numberOfRecords [
+	"Return the actual number of records that are in the data that I hold.
+	In principle this equals #rowCount"
+	
 	^ self hasData ifTrue: [ self data size ] ifFalse: [ 0 ]
 ]
 
@@ -135,11 +168,17 @@ P3Result >> printOn: stream [
 
 { #category : #convenience }
 P3Result >> records [
+	"Return the records that I hold, also known as my data"
+	
 	^ data
 ]
 
 { #category : #convenience }
 P3Result >> recordsAsDictionaries [
+	"Return the data that I hold as a collection where each record 
+	is represented by a Dictionary whose keys are the column names.
+	This more verbose representation can be more user friendly."
+	
 	^ self records collect: [ :record |
 		| dictionary |
 		dictionary := Dictionary new.
@@ -150,21 +189,30 @@ P3Result >> recordsAsDictionaries [
 
 { #category : #accessing }
 P3Result >> result [
+	"Return the result.
+	As this is the most common case, we assume a single result."
+	
 	^ self firstResult
 ]
 
 { #category : #accessing }
 P3Result >> results [
+	"Return the SQL query execution results, possibly a collection.
+	Among other things, the results indicates how many rows were returned or modified."
+
 	^ results
 ]
 
-{ #category : #accessing }
+{ #category : #'private-accessing' }
 P3Result >> results: stringOrCollectionOfStrings [
 	results := stringOrCollectionOfStrings
 ]
 
 { #category : #accessing }
 P3Result >> rowCount [
+	"Return the integer count of the number of records returned or modified.
+	If there is data, this equals #numberOfRecords"
+	
 	^ self firstRowCount
 ]
 
@@ -175,8 +223,14 @@ P3Result >> rowCountFromCommandResultTag: string [
 
 { #category : #accessing }
 P3Result >> totalRowCount [
+	"Return the total integer count of the number of record returned or modified in all results"
+
 	results ifNil: [ ^ 0 ].
 	^ results isString
-		ifTrue: [ self firstRowCount ]
-		ifFalse: [ results inject: 0 into: [ :sum :next | sum + (self rowCountFromCommandResultTag: next) ] ]
+		ifTrue: [ 
+			self firstRowCount ]
+		ifFalse: [ 
+			results 
+				inject: 0 
+				into: [ :sum :next | sum + (self rowCountFromCommandResultTag: next) ] ]
 ]
