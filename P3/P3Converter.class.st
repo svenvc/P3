@@ -81,17 +81,13 @@ P3Converter >> asciiStreamFor: bytes length: length [
 
 { #category : #converting }
 P3Converter >> convert: bytes length: length description: description [
-
-	| type lambda |
-	
-	type := map at: description typeOid 
-		ifAbsent: [ self error: 'P3 cannot convert typeOid ', description typeOid asString ].
-		
-	lambda := type second.
-	
-	^ lambda isSymbol 
-		ifTrue: [ self perform: type second with: bytes with: length with: description ]
-		ifFalse: [ lambda value: bytes value: length value: description ]
+	^ map at: description typeOid
+		ifPresent: [ :tuple | tuple second isSymbol
+			ifTrue: [ self perform: tuple second with: bytes with: length with: description ]
+			ifFalse: [ tuple second value: bytes value: length value: description ] ]
+		ifAbsent: [ description format = 0
+			ifTrue: [ self convertStringFrom: bytes length: length description: description ]
+			ifFalse: [ self error: 'P3 cannot convert typeOid ', description typeOid asString ] ]
 ]
 
 { #category : #converting }
