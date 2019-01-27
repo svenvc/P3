@@ -230,8 +230,7 @@ P3ClientTest >> testEmptyString [
 
 { #category : #testing }
 P3ClientTest >> testEnum [
-
-	| result ooid |
+	| result |
 
 	result := client 
 		execute: 'DROP TABLE IF EXISTS table1;';
@@ -239,14 +238,10 @@ P3ClientTest >> testEnum [
 		execute: 'CREATE TYPE mood AS ENUM (''sad'', ''ok'', ''happy'');';
 		execute: 'CREATE TABLE table1 (name text, current_mood mood );';
 		execute: 'INSERT INTO table1 VALUES (''Moe'', ''happy'');'.
-		
-	result := client query: 'SELECT oid FROM pg_type WHERE typname = ''mood'';'.
-	ooid := result firstRecord first.
+				
+	result := client loadEnums.
 	
-	client converter 
-		mapOid: ooid 
-		type: #mood
-		to: [ :reader :length :description | (reader next: length) asString asSymbol ].
+	self assert: (result includes: #mood).
 		
 	result := client query: 'SELECT * FROM table1 WHERE current_mood = ''happy'';'.
 		

@@ -217,6 +217,11 @@ P3Converter >> convertStringFrom: bytes length: length description: description 
 ]
 
 { #category : #converting }
+P3Converter >> convertSymbolFrom: bytes length: length description: description [
+	^ (self convertStringFrom: bytes length: length description: description) asSymbol
+]
+
+{ #category : #converting }
 P3Converter >> convertTimeFrom: bytes length: length description: description [
 	^ Time readFrom: (self asciiStreamFor: bytes length: length)
 ]

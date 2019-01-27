@@ -320,6 +320,14 @@ P3Client >> listDatabases [
 ]
 
 { #category : #convenience }
+P3Client >> listEnums [
+	"Return the list of currently defined/visible ENUMs as a collection of type OID, type name pairs.
+	See also #loadEnums"
+	
+	^ (self query: 'SELECT oid, typname FROM pg_type WHERE oid IN (SELECT DISTINCT enumtypid FROM pg_enum)') data
+]
+
+{ #category : #convenience }
 P3Client >> listSchemas [
 	"Return the list of known schema or namespace names"
 	
@@ -334,6 +342,22 @@ P3Client >> listTablesInSchema: schemaName [
 	query := 'SELECT tablename FROM pg_tables WHERE schemaname=''{1}'' ORDER BY 1' 
 		format: { schemaName }.
 	^ (self query: query) firstColumnData
+]
+
+{ #category : #configuration }
+P3Client >> loadEnums [
+	"Define converters for all ENUM type OIDs currently visible, converting their values to Symbols.
+	In PSQL ENUMs constitute distinct type OIDs and must be thus be defined before they can be used in results.
+	Since new ENUMs can be added at any time, there is no good/correct time to call this method.
+	Either call #loadEnums as an initialization for a new connection, or after (all) ENUMs are (re)defined.
+	Return the collection of enum type names processed."
+	
+	^ self listEnums collect: [ :each |
+		self converter
+			mapOid: each first 
+			type: each second asSymbol 
+			to: #convertSymbolFrom:length:description:.
+		each second asSymbol ]
 ]
 
 { #category : #'private messages' }

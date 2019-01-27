@@ -110,10 +110,13 @@ P3FormattedStatement >> printScaledDecimal: scaledDecimal on: stream [
 
 { #category : #'printing-dispatched' }
 P3FormattedStatement >> printString: string on: stream [
-	"For string, nothing more has to happen, the print string representation of a tring
-	already uses single quotes and the doubling of single quotes when part of the string."
+	"For strings use single quotes and the doubling of single quotes when they are part of the string"
 	
-	string printOn: stream 
+	stream nextPut: $'.
+	string do: [ :each |
+		each = $' ifTrue: [ stream nextPut: $' ].
+		stream nextPut: each ].
+	stream nextPut: $'
 ]
 
 { #category : #public }
