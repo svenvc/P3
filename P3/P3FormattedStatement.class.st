@@ -3,6 +3,8 @@ I am P3FormattedStatement, an SQL template with placeholders that, together with
 
 I am a tool to safely and more easily create SQL statements and queries that contain arguments. I know the correct textual representation of a set of primitive types. I do proper string escaping.
 
+Since I know the client that created me, I can be executed autonomously.
+
 You create instances of me by sending #format: to a P3Client instance.
 
 For example,
@@ -11,8 +13,6 @@ For example,
 	result := statement query: #( 345 ).
 
 in the above 345 will be bound to (and replace) $1 in the SQL template.
-
-Since I know the client that created me, I can be executed autonomously.
 
 The syntax that I use ($n) and my public API is mostly polymorphic with P3PreparedStatement. The difference is that I do simple string processing on the client without any interaction with the server.
 
@@ -29,14 +29,17 @@ Class {
 
 { #category : #private }
 P3FormattedStatement >> bind: arguments [
+	"Build and return the actual SQL statement by splicing in the arguments for all placeholders in the template"
+	
 	^ String streamContents: [ :out | | readStream |
 			readStream := sql readStream.
-			[ readStream atEnd ] whileFalse: [ | currentChar |
-				(currentChar := readStream next) = $$
-					ifTrue: [ | index |
+			[ readStream atEnd ] whileFalse: [ | char |
+				(char := readStream next) = $$
+					ifTrue: [ | index argument |
 						index := Integer readFrom: readStream.
-						self printArgument: (arguments at: index) on: out ]
-					ifFalse: [ out nextPut: currentChar ] ] ]
+						argument := arguments at: index.
+						argument p3PrintUsing: self on: out ]
+					ifFalse: [ out nextPut: char ] ] ]
 ]
 
 { #category : #initialization }
@@ -61,15 +64,56 @@ P3FormattedStatement >> executeBatch: argumentsCollection [
 	^ argumentsCollection collect: [ :each | self execute: each ]
 ]
 
-{ #category : #private }
-P3FormattedStatement >> printArgument: argument on: stream [
-	argument printOn: stream
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printByteArray: byteArray on: stream [
+	"Use the bytea Hex Format for bytes (ByteArray),
+	as in '\xDEADBEEF'"
+	
+	| hex |
+	stream nextPutAll: '''\x'.
+	hex := '0123456789ABCDEF'.
+	byteArray do: [ :byte | 
+		stream 
+			nextPut: (hex at: (byte bitShift: -4) + 1);
+			nextPut: (hex at: (byte bitAnd: 15) + 1) ].
+	stream nextPut: $'
+]
+
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printNullOn: stream [
+	"nil becomes NULL"
+	
+	stream nextPutAll: 'NULL'
+]
+
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printObject: object on: stream [
+	"In general, just use the standard print string representation"
+	
+	object printOn: stream 
 ]
 
 { #category : #printing }
 P3FormattedStatement >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(; << sql; nextPut: $)
+]
+
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printScaledDecimal: scaledDecimal on: stream [
+	"For ScaledDecimals, use a regular floating point like representation"
+	
+	scaledDecimal 
+		printOn: stream 
+		showingDecimalPlaces: scaledDecimal scale
+]
+
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printString: string on: stream [
+	"For string, nothing more has to happen, the print string representation of a tring
+	already uses single quotes and the doubling of single quotes when part of the string."
+	
+	string printOn: stream 
 ]
 
 { #category : #public }

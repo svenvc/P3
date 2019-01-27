@@ -29,6 +29,9 @@ See also https://en.wikipedia.org/wiki/Prepared_statement
 
 A prepared statement can be more efficient, especially if it is used multiple times. Prepared statements are also resilient against SQL injection attacks. On the server, prepared statements are bound to the current session.
 
+My API and the syntax that I use ($n) is mostly polymorphic with P3FormattedStatement. The difference is that I do much more than textual processing: my SQL template is actually parsed on the server, checking the syntax and partially planning the execution, during the actual execution phase, just the concrete argument values are transferred, taking advantage of some of the work that has already been done on the server.
+ 
+
 "
 Class {
 	#name : #P3PreparedStatement,
