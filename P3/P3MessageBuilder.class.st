@@ -62,7 +62,7 @@ P3MessageBuilder >> nextPutParameterAsText: aValue description: paramDescription
 	
 	sizePosition := byteStream position.
 	byteStream nextPutAll: #[ 0 0 0 0 ]. "placeholder"
-	aValue printAsP3TextOn: (ZnCharacterWriteStream on: byteStream encoding: encoder).
+	aValue p3PrintUsing: self on: (ZnCharacterWriteStream on: byteStream encoding: encoder).
 	endPosition := byteStream position.
 
 	"Go back and set the correct size"
@@ -76,6 +76,50 @@ P3MessageBuilder >> nextPutString: aString [
 
 	aString do: [ :each | encoder nextPut: each toStream: byteStream ].
 	byteStream nextPut: 0
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printByteArray: byteArray on: stream [
+	"Use the bytea Hex Format for bytes (ByteArray), as in \xDEADBEEF"
+	
+	| hex |
+	stream nextPutAll: '\x'.
+	hex := '0123456789ABCDEF'.
+	byteArray do: [ :byte | 
+		stream 
+			nextPut: (hex at: (byte bitShift: -4) + 1);
+			nextPut: (hex at: (byte bitAnd: 15) + 1) ]
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printNullOn: stream [
+	"This cannot happen since nil is already handled earlier,
+	see P3PreparedStatement>>#bindStrings:"
+	
+	self shouldNotImplement 
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printObject: object on: stream [
+	"In general, just use the standard print string representation"
+	
+	object printOn: stream 
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printScaledDecimal: scaledDecimal on: stream [
+	"For ScaledDecimals, use a regular floating point like representation"
+	
+	scaledDecimal 
+		printOn: stream 
+		showingDecimalPlaces: scaledDecimal scale
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printString: string on: stream [
+	"For strings just output the characters of the string, no escaping is needed"
+	
+	stream nextPutAll: string
 ]
 
 { #category : #writing }

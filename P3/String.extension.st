@@ -7,11 +7,3 @@ String >> p3PrintUsing: delegate on: stream [
 
 	delegate printString: self on: stream
 ]
-
-{ #category : #'*P3' }
-String >> printAsP3TextOn: aStream [
-	"Append to the argument aStream a representation of the receiver in 
-	Postgres text format"
-
-	aStream nextPutAll: self
-]
