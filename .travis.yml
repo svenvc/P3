@@ -9,8 +9,5 @@ smalltalk:
   - Pharo-6.1
   - Pharo64-7.0
 
-addons:
-  - postgresql: "9.4"
-  
 services:
-  - postgresql: "9.4"
+  - postgresql: "9.6.6"
