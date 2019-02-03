@@ -80,6 +80,13 @@ P3FormattedStatement >> printByteArray: byteArray on: stream [
 ]
 
 { #category : #'printing-dispatched' }
+P3FormattedStatement >> printGeometricObject: geometricObject on: stream [
+	"Delegate to P3GeometricObject that knows how to print itself in typed quoted PSQL text format"
+	
+	geometricObject printPsqlOn: stream
+]
+
+{ #category : #'printing-dispatched' }
 P3FormattedStatement >> printNullOn: stream [
 	"nil becomes NULL"
 	

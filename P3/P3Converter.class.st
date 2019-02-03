@@ -31,30 +31,41 @@ P3Converter class >> typeMap [
 	^ IdentityDictionary newFromPairs: #(
 			16 #(bool #convertBooleanFrom:length:description:) 
 			17 #(bytea #convertByteArrayFrom:length:description:) 
+			19 #(name #convertStringFrom:length:description:) 
 			20 #(int8 #convertIntegerFrom:length:description:) 
 			21 #(int2 #convertIntegerFrom:length:description:) 
 			23 #(int4 #convertIntegerFrom:length:description:) 
+			25 #(text #convertStringFrom:length:description:) 
 			26 #(oid #convertIntegerFrom:length:description:) 
 			700 #(float4 #convertFloatFrom:length:description:) 
 			701 #(float8 #convertFloatFrom:length:description:) 
-			1700 #(numeric #convertScaledDecimalFrom:length:description:) 
-			19 #(name #convertStringFrom:length:description:) 
-			25 #(text #convertStringFrom:length:description:) 
 			1042 #(bpchar #convertStringFrom:length:description:) 
 			1043 #(varchar #convertStringFrom:length:description:) 
+			1700 #(numeric #convertScaledDecimalFrom:length:description:) 
+			2278 #(void #convertVoidFrom:length:description:)
+			"chronology"
 			1082 #(date #convertDateFrom:length:description:) 
 			1083 #(time #convertTimeFrom:length:description:) 
 			1114 #(timestamp #convertDateAndTimeWithoutTimezoneFrom:length:description:) 
 			1184 #(timestamptz #convertDateAndTimeFrom:length:description:)
+			"special"
 			114 #(json #convertJsonFrom:length:description:)
-			3802 #(jsonb #convertJsonFrom:length:description:)
-			2278 #(void #convertVoidFrom:length:description:)
 			2950 #(uuid #convertUuidFrom:length:description:)
+			3802 #(jsonb #convertJsonFrom:length:description:)
+			"arrays"
 			1000 #(#'_bool' #convertBooleanArrayFrom:length:description:)
 			1007 #(#'_int4' #convertIntegerArrayFrom:length:description:)
 			1009 #(#'_text' #convertStringArrayFrom:length:description:)
 			1015 #(#'_varchar' #convertStringArrayFrom:length:description:)
 			1022 #(#'_float8' #convertFloatArrayFrom:length:description:)
+			"geometric"
+			600 #(point #convertPointFrom:length:description:)
+			601 #(lseg #convertLineSegmentFrom:length:description:)
+			602 #(path #convertPathFrom:length:description:)
+			603 #(box #convertBoxFrom:length:description:)
+			604 #(polygon #convertPolygonFrom:length:description:)
+			628 #(line #convertLineFrom:length:description:)
+			718 #(circle #convertCircleFrom:length:description:)
 		)
 ]
 
@@ -81,20 +92,17 @@ P3Converter >> asciiStreamFor: bytes length: length [
 
 { #category : #converting }
 P3Converter >> convert: bytes length: length description: description [
-
-	| type lambda |
-	
-	type := map at: description typeOid 
-		ifAbsent: [ self error: 'P3 cannot convert typeOid ', description typeOid asString ].
-		
-	lambda := type second.
-	
-	^ lambda isSymbol 
-		ifTrue: [ self perform: type second with: bytes with: length with: description ]
-		ifFalse: [ lambda value: bytes value: length value: description ]
+	^ map 
+		at: description typeOid 
+		ifPresent: [ :type | | lambda |
+			lambda := type second.
+	 		lambda isSymbol 
+				ifTrue: [ self perform: lambda with: bytes with: length with: description ]
+				ifFalse: [ lambda value: bytes value: length value: description ] ]
+		ifAbsent: [ self error: 'P3 cannot convert typeOid ', description typeOid asString ]
 ]
 
-{ #category : #converting }
+{ #category : #'converting-arrays' }
 P3Converter >> convertBooleanArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -111,6 +119,11 @@ P3Converter >> convertBooleanFrom: bytes length: length description: description
 	^ bytes next = $t charCode
 ]
 
+{ #category : #'converting-geometric' }
+P3Converter >> convertBoxFrom: bytes length: length description: description [
+	^ P3Box readFrom: (self asciiStreamFor: bytes length: length)
+]
+
 { #category : #converting }
 P3Converter >> convertByteArrayFrom: bytes length: length description: description [
 	| size byteArray digitValues |
@@ -125,14 +138,19 @@ P3Converter >> convertByteArrayFrom: bytes length: length description: descripti
 	^ byteArray 
 ]
 
-{ #category : #converting }
+{ #category : #'converting-geometric' }
+P3Converter >> convertCircleFrom: bytes length: length description: description [
+	^ P3Circle readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #'converting-chronology' }
 P3Converter >> convertDateAndTimeFrom: bytes length: length description: description [
 	"TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ) is stored internally in Postgres as UTC, but represented in the timezone of the connection, with a correct offset added. In other words, Postgres does the necessary shifting, we just have to read the result"
 	
 	^ DateAndTime readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : #'converting-chronology' }
 P3Converter >> convertDateAndTimeWithoutTimezoneFrom: bytes length: length description: description [
 	"TIMESTAMP WITHOUT TIME ZONE (TIMESTAMP) is stored internally in Postgres the way it was inserted, its representation remains constant, with no offset added. We use the timezone of the connection to do the necessary shifting. This assumes that the timezones used during insert/update and query are the same."
 
@@ -142,12 +160,12 @@ P3Converter >> convertDateAndTimeWithoutTimezoneFrom: bytes length: length descr
 	^ timestamp translateTo: offset
 ]
 
-{ #category : #converting }
+{ #category : #'converting-chronology' }
 P3Converter >> convertDateFrom: bytes length: length description: description [
 	^ Date readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : #'converting-arrays' }
 P3Converter >> convertFloatArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -163,7 +181,7 @@ P3Converter >> convertFloatFrom: bytes length: length description: description [
 	^ Float readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : #'converting-arrays' }
 P3Converter >> convertIntegerArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -179,7 +197,7 @@ P3Converter >> convertIntegerFrom: bytes length: length description: description
 	^ Integer readFrom: (self asciiStreamFor: bytes length: length) base: 10
 ]
 
-{ #category : #converting }
+{ #category : #'converting-special' }
 P3Converter >> convertJsonFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -190,12 +208,37 @@ P3Converter >> convertJsonFrom: bytes length: length description: description [
 			next
 ]
 
+{ #category : #'converting-geometric' }
+P3Converter >> convertLineFrom: bytes length: length description: description [
+	^ P3Line readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #'converting-geometric' }
+P3Converter >> convertLineSegmentFrom: bytes length: length description: description [
+	^ P3LineSegment readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #'converting-geometric' }
+P3Converter >> convertPathFrom: bytes length: length description: description [
+	^ P3Path readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #'converting-geometric' }
+P3Converter >> convertPointFrom: bytes length: length description: description [
+	^ P3Point readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #'converting-geometric' }
+P3Converter >> convertPolygonFrom: bytes length: length description: description [
+	^ P3Polygon readFrom: (self asciiStreamFor: bytes length: length)
+]
+
 { #category : #converting }
 P3Converter >> convertScaledDecimalFrom: bytes length: length description: description [
 	^ ScaledDecimal readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : #'converting-arrays' }
 P3Converter >> convertStringArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -221,12 +264,12 @@ P3Converter >> convertSymbolFrom: bytes length: length description: description 
 	^ (self convertStringFrom: bytes length: length description: description) asSymbol
 ]
 
-{ #category : #converting }
+{ #category : #'converting-chronology' }
 P3Converter >> convertTimeFrom: bytes length: length description: description [
 	^ Time readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : #'converting-special' }
 P3Converter >> convertUuidFrom: bytes length: length description: description [
 	
 	^ UUID nilUUID readFrom: (self asciiStreamFor: bytes length: length)

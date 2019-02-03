@@ -157,6 +157,23 @@ P3ClientTest >> testBooleanConversion [
 ]
 
 { #category : #testing }
+P3ClientTest >> testBoxConversion [
+	| result |
+	result := client query: 'SELECT box ''(3,4),(1,2)'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Box upperRight: (P3Point x: 3 y: 4) lowerLeft: (P3Point x: 1 y: 2)).
+	result := client query: 'SELECT box ''(0,0),(0,0)'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3Box zero.
+	result := client query: 'SELECT box ''(1,1),(0,0)'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3Box unit
+]
+
+{ #category : #testing }
 P3ClientTest >> testByteArrayConversion [
 
 	| result bytes |
@@ -199,6 +216,23 @@ P3ClientTest >> testChronology [
 	self assert: (Date today - result firstRecord fourth) abs < 30 seconds.
 	self assert: (Time now asSeconds - result firstRecord fifth asSeconds) abs < 30.
 	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #testing }
+P3ClientTest >> testCircleConversion [
+	| result |
+	result := client query: 'SELECT circle ''<(1,2),100>'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Circle center: (P3Point x: 1 y: 2) radius: 100).
+	result := client query: 'SELECT circle ''<(0,0),1>'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3Circle unit.
+	result := client query: 'SELECT circle ''<(1.5,-1.5),20.5>'''.
+	self assert: (result firstFieldOfFirstRecord center x closeTo: 1.5).
+	self assert: (result firstFieldOfFirstRecord center y closeTo: -1.5).
+	self assert: (result firstFieldOfFirstRecord radius closeTo: 20.5).
 ]
 
 { #category : #testing }
@@ -280,6 +314,40 @@ P3ClientTest >> testJsonConversion [
 ]
 
 { #category : #testing }
+P3ClientTest >> testLineConversion [
+	| result |
+	result := client query: 'SELECT line''{1,2,3}'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Line a: 1 b: 2 c: 3).
+	result := client query: 'SELECT line''{0,1,0}'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3Line xAxis.
+	result := client query: 'SELECT line''{1,0,0}'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3Line yAxis.
+]
+
+{ #category : #testing }
+P3ClientTest >> testLineSegmentConversion [
+	| result |
+	result := client query: 'SELECT lseg ''(1,2),(3,4)'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3LineSegment start: (P3Point x: 1 y: 2) stop: (P3Point x: 3 y: 4)).
+	result := client query: 'SELECT lseg ''(0,0),(1,0)'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3LineSegment xAxisUnit.
+	result := client query: 'SELECT lseg ''(0,0),(0,1)'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: P3LineSegment yAxisUnit 
+]
+
+{ #category : #testing }
 P3ClientTest >> testMultiStatement [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -322,6 +390,44 @@ P3ClientTest >> testNotification [
 				description: ('{1} does not contain abcdef' format: {notification description}).
 			notification resume ].
 	self assert: raised description: 'no notification triggered'
+]
+
+{ #category : #testing }
+P3ClientTest >> testPathConversion [
+	| result |
+	result := client query: 'SELECT path ''((1,2),(3,4),(5,6))'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Path points: { P3Point x: 1 y: 2. P3Point x: 3 y: 4. P3Point x: 5 y: 6 }).
+	self assert: result firstFieldOfFirstRecord isClosed.
+	result := client query: 'SELECT path ''[(1,2),(3,4),(5,6)]'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Path openPoints: { P3Point x: 1 y: 2. P3Point x: 3 y: 4. P3Point x: 5 y: 6 }).
+	self assert: result firstFieldOfFirstRecord isOpen.
+]
+
+{ #category : #testing }
+P3ClientTest >> testPointConversion [
+	| result |
+	result := client query: 'SELECT point (1,2)'.
+	self assert: result firstFieldOfFirstRecord equals: (P3Point x: 1 y: 2).
+	result := client query: 'SELECT point (0,0)'.
+	self assert: result firstFieldOfFirstRecord equals: P3Point zero.
+	result := client query: 'SELECT point (1,1)'.
+	self assert: result firstFieldOfFirstRecord equals: P3Point unit.
+	result := client query: 'SELECT point (1.3,-1.5)'.
+	self assert: (result firstFieldOfFirstRecord x closeTo: 1.3).
+	self assert: (result firstFieldOfFirstRecord y closeTo: -1.5).
+]
+
+{ #category : #testing }
+P3ClientTest >> testPolygonConversion [
+	| result |
+	result := client query: 'SELECT polygon ''((1,2),(3,4),(5,6))'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Polygon points: { P3Point x: 1 y: 2. P3Point x: 3 y: 4. P3Point x: 5 y: 6 })
 ]
 
 { #category : #testing }

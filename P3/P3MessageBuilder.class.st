@@ -92,6 +92,13 @@ P3MessageBuilder >> printByteArray: byteArray on: stream [
 ]
 
 { #category : #'printing-dispatched' }
+P3MessageBuilder >> printGeometricObject: geometricObject on: stream [
+	"Delegate to P3GeometricObject that knows how to print itself in unescaped, raw PSQL text format"
+	
+	geometricObject printOn: stream
+]
+
+{ #category : #'printing-dispatched' }
 P3MessageBuilder >> printNullOn: stream [
 	"This cannot happen since nil is already handled earlier,
 	see P3PreparedStatement>>#bindStrings:"

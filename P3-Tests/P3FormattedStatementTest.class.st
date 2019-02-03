@@ -50,6 +50,33 @@ P3FormattedStatementTest >> testByteArray [
 ]
 
 { #category : #tests }
+P3FormattedStatementTest >> testGeometricTypes [
+	| p1 p2 p3 points row1 row2 row3 statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id SERIAL, p POINT, b BOX, c CIRCLE, l1 LINE, l2 LSEG, p1 POLYGON, p2 PATH)'.
+	
+	p1 := P3Point x: 1 y: 2.
+	p2 := P3Point x: 3 y: 4.
+	p3 := P3Point x: 5 y: 6.
+	points := { p1. p2. p3}.
+	row1 := { P3Point unit. P3Circle unit. P3Box unit. P3Line xAxis. P3LineSegment xAxisUnit.
+		P3Polygon points: points. P3Path points: points }. 
+	row2 := { P3Point zero. P3Circle unit. P3Box unit. P3Line yAxis. P3LineSegment yAxisUnit.
+		P3Polygon points: points reversed. P3Path openPoints: points reversed }.
+	row3 := Array new: 7 withAll: nil.
+	
+	statement := client format: 'INSERT INTO table1 (p, c, b, l1, l2, p1, p2) VALUES ($1, $2, $3, $4, $5, $6, $7)'.
+	statement executeBatch: { row1. row2. row3 }.
+	
+	result := client query: 'SELECT p, c, b, l1, l2, p1, p2 FROM table1 ORDER BY id'.
+
+	self assert: result records equals: { row1. row2. row3 }.
+	
+	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #tests }
 P3FormattedStatementTest >> testNull [
 	| statement result |
 	
