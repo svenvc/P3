@@ -17,6 +17,15 @@ Class {
 	#category : #'P3-Tests'
 }
 
+{ #category : #testing }
+P3PreparedStatementTest >> isServerVersionAtLeastMajor: major minor: minor [
+	| serverVersion |
+	serverVersion := ($. split: client serverVersion) collect: #asNumber.
+	^ serverVersion first > major
+		or:
+			[ serverVersion first = major and: [ serverVersion second >= minor ] ]
+]
+
 { #category : #running }
 P3PreparedStatementTest >> setUp [
 	super setUp.
@@ -107,6 +116,7 @@ P3PreparedStatementTest >> testBulkInsertAndSelect [
 { #category : #tests }
 P3PreparedStatementTest >> testGeometricTypes [
 	| p1 p2 p3 points row1 row2 row3 statement result |
+	(self isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
 	
 	client execute: 'DROP TABLE IF EXISTS table1'.
 	client execute: 'CREATE TABLE table1 (id SERIAL, p POINT, b BOX, c CIRCLE, l1 LINE, l2 LSEG, p1 POLYGON, p2 PATH)'.

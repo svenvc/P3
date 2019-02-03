@@ -52,6 +52,15 @@ P3ClientTest >> benchmark1Size [
 	^ 10000
 ]
 
+{ #category : #testing }
+P3ClientTest >> isServerVersionAtLeastMajor: major minor: minor [
+	| serverVersion |
+	serverVersion := ($. split: client serverVersion) collect: #asNumber.
+	^ serverVersion first > major
+		or:
+			[ serverVersion first = major and: [ serverVersion second >= minor ] ]
+]
+
 { #category : #benchmarking }
 P3ClientTest >> runAllTests [
 	"Runs all tests on the same connection/session"
@@ -110,26 +119,13 @@ P3ClientTest >> setupBenchmark1 [
 	^ timeToRun  
 ]
 
-{ #category : #versionInfo }
-P3ClientTest >> supportsJsonB [
-
-	| record version |
-	
-	record := (client query: 'SHOW server_version') firstRecord.
-	version := ($. split: record first) collect: [ :part | part asNumber ].
-	
-	^ version first > 9 or: [ 
-		version first = 9 and: [ version second > 4 ]		
-	]
-]
-
 { #category : #running }
 P3ClientTest >> tearDown [
 	client close.
 	super tearDown
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testArrayTypes [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table_a'.
@@ -149,14 +145,14 @@ P3ClientTest >> testArrayTypes [
 	client execute: 'DROP TABLE table_a'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testBooleanConversion [
 	| result |
 	result := client query: 'SELECT b::boolean FROM (VALUES (true), (false), (NULL)) t(b)'.
 	self assert: result data equals: #((true) (false) (nil))
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testBoxConversion [
 	| result |
 	result := client query: 'SELECT box ''(3,4),(1,2)'''.
@@ -173,7 +169,7 @@ P3ClientTest >> testBoxConversion [
 		equals: P3Box unit
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testByteArrayConversion [
 
 	| result bytes |
@@ -195,7 +191,7 @@ P3ClientTest >> testByteArrayConversion [
 	client execute: 'DROP TABLE testBytea'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testChronology [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -218,7 +214,7 @@ P3ClientTest >> testChronology [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testCircleConversion [
 	| result |
 	result := client query: 'SELECT circle ''<(1,2),100>'''.
@@ -235,20 +231,20 @@ P3ClientTest >> testCircleConversion [
 	self assert: (result firstFieldOfFirstRecord radius closeTo: 20.5).
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testConnection [
 	self assert: client isConnected.
 	self assert: client isWorking.
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testConvenienceMetaAccess [
 	self deny: client listDatabases isEmpty.
 	self assert: (client listSchemas includes: 'public').
 	self assert: (client listTablesInSchema: 'public') isCollection.
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testEmptyString [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -262,7 +258,7 @@ P3ClientTest >> testEmptyString [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testEnum [
 	| result |
 
@@ -284,23 +280,23 @@ P3ClientTest >> testEnum [
 
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testError [
 	self should: [ client query: 'SELECT * FROM abcdef' ] raise: P3Error
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testIntegerConversion [
 	| result |
 	result := client query: 'SELECT i::integer FROM (VALUES (-1), (1), (NULL), (1234567890)) t(i)'.
 	self assert: result data equals: #((-1) (1) (nil) (1234567890))
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testJsonConversion [
 	| data result |
 	
-	self supportsJsonB ifFalse: [ ^ self skip ].
+	(self isServerVersionAtLeastMajor: 9 minor: 5) ifFalse: [ ^ self skip ].
 	data := NeoJSONObject new 
 		x: 1; 
 		str: 'les élève Français'; 
@@ -313,9 +309,10 @@ P3ClientTest >> testJsonConversion [
 	self assert: result firstFieldOfFirstRecord equals: data
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testLineConversion [
 	| result |
+	(self isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
 	result := client query: 'SELECT line''{1,2,3}'''.
 	self 
 		assert: result firstFieldOfFirstRecord 
@@ -330,7 +327,7 @@ P3ClientTest >> testLineConversion [
 		equals: P3Line yAxis.
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testLineSegmentConversion [
 	| result |
 	result := client query: 'SELECT lseg ''(1,2),(3,4)'''.
@@ -347,7 +344,7 @@ P3ClientTest >> testLineSegmentConversion [
 		equals: P3LineSegment yAxisUnit 
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testMultiStatement [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -363,7 +360,7 @@ P3ClientTest >> testMultiStatement [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testNonAsciiStrings [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -377,7 +374,7 @@ P3ClientTest >> testNonAsciiStrings [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testNotification [
 	| raised |
 	raised := false.
@@ -392,7 +389,7 @@ P3ClientTest >> testNotification [
 	self assert: raised description: 'no notification triggered'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testPathConversion [
 	| result |
 	result := client query: 'SELECT path ''((1,2),(3,4),(5,6))'''.
@@ -407,7 +404,7 @@ P3ClientTest >> testPathConversion [
 	self assert: result firstFieldOfFirstRecord isOpen.
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testPointConversion [
 	| result |
 	result := client query: 'SELECT point (1,2)'.
@@ -421,7 +418,7 @@ P3ClientTest >> testPointConversion [
 	self assert: (result firstFieldOfFirstRecord y closeTo: -1.5).
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testPolygonConversion [
 	| result |
 	result := client query: 'SELECT polygon ''((1,2),(3,4),(5,6))'''.
@@ -430,7 +427,7 @@ P3ClientTest >> testPolygonConversion [
 		equals: (P3Polygon points: { P3Point x: 1 y: 2. P3Point x: 3 y: 4. P3Point x: 5 y: 6 })
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testQueryCatalog [
 	| result |
 	result := client query: 'SELECT schemaname,tablename FROM pg_catalog.pg_tables'.
@@ -444,7 +441,7 @@ P3ClientTest >> testQueryCatalog [
 	self assert: (result data allSatisfy: [ :each | each size = 2])
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testSession [
 
 	| session |
@@ -480,7 +477,7 @@ P3ClientTest >> testSession [
 
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testSimpleTable [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -501,7 +498,7 @@ P3ClientTest >> testSimpleTable [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testSqlFunction [
 	| x y result |
 	client execute: 'DROP FUNCTION IF EXISTS my_add(x INTEGER, y INTEGER)'.
@@ -513,7 +510,7 @@ P3ClientTest >> testSqlFunction [
 	client execute: 'DROP FUNCTION my_add(x INTEGER, y INTEGER)'.
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testStringEscaping [
 	| result string |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -526,7 +523,7 @@ P3ClientTest >> testStringEscaping [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testTimeout [
 	"Reconnect with an explicit timeout"
 	client close.
@@ -539,7 +536,7 @@ P3ClientTest >> testTimeout [
 	self should: [ client execute: 'SELECT pg_sleep(1.5)' ] raise: ConnectionTimedOut 
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testTimezone [
 	| result originalTimezone |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -570,7 +567,7 @@ P3ClientTest >> testTimezone [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #testing }
+{ #category : #tests }
 P3ClientTest >> testUuid [
 
 	| result uuid num |

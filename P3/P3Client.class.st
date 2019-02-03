@@ -682,6 +682,16 @@ P3Client >> runStartup [
 ]
 
 { #category : #accessing }
+P3Client >> serverVersion [
+	"Return the version string of the PostgreSQL server"
+	
+	self ensureConnected.
+	^ properties 
+		at: 'server_version' 
+		ifAbsent: [ (self query: 'SHOW server_version') firstFieldOfFirstRecord ]
+]
+
+{ #category : #accessing }
 P3Client >> session [
 	
 	"Returns the current session identifier (backend process id) if connected"
