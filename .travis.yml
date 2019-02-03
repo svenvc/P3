@@ -10,4 +10,4 @@ smalltalk:
   - Pharo64-7.0
   
 services:
-  - postgresql
+  - postgresql: "9.4"
