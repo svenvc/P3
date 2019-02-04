@@ -83,7 +83,7 @@ Class {
 		'converter',
 		'message'
 	],
-	#category : 'P3'
+	#category : #'P3-Core'
 }
 
 { #category : #accessing }

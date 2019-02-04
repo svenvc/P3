@@ -14,7 +14,7 @@ Class {
 		'start',
 		'stop'
 	],
-	#category : #P3
+	#category : #'P3-Objects'
 }
 
 { #category : #'instance creation' }

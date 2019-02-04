@@ -24,7 +24,7 @@ Class {
 		'client',
 		'sql'
 	],
-	#category : #P3
+	#category : #'P3-Core'
 }
 
 { #category : #private }

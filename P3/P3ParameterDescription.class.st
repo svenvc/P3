@@ -10,7 +10,7 @@ Class {
 	#instVars : [
 		'typeOid'
 	],
-	#category : #P3
+	#category : #'P3-Support'
 }
 
 { #category : #printing }

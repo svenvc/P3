@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'info'
 	],
-	#category : #P3
+	#category : #'P3-Core'
 }
 
 { #category : #accessing }

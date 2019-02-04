@@ -19,7 +19,7 @@ Class {
 		'stream',
 		'converter'
 	],
-	#category : #P3
+	#category : #'P3-Support'
 }
 
 { #category : #'private-parsing' }

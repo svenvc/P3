@@ -42,7 +42,7 @@ Class {
 		'paramDescriptions',
 		'fieldDescriptions'
 	],
-	#category : #P3
+	#category : #'P3-Core'
 }
 
 { #category : #'instance creation' }

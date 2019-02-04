@@ -10,7 +10,7 @@ Class {
 		'encoder',
 		'byteStream'
 	],
-	#category : #P3
+	#category : #'P3-Support'
 }
 
 { #category : #'instance creation' }

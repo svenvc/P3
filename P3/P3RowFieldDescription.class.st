@@ -17,7 +17,7 @@ Class {
 		'typeModifier',
 		'format'
 	],
-	#category : #P3
+	#category : #'P3-Support'
 }
 
 { #category : #accessing }

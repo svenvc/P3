@@ -14,7 +14,7 @@ Class {
 		'payload',
 		'size'
 	],
-	#category : 'P3'
+	#category : #'P3-Support'
 }
 
 { #category : #accessing }

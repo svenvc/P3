@@ -19,7 +19,7 @@ Class {
 		'descriptions',
 		'data'
 	],
-	#category : 'P3'
+	#category : #'P3-Core'
 }
 
 { #category : #'instance creation' }

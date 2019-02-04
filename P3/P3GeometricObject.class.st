@@ -5,7 +5,7 @@ representing two-dimenional spatial objects.
 Class {
 	#name : #P3GeometricObject,
 	#superclass : #Object,
-	#category : #P3
+	#category : #'P3-Objects'
 }
 
 { #category : #accessing }

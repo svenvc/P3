@@ -16,7 +16,7 @@ Class {
 		'asciiReadStream',
 		'asciiWriteStream'
 	],
-	#category : 'P3'
+	#category : #'P3-Support'
 }
 
 { #category : #accessing }
