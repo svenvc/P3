@@ -86,6 +86,27 @@ P3PreparedStatementTest >> testBinaryColumn [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testBitString [
+	| statement bitString fixedBitString result |
+	
+	client execute: 'DROP TABLE IF EXISTS testBits'.
+	client execute: 'CREATE TABLE testBits (id INT, b1 BIT, b2 BIT VARYING, b3 BIT(8), b4 BIT VARYING(8))'.
+	
+	bitString := P3BitString bits: 2r11001111.
+	fixedBitString := P3FixedBitString bits: 2r11110011.
+	
+	statement := client prepare: 'INSERT INTO testBits (id, b1, b2, b3, b4) VALUES ($1, $2, $3, $4, $5)'.
+	statement execute: { 100. P3FixedBitString one. bitString. fixedBitString. bitString }.
+	
+	statement := client prepare: 'SELECT b1, b2, b3, b4 FROM testBits WHERE id = $1'.
+	result := statement query: #( 100 ).
+	
+	self assert: result firstRecord equals: { P3FixedBitString one. bitString. fixedBitString. bitString }.
+	
+	client execute: 'DROP TABLE testBits'
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testBulkInsertAndSelect [
 
 	| insertStatement result selectStatement |

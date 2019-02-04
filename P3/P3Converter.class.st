@@ -40,7 +40,9 @@ P3Converter class >> typeMap [
 			700 #(float4 #convertFloatFrom:length:description:) 
 			701 #(float8 #convertFloatFrom:length:description:) 
 			1042 #(bpchar #convertStringFrom:length:description:) 
-			1043 #(varchar #convertStringFrom:length:description:) 
+			1043 #(varchar #convertStringFrom:length:description:)
+			1560 #(bit #convertFixedBitStringFrom:length:description:)
+			1562 #(varbit #convertBitStringFrom:length:description:)
 			1700 #(numeric #convertScaledDecimalFrom:length:description:) 
 			2278 #(void #convertVoidFrom:length:description:)
 			"chronology"
@@ -100,6 +102,11 @@ P3Converter >> convert: bytes length: length description: description [
 				ifTrue: [ self perform: lambda with: bytes with: length with: description ]
 				ifFalse: [ lambda value: bytes value: length value: description ] ]
 		ifAbsent: [ self error: 'P3 cannot convert typeOid ', description typeOid asString ]
+]
+
+{ #category : #converting }
+P3Converter >> convertBitStringFrom: bytes length: length description: description [
+	^ P3BitString readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
 { #category : #'converting-arrays' }
@@ -163,6 +170,11 @@ P3Converter >> convertDateAndTimeWithoutTimezoneFrom: bytes length: length descr
 { #category : #'converting-chronology' }
 P3Converter >> convertDateFrom: bytes length: length description: description [
 	^ Date readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #converting }
+P3Converter >> convertFixedBitStringFrom: bytes length: length description: description [
+	^ P3FixedBitString readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
 { #category : #'converting-arrays' }

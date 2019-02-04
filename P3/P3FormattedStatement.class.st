@@ -65,6 +65,13 @@ P3FormattedStatement >> executeBatch: argumentsCollection [
 ]
 
 { #category : #'printing-dispatched' }
+P3FormattedStatement >> printBitString: bitString on: stream [
+	"Use the B'0101' syntax for bit strings"
+	
+	stream nextPut: $B; nextPut: $'; print: bitString; nextPut: $'
+]
+
+{ #category : #'printing-dispatched' }
 P3FormattedStatement >> printByteArray: byteArray on: stream [
 	"Use the bytea Hex Format for bytes (ByteArray),
 	as in '\xDEADBEEF'"

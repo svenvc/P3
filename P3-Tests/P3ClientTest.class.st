@@ -146,6 +146,15 @@ P3ClientTest >> testArrayTypes [
 ]
 
 { #category : #tests }
+P3ClientTest >> testBitStringConversion [
+	| result |
+	result := client query: 'SELECT B''11001111'''.
+	self assert: result firstFieldOfFirstRecord equals: (P3FixedBitString bits: 2r11110011).
+	result := client query: 'SELECT B''11001111''::bit varying'.
+	self assert: result firstFieldOfFirstRecord equals: (P3BitString bits: 2r11110011).
+]
+
+{ #category : #tests }
 P3ClientTest >> testBooleanConversion [
 	| result |
 	result := client query: 'SELECT b::boolean FROM (VALUES (true), (false), (NULL)) t(b)'.

@@ -79,6 +79,13 @@ P3MessageBuilder >> nextPutString: aString [
 ]
 
 { #category : #'printing-dispatched' }
+P3MessageBuilder >> printBitString: bitString on: stream [
+	"Delegate to P3[Fixed]BitString that knows how to print itself in unescaped, raw PSQL text format"
+	
+	bitString printOn: stream
+]
+
+{ #category : #'printing-dispatched' }
 P3MessageBuilder >> printByteArray: byteArray on: stream [
 	"Use the bytea Hex Format for bytes (ByteArray), as in \xDEADBEEF"
 	
