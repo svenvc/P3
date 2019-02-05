@@ -31,7 +31,8 @@ P3Client also supports SSL connections. Use #connectSSL to initiate such a conne
 
 Through the #prepare: message, you can ask P3Client to prepare/parse an SQL statement or
 query with parameters. This will give you a P3PreparedStatement instance than you can then
-execute with specific parameters.
+execute with specific parameters. Polymorphic to this there is also P3FormattedStatement
+which you create using the #format: message. These work at the textual, client side level.
 
 
 ## Usage
@@ -138,16 +139,16 @@ Metacello new
 
 ## Unit tests
 
-**P3ClientTests** holds unit tests for the P3 PSQL client.
+**P3ClientTest** holds unit tests for the P3 PSQL client.
 
 Configure it by setting its class side's connection URL.
 
 ```smalltalk
-P3ClientTests url: 'psql://sven:secret@localhost:5432/database'.
+P3ClientTest url: 'psql://sven:secret@localhost:5432/database'.
 ```
 
 The minimal being the following:
 
 ```smalltalk
-P3ClientTests url: 'psql://sven@localhost'.
+P3ClientTest url: 'psql://sven@localhost'.
 ```
