@@ -439,7 +439,7 @@ P3Client >> prepare: query [
 		writeSyncMessage.
 
 	self readMessage tag = $1
-		ifFalse: [ ^ self error: 'ParseComplete message expecyted' ].
+		ifFalse: [ ^ self error: 'ParseComplete message expected' ].
 
 	self readMessage.
 	message tag = $t
