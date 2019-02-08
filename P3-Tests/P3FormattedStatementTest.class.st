@@ -108,6 +108,24 @@ P3FormattedStatementTest >> testGeometricTypes [
 ]
 
 { #category : #tests }
+P3FormattedStatementTest >> testInterval [
+	| statement intervals result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id SERIAL, time_interval INTERVAL)'.
+	
+	intervals := { { P3Interval zero }. { P3Interval years: 1 months: 2 days: 3 hours: 4 minutes: 5 seconds: 6 } }.
+	
+	statement := client format: 'INSERT INTO table1 (time_interval) VALUES ($1)'.
+	statement executeBatch: intervals.
+	
+	result := client query: 'SELECT time_interval FROM table1 ORDER BY id'.	
+	self assert: result data equals: intervals.
+	
+	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #tests }
 P3FormattedStatementTest >> testNull [
 	| statement result |
 	

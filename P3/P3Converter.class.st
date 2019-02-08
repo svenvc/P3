@@ -50,6 +50,7 @@ P3Converter class >> typeMap [
 			1083 #(time #convertTimeFrom:length:description:) 
 			1114 #(timestamp #convertDateAndTimeWithoutTimezoneFrom:length:description:) 
 			1184 #(timestamptz #convertDateAndTimeFrom:length:description:)
+			1186 #(interval #convertIntervalFrom:length:description:)
 			"special"
 			114 #(json #convertJsonFrom:length:description:)
 			2950 #(uuid #convertUuidFrom:length:description:)
@@ -207,6 +208,11 @@ P3Converter >> convertIntegerArrayFrom: bytes length: length description: descri
 { #category : #converting }
 P3Converter >> convertIntegerFrom: bytes length: length description: description [
 	^ Integer readFrom: (self asciiStreamFor: bytes length: length) base: 10
+]
+
+{ #category : #'converting-chronology' }
+P3Converter >> convertIntervalFrom: bytes length: length description: description [
+	^ P3Interval readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
 { #category : #'converting-special' }

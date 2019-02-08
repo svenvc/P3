@@ -106,6 +106,13 @@ P3MessageBuilder >> printGeometricObject: geometricObject on: stream [
 ]
 
 { #category : #'printing-dispatched' }
+P3MessageBuilder >> printInterval: interval on: stream [
+	"Delegate to P3Interval that knows how to print itself in postgresql style"
+	
+	stream print: interval
+]
+
+{ #category : #'printing-dispatched' }
 P3MessageBuilder >> printNullOn: stream [
 	"This cannot happen since nil is already handled earlier,
 	see P3PreparedStatement>>#bindStrings:"

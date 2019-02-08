@@ -302,6 +302,32 @@ P3ClientTest >> testIntegerConversion [
 ]
 
 { #category : #tests }
+P3ClientTest >> testIntervalConversion [
+	| result |
+	result := client query: 'SELECT INTERVAL ''1 years 1 mons 1 days 1 hours 1 minutes 1 seconds'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Interval years: 1 months: 1 days: 1 hours: 1 minutes: 1 seconds: 1).
+	result := client query: 'SELECT INTERVAL ''0 seconds'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Interval zero).
+	result := client query: 'SELECT INTERVAL ''1 years 2 mons 3 days 0 hours 0 minutes 0 seconds'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Interval years: 1 months: 2 days: 3 hours: 0 minutes: 0 seconds: 0).
+	result := client query: 'SELECT INTERVAL ''1 hours 2 minutes 3 seconds'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Interval years: 0 months: 0 days: 0 hours: 1 minutes: 2 seconds: 3).
+	result := client query: 'SELECT INTERVAL ''1 years 1 mons 1 days 1 hours 1 minutes 1 seconds ago'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: (P3Interval years: -1 months: -1 days: -1 hours: -1 minutes: 1 seconds: 1).
+
+]
+
+{ #category : #tests }
 P3ClientTest >> testJsonConversion [
 	| data result |
 	

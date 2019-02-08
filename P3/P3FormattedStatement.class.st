@@ -94,6 +94,13 @@ P3FormattedStatement >> printGeometricObject: geometricObject on: stream [
 ]
 
 { #category : #'printing-dispatched' }
+P3FormattedStatement >> printInterval: interval on: stream [
+	"Delegate partially to P3Interval that knows how to print itself in postgresql style"
+	
+	stream nextPutAll: #interval; space; nextPut: $'; print: interval; nextPut: $'
+]
+
+{ #category : #'printing-dispatched' }
 P3FormattedStatement >> printNullOn: stream [
 	"nil becomes NULL"
 	
