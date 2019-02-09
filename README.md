@@ -1,14 +1,17 @@
 # P3
 
+
 P3 is a modern, lean and mean PostgreSQL client for Pharo.
 
 [![Build Status](https://travis-ci.org/svenvc/P3.svg?branch=master)](https://travis-ci.org/svenvc/P3)
+
 
 **P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later),
 implementing the simple and extended query cycles. 
 It supports plaintext and md5 password authentication.
 When SQL queries return row data, it efficiently converts incoming data to objects.
 P3Client supports most common PostgreSQL types.
+
 
 P3Client can be configured manually or through a URL.
 
@@ -21,6 +24,7 @@ Not all properties need to be specified, the minimum is the following URL.
 ```smalltalk
 P3Client new url: 'psql://user@localhost'.
 ```
+
 
 P3Client has a minimal public protocol, basically #query: (#execute: is an alias).
 
@@ -35,7 +39,7 @@ execute with specific parameters. Polymorphic to this there is also P3FormattedS
 which you create using the #format: message. These work at the textual, client side level.
 
 
-## Usage
+## Basic Usage
 
 Here is the simplest test that does an actual query, it should return true.
 
@@ -94,6 +98,156 @@ Finally we can clean up.
 -  https://www.postgresql.org/docs/9.6/static/protocol.html
 
 
+## Using Prepared and Formatted Statements
+
+Although you are free to create your SQL statements in any way you see fit,
+feeding them to #execute: and #query:,
+inserting arguments in SQL statements can be hard (because you have to know the correct syntax),
+error prone (because you might violate syntax rules) and dangerous (due to SQL injection attacks).
+
+P3 can help here with two mechanisms: prepared and formatted statements.
+They are mostly polymorphic and use the same template notation.
+They allow you to create a statement once, specifying placeholders with $n, 
+and execute it once or multiple times with concrete arguments,
+with the necessary conversions happening automatically.
+
+The difference between the two is that formatted statements are implemented 
+using simple textual substitution on the client side, while
+prepared statements are evaluated on the server side with full syntax checking,
+and are executed with more type checks.
+Prepared statements are more efficient since the server can do part of its optimalization
+in the prepare phase, saving time on each execution.
+
+Here is a transcript of how to use them. First we set up a client and create a test table.
+
+```smalltalk
+client := P3Client new url: 'psql://sven@localhost'.
+
+client execute: 'DROP TABLE IF EXISTS table1'.
+client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, weight REAL, enabled BOOLEAN)'.
+```
+
+Next we insert some data and then query it using prepared statements.
+
+```smalltalk
+statement := client prepare: 'INSERT INTO table1 (id, name, weight, enabled) VALUES ($1, $2, $3, $4)'.
+
+statement execute: { 1. 'foo'. 75.5. true }.
+statement executeBatch: { { 2. 'bar'. 80.25. true }. { 3. 'foobar'. 10.75. false } }.
+
+statement close.
+
+statement := client prepare: 'SELECT id, name, weight FROM table1 WHERE id = $1 AND enabled = $2'.
+statement query: { 1. true }.
+
+statement close.
+```
+
+Note that prepared statements are server side resources that need to be closed when no longer needed.
+Prepared statements exist in the scope of a single session/connection.
+
+Next we start over and do the same insert and query using formatted statements.
+
+
+```smalltalk
+client execute: 'TRUNCATE TABLE table1'.
+
+statement := client format: 'INSERT INTO table1 (id, name, weight, enabled) VALUES ($1, $2, $3, $4)'.
+
+statement execute: { 1. 'foo'. 75.5. true }.
+statement executeBatch: { { 2. 'bar'. 80.25. true }. { 3. 'foobar'. 10.75. false } }.
+
+statement := client format: 'SELECT id, name, weight FROM table1 WHERE id = $1 AND enabled = $2'.
+statement query: { 1. true }.
+```
+
+And finally we clean up.
+
+```smalltalk
+client execute: 'DROP TABLE table1'.
+client close.
+```
+
+
+## Supported Data Types
+
+P3 supports most common PostgreSQL types. Here are some tables with the details.
+As of PostgreSQL 9.6, there are 41 general purpose data types of which 32 are currently implemented.
+
+These are the 32 general purpose data type currently implemented,
+with the Pharo class they map to.
+
+Name | Alias | Description | Oid | Class 
+-----|-------|-------------|-----|------
+bigint | int8 | signed eight-byte integer | 20 | Integer
+bigserial | serial8 | autoincrementing eight-byte integer | 20 | Integer
+bit [n] | | fixed-length bit string | 1560 | P3FixedBitString
+bit varying | varbit | variable-length bit string | 1562 | P3BitString
+boolean | bool | logical boolean (true/false) | 16 | Boolean
+box | | rectangular box on a plane (upperright, lowerleft) | 603 | P3Box
+bytea | | binary data (byte array) | 17 | ByteArray
+character [n] | char | fixed-length character string | 1042 | String
+character varying | varchar | variable-length character string | 1043 | String
+circle | | circle on a plane (center, radius) | 718 | P3Circle
+date | | calendar date (year,month,day) | 1082 | Date 
+double precision | float8 | double precision floating point number (8 bytes) | 701 | Float
+integer | int, int4 | signed four-byte integer | 23 | Integer
+interval | | time span | 114 | P3Interval
+json | | textual JSON data | 114 | NeoJSONObject
+jsonb | | binary JSON data, decomposed | 3802 | NeoJSONObject
+line | | infinite line on a plane (ax+by+c=0) | 628 | P3Line
+lseg | | line segment on a plane (start,stop) | 601 | P3LineSegment
+numeric | decimal | exact number of selectable precision | 1700 | ScaledDecimal
+path | | geometric path on a plane (points) | 602 | P3Path
+point | | geometric point on a plane (x, y) | 600 | P3Point
+polygon | | closed geometric path on a plane (points) | 604 | P3Polygon
+real | float4 | single-precision floating point number (4-bytes) | 700 | Float
+smallint | int2 | signed two-byte integer | 21 | Integer
+smallserial | serial2 | autoincrementing two-byte integer | 21 | Integer
+serial | serial4 | autoincrementing four-byte integer | 23 | Integer
+text | | variable-length character string | 25 | String
+time [ without time zone ] | | time of day (no time zone) | 1083 | Time
+time with time zone | timetz | time of day including time zone | 1266 | Time
+timestamp [ without time zone ] | | date and time (no time zone) | 1114 | DateAndTime
+timestamp with time zone  | timestamptz | date and time includig time zone | 1184 | DateAndTime
+uuid | | universal unique identifier | 2950 | UUID
+
+Here are the 9 general purpose data types that are not yet implemented.
+
+Name | Description | Oid
+-----|-------------|----
+cidr | IPv4 or IPv6 network address | 650
+inet | IPv4 or IPv6 host address | 869
+macaddr | MAC (Media Access Control) address | 829
+money | currency amount | 790
+pg_lsn | PostgreSQL Log Sequence Number | 3220
+tsquery | text search query | 3615
+tsvector | text search document | 3614
+txid_snapshot | user-level transaction ID snapshot | 2970
+xml | XML data | 142
+
+Additionally, the following 9 common types are also implemented, 
+with the Pharo class they map to.
+
+Name | Description | Oid | Class 
+-----|-------------|-----|------
+oid | object identifier | 26 | Integer 
+name | name | 19 | String
+bpchar | text | 1042 | String
+void | void | 2278 | UndefinedObject
+_bool | boolean array | 1000 | Array<Boolean>
+_int4  | integer array | 1007 | Array<Integer>
+_text |	string	array |	1009 | Array<String>
+_varchar | string array | 1015 | Array<String>
+_float8 | float array |	1022 | Array<Float>
+
+P3 also supports enums. Each enum definition creates a new type.
+You can send #loadEnums to P3Client to create mappings for all visible enums.
+
+When you do a query that results in data of an unknown type you will get an error,
+P3 cannot convert typeOid XXX, where XXX is the oid in the pg_type table. 
+
+
 ## Glorp
 
 Included is **P3DatabaseDriver**, an interface between Glorp, an advanced object-relational mapper, and P3Client.
@@ -137,6 +291,7 @@ Metacello new
    load: 'glorp'.
 ```
 
+
 ## Unit tests
 
 **P3ClientTest** holds unit tests for the P3 PSQL client.
@@ -152,3 +307,19 @@ The minimal being the following:
 ```smalltalk
 P3ClientTest url: 'psql://sven@localhost'.
 ```
+
+
+## Development, Goals, Contributing
+
+The main goal of P3 is to be a modern, lean and mean PostgreSQL client for Pharo.
+Right now, P3 is functional and usable.
+
+The quality of open source software is determined by it being alive, supported and maintained.
+
+The first way to help is to simply use P3 in your projects and tells us about 
+your successes and the issues that you encounter. 
+You can ask questions on the Pharo mailing lists.
+
+Development happens on GitHub, where you can create issues.
+
+Contributions should be done with pull requests solving specific issues.
