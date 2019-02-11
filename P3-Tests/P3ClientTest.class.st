@@ -559,6 +559,29 @@ P3ClientTest >> testStringEscaping [
 ]
 
 { #category : #tests }
+P3ClientTest >> testTimeConversion [
+	| result offset formattedOffset |
+	"TIME WITHOUT TIME ZONE maps 1 on 1"
+	result := client query: 'SELECT TIME ''01:02:03'''.
+	self assert: result firstFieldOfFirstRecord equals: (Time hour: 1 minute: 2 second: 3).
+	"Figure out the offset of the connection's time zone"
+	offset := client converter timezone offsetForTimestamp: ZTimestamp today.
+	formattedOffset := String streamContents: [ :out |
+		out nextPut: (offset positive ifTrue: [ $+ ] ifFalse: [ $- ]).
+		offset hours printOn: out base: 10 length: 2 padded: true.
+		out nextPut: $:.
+		offset minutes printOn: out base: 10 length: 2 padded: true ].
+	"TIME WITH TIME ZONE does not change when the time zone matches"
+	result := client query: 'SELECT TIMETZ ''01:02:03' , formattedOffset , ''''.
+	self assert: result firstFieldOfFirstRecord equals: (Time hour: 1 minute: 2 second: 3).
+	"TIME WITH TIME ZONE is shifted when the time zone differs"
+	result := client query: 'SELECT TIMETZ ''01:02:03+00:00'''.
+	self 
+		assert: result firstFieldOfFirstRecord 
+		equals: ((Time hour: 1 minute: 2 second: 3) addTime: offset).
+]
+
+{ #category : #tests }
 P3ClientTest >> testTimeout [
 	"Reconnect with an explicit timeout"
 	client close.

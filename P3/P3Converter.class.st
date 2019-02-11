@@ -51,6 +51,7 @@ P3Converter class >> typeMap [
 			1114 #(timestamp #convertDateAndTimeWithoutTimezoneFrom:length:description:) 
 			1184 #(timestamptz #convertDateAndTimeFrom:length:description:)
 			1186 #(interval #convertIntervalFrom:length:description:)
+			1266 #(timetz #convertTimeWithTimezoneFrom:length:description:)
 			"special"
 			114 #(json #convertJsonFrom:length:description:)
 			2950 #(uuid #convertUuidFrom:length:description:)
@@ -284,7 +285,32 @@ P3Converter >> convertSymbolFrom: bytes length: length description: description 
 
 { #category : #'converting-chronology' }
 P3Converter >> convertTimeFrom: bytes length: length description: description [
+	"TIME [ WITHOUT TIME ZONE ] corresponds to Time, i.e. 
+	both have no knowledge about the applicable time zone.
+	We assume the time to be correct as there is no sensible conversion to be done"
+	
 	^ Time readFrom: (self asciiStreamFor: bytes length: length)
+]
+
+{ #category : #'converting-chronology' }
+P3Converter >> convertTimeWithTimezoneFrom: bytes length: length description: description [
+	"TIME WITH TIME ZONE corresponds to Time plus an offset. 
+	Time does not hold a time zone nor an offset.
+	We comnpare the offset coming in with the offset for that time today 
+	in our connection's timezone, if they differ we correct to compensate"
+
+	| stream time offset connectionOffset translatedTime |
+	stream := self asciiStreamFor: bytes length: length.
+	time := Time readFrom: stream.
+	offset := DateAndTime readTimezoneOffsetFrom: stream default: Duration zero.
+	connectionOffset := self timezone offsetForTimestamp: (ZTimestamp today + time).
+	^ offset = connectionOffset 
+		ifTrue: [ time ]
+		ifFalse: [ 
+			translatedTime := time subtractTime: (offset - connectionOffset).
+			^ translatedTime seconds < 0 
+				ifTrue: [ translatedTime addSeconds: 24 * 60 * 60 ]
+				ifFalse: [ translatedTime ] ]
 ]
 
 { #category : #'converting-special' }
