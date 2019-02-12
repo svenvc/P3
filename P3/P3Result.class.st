@@ -3,7 +3,7 @@ I am P3Result, I encapsulate the result from a PostgreSQL query.
 
 I hold 3 things:
 
-- results -  the command completion tags, a String (singular if there was only one query) or a collection ofStrings (if there were multiple queries) in the form of 'SELECT 100'
+- results -  the command completion tags, a String (singular if there was only one query) or a collection of Strings (if there were multiple queries) in the form of 'SELECT 100'
 
 - descriptions - a collection of P3RowFieldDescription objects (one for each column, nil if there is no data)
 
