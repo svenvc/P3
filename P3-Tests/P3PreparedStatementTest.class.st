@@ -202,6 +202,38 @@ P3PreparedStatementTest >> testInterval [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testLongQueries [
+	"Test fix for issue: Prepared statements error when query is long and differs slightly at the end
+	https://github.com/svenvc/P3/issues/20"
+
+	| statement select1 select2 result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'.
+	statement executeBatch: #(
+		( 123 'Hello World' true )
+		( 345 'Greetings' false )
+		( 567 'From Mars' true )	).
+	statement close.
+	
+	select1 := client prepare: 'SELECT name, enabled FROM table1 /* long and boring piece of comment */ WHERE id >= $1 order by id'.
+	select2 := client prepare: 'SELECT name, enabled FROM table1 /* long and boring piece of comment */ WHERE id < $1 order by id'.
+
+	result := select1 query: #( 345 ).
+	self assert: result records equals: #( ('Greetings' false) ('From Mars' true ) ).
+	
+	result := select2 query: #( 345 ).
+	self assert: result records equals: #( ('Hello World' true ) ).
+	self assert: select1 name size < 64.
+	
+	statement close.
+	select1 close.
+	select2 close.
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testMultipleInsertStatements [
 
 	| statement1 statement2 |
