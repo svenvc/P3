@@ -423,15 +423,33 @@ P3Client >> port: integer [
 
 { #category : #public }
 P3Client >> prepare: query [
+	"Create a P3PreparedStatement with a default name derived from the query string. 
+	Only the first 63 characters of the name are significant. For longer queries try
+	to make a unique name by using the hash value of the query string."
+
+	| name |
+	
+	name := query.
+	name size > 63
+		ifTrue: [ 
+			| hashString |
+			hashString := name hash printStringHex.
+			name := (name copyFrom: 1 to: 62 - hashString size), '_', hashString ].
+		
+	^ self prepare: query named: name
+]
+
+{ #category : #public }
+P3Client >> prepare: query named: queryName [
 	"Create and return an instance of P3PreparedStatement by parsing query, 
 	which can contain one or more placeholders, once. Later the prepared statement can be executed 
 	multiple times by providing an array with a value for each placeholder. 
-	When no longer needed, the prepared statement should be closed. See P3PreparedStatement."
+	When no longer needed, the prepared statement should be closed. See P3PreparedStatement.
+	Each prepared statement must have a unique name. Note that in a standard Postgres installation 
+	only the first 63 characters of queryName are significant."
 
-	| queryName paramDescriptions rowDescriptions |
+	| paramDescriptions rowDescriptions |
 	
-	queryName := query.
-
 	self 
 		ensureConnected;
 		writeParseMessage: query name: queryName types: #();
