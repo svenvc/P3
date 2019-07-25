@@ -62,31 +62,33 @@ P3PreparedStatement >> bindStrings: inputValues [
 		nextPutString: name;
 		nextPutInt16: 0;
 		nextPutInt16: inputValues size.
-		
-	inputValues with: paramDescriptions do: [ :eachValue :paramDescription |
-		eachValue isNil
-			ifTrue: [ msgBuilder nextPutNullParameter ]
-			ifFalse: [ msgBuilder nextPutParameterAsText: eachValue description: paramDescription ] ].
 
-	msgBuilder 
-		nextPutInt16: 0.	"All result columns use the text format"		
-		
+	inputValues
+		with: paramDescriptions
+		do: [ :eachValue :paramDescription | 
+			eachValue
+				ifNil: [ msgBuilder nextPutNullParameter ]
+				ifNotNil: [ msgBuilder nextPutParameterAsText: eachValue description: paramDescription ]
+			].
+
+	msgBuilder nextPutInt16: 0.	"All result columns use the text format"
+
 	client writeMessageNoFlush: msgBuilder asBytes tag: $B
 ]
 
 { #category : #public }
 P3PreparedStatement >> close [
+
 	"Close this query and release server side resources."
 
-	client isNil 
-		ifTrue: [ ^ self ].
+	client ifNil: [ ^ self ].
 
 	self writeCloseMessage: name type: $S.
-	self writeFlushMessage.
+	self writeFlushMessage.	
 	
 	"Check for CloseComplete message"
 	client readMessage tag = $3
-		ifFalse: [ self error: 'CloseComplete message expected' ].
+		ifFalse: [ self error: 'CloseComplete message expected' ].	
 	
 	"This prepared statement can no longer be used."
 	client := nil
