@@ -87,6 +87,24 @@ P3FormattedStatement >> printByteArray: byteArray on: stream [
 ]
 
 { #category : #'printing-dispatched' }
+P3FormattedStatement >> printDate: date on: stream [
+	"Use ISO 8601 YYYY-MM-DD"
+	
+	stream nextPut: $'.
+	date printOn: stream format: #(3 2 1 $- 1 1 2).
+	stream nextPut: $'
+]
+
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printDateAndTime: dateAndTime on: stream [
+	"Use ISO 8601 YYYY-MM-DDThh:mm:ss.s+ZZ:zz"
+	
+	stream nextPut: $'.
+	dateAndTime printOn: stream.
+	stream nextPut: $' 
+]
+
+{ #category : #'printing-dispatched' }
 P3FormattedStatement >> printGeometricObject: geometricObject on: stream [
 	"Delegate to P3GeometricObject that knows how to print itself in typed quoted PSQL text format"
 	
@@ -137,6 +155,15 @@ P3FormattedStatement >> printString: string on: stream [
 	string do: [ :each |
 		each = $' ifTrue: [ stream nextPut: $' ].
 		stream nextPut: each ].
+	stream nextPut: $'
+]
+
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printTime: time on: stream [
+	"Use ISO 8601 hh:mm:ss"
+	
+	stream nextPut: $'.
+	time print24: true on: stream.
 	stream nextPut: $'
 ]
 

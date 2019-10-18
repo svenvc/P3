@@ -99,6 +99,24 @@ P3MessageBuilder >> printByteArray: byteArray on: stream [
 ]
 
 { #category : #'printing-dispatched' }
+P3MessageBuilder >> printDate: date on: stream [
+	"Use ISO 8601 YYYY-MM-DD"
+	
+	stream nextPut: $'.
+	date printOn: stream format: #(3 2 1 $- 1 1 2).
+	stream nextPut: $'
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printDateAndTime: dateAndTime on: stream [
+	"Use ISO 8601 YYYY-MM-DDThh:mm:ss.s+ZZ:zz"
+	
+	stream nextPut: $'.
+	dateAndTime printOn: stream.
+	stream nextPut: $' 
+]
+
+{ #category : #'printing-dispatched' }
 P3MessageBuilder >> printGeometricObject: geometricObject on: stream [
 	"Delegate to P3GeometricObject that knows how to print itself in unescaped, raw PSQL text format"
 	
@@ -141,6 +159,15 @@ P3MessageBuilder >> printString: string on: stream [
 	"For strings just output the characters of the string, no escaping is needed"
 	
 	stream nextPutAll: string
+]
+
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printTime: time on: stream [
+	"Use ISO 8601 hh:mm:ss"
+	
+	stream nextPut: $'.
+	time print24: true on: stream.
+	stream nextPut: $'
 ]
 
 { #category : #writing }
