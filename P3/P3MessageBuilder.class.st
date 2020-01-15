@@ -170,6 +170,17 @@ P3MessageBuilder >> printTime: time on: stream [
 	stream nextPut: $'
 ]
 
+{ #category : #'printing-dispatched' }
+P3MessageBuilder >> printValuesArray: valuesArray on: stream [
+	| first |
+	first := true.
+	stream nextPut: ${.
+	valuesArray do: [ :each |
+		first ifTrue: [ first := false ] ifFalse: [ stream nextPut: $, ].
+		each p3PrintUsing: self on: stream ].
+	stream nextPut: $}
+]
+
 { #category : #writing }
 P3MessageBuilder >> writeTo: aConnection tag: aChar [
 

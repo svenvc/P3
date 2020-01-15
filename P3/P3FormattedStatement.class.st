@@ -167,6 +167,18 @@ P3FormattedStatement >> printTime: time on: stream [
 	stream nextPut: $'
 ]
 
+{ #category : #'printing-dispatched' }
+P3FormattedStatement >> printValuesArray: valuesArray on: stream [
+	| first |
+	first := true.
+	stream nextPutAll: #array.
+	stream nextPut: $[.
+	valuesArray do: [ :each |
+		first ifTrue: [ first := false ] ifFalse: [ stream nextPut: $, ].
+		each p3PrintUsing: self on: stream ].
+	stream nextPut: $]
+]
+
 { #category : #public }
 P3FormattedStatement >> query: arguments [
 	"Bind the arguments given to the placeholders in my SQL template and
