@@ -3,7 +3,7 @@ I am P3ConnectionPool.
 
 I offer a pool of shared PSQL connections (P3Client instances) as a resource.
 
-After configuring me with at least a url, you use me be calling #withConnection:
+After configuring me with at least a url, you use me by calling #withConnection:
 
   pool := P3ConnectionPool url: 'psql://sven@localhost'.
   pool withConnection: [ :p3Client | 
@@ -15,12 +15,13 @@ When a connection is returned/released to the pool, it becomes available for reu
 
 The pool's size is the number of open connection ready to be reused.
 The pool's capacity is the maximum number of connection that will be pooled.
+Excess connections will be closed when they are returned/released to the pool.
 
 New connections are created as needed.
 You can set a #configurator to further initialize new connections.
 You can use #warmUp or #warmUp: to precreate a number of connections.
 
-When a error occurs, the connection should not be reused and be closed by the caller.
+When an error occurs, the connection should not be reused and be closed by the caller.
 
 "
 Class {

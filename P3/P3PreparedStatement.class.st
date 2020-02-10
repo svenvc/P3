@@ -91,6 +91,7 @@ P3PreparedStatement >> close [
 		ifFalse: [ self error: 'CloseComplete message expected' ].	
 	
 	"This prepared statement can no longer be used."
+	client forgetPreparedStatementNamed: name.
 	client := nil
 ]
 

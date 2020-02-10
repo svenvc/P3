@@ -279,6 +279,39 @@ P3PreparedStatementTest >> testMultipleInsertStatements [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testNamedPreparedStatement [
+	| result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)'.
+	
+	client 
+		prepare: 'INSERT INTO table1 (id, name, enabled) VALUES ($1,$2,$3)'
+		named: 'table1_insert1'.
+	(client preparedStatementNamed: 'table1_insert1') executeBatch: #(
+		( 123 'Hello World' true )
+		( 345 'Greetings' false )
+		( 567 'From Mars' true )	).
+	(client preparedStatementNamed: 'table1_insert1') close.
+	self should: [ client preparedStatementNamed: 'table1_insert1' ] raise: NotFound.
+	
+	client 
+		prepare: 'SELECT name, enabled FROM table1 where id >= $1 order by id'
+		named: 'table1_select1'.
+
+	result := (client preparedStatementNamed: 'table1_select1') query: #( 345 ).
+	self assert: result records equals: #( ('Greetings' false) ('From Mars' true ) ).
+	
+	result := (client preparedStatementNamed: 'table1_select1') query: #( 567 ).
+	self assert: result records equals: #( ('From Mars' true ) ).
+	
+	result := (client preparedStatementNamed: 'table1_select1') query: #( 800 ).
+	self assert: result records equals: #( ).
+	
+	(client preparedStatementNamed: 'table1_select1') close.
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testScaledDecimal [
 
 	| statement result |

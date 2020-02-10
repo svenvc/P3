@@ -181,6 +181,19 @@ P3Client >> converter: anObject [
 	converter := anObject
 ]
 
+{ #category : #private }
+P3Client >> createPreparedStatementNamed: name withParameters: parameterDescriptions andFields: rowDescriptions [
+	| preparedStatement |
+	preparedStatement := P3PreparedStatement 
+		newWith: self 
+		name: name 
+		parameters: parameterDescriptions 
+		fields: rowDescriptions.
+	(properties at: 'prepared_statements' ifAbsentPut: [ Dictionary new ])
+		at: name put: preparedStatement.
+	^ preparedStatement
+]
+
 { #category : #accessing }
 P3Client >> database [
 	"Return the database name I (want to) connect to.
@@ -237,6 +250,14 @@ P3Client >> execute: query [
 	| result |
 	result := self query: query.
 	^ result results
+]
+
+{ #category : #private }
+P3Client >> forgetPreparedStatementNamed: name [
+	properties 
+		at: 'prepared_statements' 
+		ifPresent: [ :preparedStatements | 
+			preparedStatements removeKey: name ifAbsent: [ ] ]
 ]
 
 { #category : #public }
@@ -447,8 +468,8 @@ P3Client >> prepare: query named: queryName [
 	Each prepared statement must have a unique name. Note that in a standard Postgres installation 
 	only the first 63 characters of queryName are significant."
 
-	| paramDescriptions rowDescriptions |
-	
+	| parameterDescriptions rowDescriptions |
+
 	self 
 		ensureConnected;
 		writeParseMessage: query name: queryName types: #();
@@ -460,9 +481,9 @@ P3Client >> prepare: query named: queryName [
 
 	self readMessage.
 	message tag = $t
-		ifTrue: [ paramDescriptions := self processParameterDescription: message readStream ]
+		ifTrue: [ parameterDescriptions := self processParameterDescription: message readStream ]
 		ifFalse: [ 
-			paramDescriptions := #().
+			parameterDescriptions := #().
 			message tag = $n 
 				ifFalse: [ self error: 'NoData message expected' ] ].
 
@@ -477,10 +498,23 @@ P3Client >> prepare: query named: queryName [
 	self readMessage tag = $Z
 		ifFalse: [ ^ self error: 'ReadyForQuery message expected' ].
 
-	^ P3PreparedStatement newWith: self 
-			name: queryName 
-			parameters: paramDescriptions 
-			fields: rowDescriptions
+	^ self 
+		createPreparedStatementNamed: queryName 
+		withParameters: parameterDescriptions 
+		andFields: rowDescriptions
+]
+
+{ #category : #accessing }
+P3Client >> preparedStatementNamed: name [
+	"Return the P3PreparedStatement previously created under name, else signal NotFound"
+	
+	properties 
+		at: 'prepared_statements'
+		ifPresent: [ :preparedStatements |
+			preparedStatements 
+				at: name 
+				ifPresent: [ :preparedStatement | ^ preparedStatement ] ].
+	NotFound signalFor: name in: self
 ]
 
 { #category : #printing }
