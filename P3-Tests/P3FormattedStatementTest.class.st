@@ -1,16 +1,13 @@
 "
 P3FormattedStatementTest holds unit tests for the P3FormattedStatement class.
 
-I reuse the configuration of P3ClientTests.
+I reuse the configuration of P3ClientTest.
 "
 Class {
 	#name : #P3FormattedStatementTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'client'
-	],
-	#classVars : [
-		'Url'
 	],
 	#category : #'P3-Tests'
 }

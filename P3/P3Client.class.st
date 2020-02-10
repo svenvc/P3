@@ -86,9 +86,8 @@ Class {
 	#category : #'P3-Core'
 }
 
-{ #category : #accessing }
+{ #category : #'instance creation' }
 P3Client class >> url: anUrl [
-
 	^ self new url: anUrl 
 ]
 
