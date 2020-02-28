@@ -78,7 +78,6 @@ P3PreparedStatement >> bindStrings: inputValues [
 
 { #category : #public }
 P3PreparedStatement >> close [
-
 	"Close this query and release server side resources."
 
 	client ifNil: [ ^ self ].

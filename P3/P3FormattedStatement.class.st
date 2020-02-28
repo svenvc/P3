@@ -48,6 +48,10 @@ P3FormattedStatement >> client: aP3Client [
 ]
 
 { #category : #public }
+P3FormattedStatement >> close [
+]
+
+{ #category : #public }
 P3FormattedStatement >> execute: arguments [
 	"Bind the arguments given to the placeholders in my SQL template and
 	execute this statement using my client, returning the result"

@@ -186,6 +186,35 @@ P3PreparedStatementTest >> testGeometricTypes [
 ]
 
 { #category : #tests }
+P3PreparedStatementTest >> testInClause [
+	| statement result |
+	
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, name TEXT)'.
+	
+	statement := client prepare: 'INSERT INTO table1 (id, name) VALUES ($1,$2)'.
+	statement executeBatch: #(
+		( 1 'Hello World' )
+		( 2 'Greetings' )
+		( 3 'From Mars' )	).
+	statement close.
+	
+	statement := client prepare: 'SELECT id, name FROM table1 WHERE id = ANY ($1) ORDER BY id'.
+
+	result := statement query: { P3ValuesArray withAll: #( 2 3 ) }.
+	self assert: result records equals: #( (2 'Greetings') (3 'From Mars') ).
+	
+	result := statement query: { P3ValuesArray withAll: #( 3 ) }.
+	self assert: result records equals: #( (3 'From Mars') ).
+	
+	result := statement query: { P3ValuesArray withAll: #( 666 ) }.
+	self assert: result records equals: #( ).
+	
+	statement close.
+	client execute: 'DROP TABLE table1'.
+]
+
+{ #category : #tests }
 P3PreparedStatementTest >> testInsertNull [
 
 	| statement result |
