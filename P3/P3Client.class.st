@@ -176,7 +176,7 @@ P3Client >> converter [
 	^ converter ifNil: [ converter := P3Converter new ]
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 P3Client >> converter: anObject [
 	converter := anObject
 ]
@@ -602,13 +602,6 @@ P3Client >> query: query [
 		runQueryResult
 ]
 
-{ #category : #accessing }
-P3Client >> queryEncoding [
-	"Return the name of the encoder used"
-	
-	^ self converter encoder identifier
-]
-
 { #category : #'input/output' }
 P3Client >> readMessage [
 	"During normal operations, an error is reported followed by a ready for query so that we can continue to use the connection"
@@ -730,6 +723,28 @@ P3Client >> runStartup [
 			message tag = $K
 				ifTrue: [ self processBackendKeyData: message readStream ]
 				ifFalse: [ ^ self error: 'Unexpected message during startup' ] ] ] repeat
+]
+
+{ #category : #accessing }
+P3Client >> serverEncoding [
+	"Return the name of the encoder/decoder used by the server for this session/connection.
+	This is determined automatically from the client_encoding property of the server.
+	One way to set the default at the database level is with the SQL command
+	ALTER DATABASE <mydb> SET client_encoding TO 'UTF8' "
+	
+	self ensureConnected.
+	^ self converter encoder identifier
+]
+
+{ #category : #accessing }
+P3Client >> serverTimezone [
+	"Return the name of the timezone used by the server for this session/connection.
+	This is determined automatically from the TimeZone property of the server.
+	One way to set the default at the database level is with the SQL command
+	ALTER DATABASE <mydb> SET timezone TO 'UTC' "
+	
+	self ensureConnected.
+	^ self converter timezone id
 ]
 
 { #category : #accessing }
