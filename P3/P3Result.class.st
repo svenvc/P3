@@ -218,6 +218,8 @@ P3Result >> rowCount [
 
 { #category : #private }
 P3Result >> rowCountFromCommandResultTag: string [
+
+	string ifEmpty: [ ^ 0 ].
 	^ ($ split: string) last asInteger
 ]
 
