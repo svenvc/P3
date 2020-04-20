@@ -20,11 +20,14 @@ Class {
 { #category : #'instance creation' }
 P3LineSegment class >> readFrom: stream [
 	| start stop |
-	(stream peekFor: $[) ifFalse: [ self error: 'opening [ not found' ].
+	(stream peekFor: $[) ifFalse: [ 
+		(P3Error parsingFailed: 'opening [ not found') signal ].
 	start := P3Point readFrom: stream.
-	(stream peekFor: $,) ifFalse: [ self error: 'separator , not found' ].
+	(stream peekFor: $,) ifFalse: [ 
+		(P3Error parsingFailed: 'separator , not found') signal ].
 	stop := P3Point readFrom: stream.
-	(stream peekFor: $]) ifFalse: [ self error: 'closing ] not found' ].
+	(stream peekFor: $]) ifFalse: [ 
+		(P3Error parsingFailed: 'closing ] not found') signal ].
 	^ self start: start stop: stop
 ]
 

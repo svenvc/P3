@@ -27,14 +27,17 @@ P3Polygon class >> points: aCollectionOfPoints [
 P3Polygon class >> readFrom: stream [
 	| points |
 	points := OrderedCollection new.
-	(stream peekFor: $() ifFalse: [ self error: 'opening ( not found' ].
+	(stream peekFor: $() ifFalse: [ 
+		(P3Error parsingFailed: 'opening ( not found') signal ].
 	[ stream atEnd or: [ stream peek = $) ] ] whileFalse: [ | point |
 		point := P3Point readFrom: stream.
 		points add: point.
 		(stream atEnd or: [ stream peek = $) ] ) 
 			ifFalse: [ 
-				(stream peekFor: $,) ifFalse: [ self error: 'separating , not found' ] ] ].
-	(stream peekFor: $)) ifFalse: [ self error: 'closing ) not found' ].	
+				(stream peekFor: $,) ifFalse: [ 
+					(P3Error parsingFailed: 'separating , not found') signal ] ] ].
+	(stream peekFor: $)) ifFalse: [ 
+		(P3Error parsingFailed: 'closing ) not found') signal ].	
 	^ self points: points
 ]
 

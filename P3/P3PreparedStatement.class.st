@@ -87,7 +87,7 @@ P3PreparedStatement >> close [
 	
 	"Check for CloseComplete message"
 	client readMessage tag = $3
-		ifFalse: [ self error: 'CloseComplete message expected' ].	
+		ifFalse: [ P3Error closeCompleteExpected signal ].	
 	
 	"This prepared statement can no longer be used."
 	client forgetPreparedStatementNamed: name.

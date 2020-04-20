@@ -30,13 +30,17 @@ P3Line class >> a: a b: b c: c [
 { #category : #'instance creation' }
 P3Line class >> readFrom: stream [
 	| a b c |
-	(stream peekFor: ${) ifFalse: [ self error: 'opening { not found' ].
+	(stream peekFor: ${) ifFalse: [ 
+		(P3Error parsingFailed: 'opening { not found') signal ].
 	a := Number readFrom: stream.
-	(stream peekFor: $,) ifFalse: [ self error: 'separator , not found' ].
+	(stream peekFor: $,) ifFalse: [ 
+		(P3Error parsingFailed: 'separator , not found') signal ].
 	b := Number readFrom: stream.
-	(stream peekFor: $,) ifFalse: [ self error: 'separator , not found' ].
+	(stream peekFor: $,) ifFalse: [ 
+		(P3Error parsingFailed: 'separator , not found') signal ].
 	c := Number readFrom: stream.
-	(stream peekFor: $}) ifFalse: [ self error: 'closing } not found' ].
+	(stream peekFor: $}) ifFalse: [ 
+		(P3Error parsingFailed: 'closing } not found') signal ].
 	^ self a: a b: b c: c
 ]
 

@@ -25,11 +25,14 @@ P3Point class >> origin [
 { #category : #'instance creation' }
 P3Point class >> readFrom: stream [
 	| x y |
-	(stream peekFor: $() ifFalse: [ self error: 'opening ( not found' ].
+	(stream peekFor: $() ifFalse: [ 
+		(P3Error parsingFailed: 'opening ( not found') signal ].
 	x := Number readFrom: stream.
-	(stream peekFor: $,) ifFalse: [ self error: 'separator , not found' ].
+	(stream peekFor: $,) ifFalse: [ 
+		(P3Error parsingFailed: 'separator , not found') signal ].
 	y := Number readFrom: stream.
-	(stream peekFor: $)) ifFalse: [ self error: 'closing ) not found' ].
+	(stream peekFor: $)) ifFalse: [ 
+		(P3Error parsingFailed: 'closing ) not found') signal ].
 	^ self x: x y: y
 ]
 

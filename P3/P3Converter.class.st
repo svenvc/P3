@@ -103,7 +103,7 @@ P3Converter >> convert: bytes length: length description: description [
 	 		lambda isSymbol 
 				ifTrue: [ self perform: lambda with: bytes with: length with: description ]
 				ifFalse: [ lambda value: bytes value: length value: description ] ]
-		ifAbsent: [ self error: 'P3 cannot convert typeOid ', description typeOid asString ]
+		ifAbsent: [ (P3Error cannotConvertTypeOid: description typeOid) signal ]
 ]
 
 { #category : #converting }

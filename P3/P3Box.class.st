@@ -21,7 +21,8 @@ Class {
 P3Box class >> readFrom: stream [
 	| upperRight lowerLeft |
 	upperRight := P3Point readFrom: stream.
-	(stream peekFor: $,) ifFalse: [ self error: 'separator , not found' ].
+	(stream peekFor: $,) ifFalse: [ 
+			(P3Error parsingFailed: 'separator , not found') signal ].
 	lowerLeft := P3Point readFrom: stream.
 	^ self upperRight: upperRight lowerLeft: lowerLeft
 ]

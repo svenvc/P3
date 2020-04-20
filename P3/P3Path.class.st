@@ -32,14 +32,18 @@ P3Path class >> readFrom: stream [
 	closer := nil.
 	stream peek = $( ifTrue: [ closer := $) ].
 	stream peek = $[ ifTrue: [ closer := $] ].
-	closer ifNil: [ self error: 'opening ( or [ not found' ] ifNotNil: [ stream next ]. 
+	closer 
+		ifNil: [ (P3Error parsingFailed: 'opening ( or [ not found') signal ] 
+		ifNotNil: [ stream next ]. 
 	[ stream atEnd or: [ stream peek = closer ] ] whileFalse: [ | point |
 		point := P3Point readFrom: stream.
 		points add: point.
 		(stream atEnd or: [ stream peek = closer ] ) 
 			ifFalse: [ 
-				(stream peekFor: $,) ifFalse: [ self error: 'separating , not found' ] ] ].
-	(stream peekFor: closer) ifFalse: [ self error: 'closing ) or ] not found' ].	
+				(stream peekFor: $,) ifFalse: [ 
+					(P3Error parsingFailed: 'separating , not found') signal ] ] ].
+	(stream peekFor: closer) ifFalse: [ 
+		(P3Error parsingFailed: 'closing ) or ] not found') signal ].	
 	path := self points: points.
 	closer = $] ifTrue: [ path beOpen ].
 	^ path

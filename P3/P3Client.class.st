@@ -114,7 +114,7 @@ P3Client >> clearSession [
 
 { #category : #'private messages' }
 P3Client >> clearTextPasswordMessage [
-	self password ifNil: [ self error: 'Password required' ].
+	self password ifNil: [ P3Error passwordRequired signal ].
 	^ self asCString: self password
 ]
 
@@ -226,7 +226,7 @@ P3Client >> ensureOpen [
 
 { #category : #'error handling' }
 P3Client >> error: string [
-	self signal: P3Error using: { $M -> string } asDictionary  
+	self halt
 ]
 
 { #category : #'error handling' }
@@ -386,7 +386,7 @@ P3Client >> md5PasswordMessage: salt [
 	Keep in mind the md5() function returns its result as a hex string."
 	
 	| credential salted |
-	self password ifNil: [ self error: 'Password required' ].
+	self password ifNil: [ P3Error passwordRequired signal ].
 	credential := (MD5 hashMessage: self password , self user) hex.
 	salted := (MD5 hashMessage: credential , salt) hex.
 	^ self asCString: 'md5' , salted
@@ -477,7 +477,7 @@ P3Client >> prepare: query named: queryName [
 		writeSyncMessage.
 
 	self readMessage tag = $1
-		ifFalse: [ ^ self error: 'ParseComplete message expected' ].
+		ifFalse: [ ^ P3Error parseCompleteExpected signal ].
 
 	self readMessage.
 	message tag = $t
@@ -485,7 +485,7 @@ P3Client >> prepare: query named: queryName [
 		ifFalse: [ 
 			parameterDescriptions := #().
 			message tag = $n 
-				ifFalse: [ self error: 'NoData message expected' ] ].
+				ifFalse: [ P3Error noDataExpected signal ] ].
 
 	self readMessage.
 	message tag = $T
@@ -493,10 +493,10 @@ P3Client >> prepare: query named: queryName [
 		ifFalse: [ 
 			rowDescriptions := #().
 			message tag = $n
-				ifFalse: [ self error: 'NoData message expected' ] ].
+				ifFalse: [ P3Error noDataExpected signal ] ].
 
 	self readMessage tag = $Z
-		ifFalse: [ ^ self error: 'ReadyForQuery message expected' ].
+		ifFalse: [ ^ P3Error readyForQueryExpected signal ].
 
 	^ self 
 		createPreparedStatementNamed: queryName 
@@ -655,7 +655,7 @@ P3Client >> runAuthentication [
 					salt := message readStream next: 4.
 					self writeMessage: (self md5PasswordMessage: salt) tag: $p ] ]
 		ifFalse: [ 
-			^ self error: 'Unexpected message during authentication' ] ] repeat
+			^ P3Error unexpectedMessageDuringAuthentication signal ] ] repeat
 ]
 
 { #category : #protocol }
@@ -664,9 +664,9 @@ P3Client >> runExtendedQueryResult: descriptions [
 
 	| rows |
 
-			"Check for BindComplete message"
+	"Check for BindComplete message"
 	message tag = $2
-		ifFalse: [ ^ self error: 'BindComplete message expected' ].
+		ifFalse: [ ^ P3Error bindCompleteExpected signal ].
 	self readMessage.
 
 	rows := Array streamContents: [ :out |
@@ -722,7 +722,7 @@ P3Client >> runStartup [
 		ifFalse: [  
 			message tag = $K
 				ifTrue: [ self processBackendKeyData: message readStream ]
-				ifFalse: [ ^ self error: 'Unexpected message during startup' ] ] ] repeat
+				ifFalse: [ ^ P3Error unexpectedMessageDuringStartup signal ] ] ] repeat
 ]
 
 { #category : #accessing }
@@ -782,7 +782,6 @@ P3Client >> setSSL [
 P3Client >> signal: exceptionClass using: info [
 	exceptionClass new 
 		info: info; 
-		messageText: (info at: $M);
 		signal
 ]
 
@@ -825,7 +824,7 @@ P3Client >> upgradeToSSL [
 			connection := ZdcSecureSocketStream on: connection socket.
 			connection connect ]
 		ifFalse: [ 
-			self error: 'PostgreSQL server did not honor SSL connection request' ]
+			P3Error postgreSQLServerDidNotHonorSSLConnectionRequest signal ]
 
 ]
 

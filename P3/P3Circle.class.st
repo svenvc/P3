@@ -28,11 +28,14 @@ P3Circle class >> center: center radius: radius [
 { #category : #'instance creation' }
 P3Circle class >> readFrom: stream [
 	| center radius |
-	(stream peekFor: $<) ifFalse: [ self error: 'opening < not found' ].
+	(stream peekFor: $<) ifFalse: [ 
+		(P3Error parsingFailed: 'opening < not found') signal ].
 	center := P3Point readFrom: stream.
-	(stream peekFor: $,) ifFalse: [ self error: 'separating , not found' ].
+	(stream peekFor: $,) ifFalse: [ 
+		(P3Error parsingFailed: 'separating , not found') signal ].
 	radius := Number readFrom: stream.
-	(stream peekFor: $>) ifFalse: [ self error: 'closing > not found' ].
+	(stream peekFor: $>) ifFalse: [ 
+		(P3Error parsingFailed: 'closing > not found') signal ].
 	^ self center: center radius: radius
 
 ]
