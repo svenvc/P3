@@ -225,11 +225,6 @@ P3Client >> ensureOpen [
 ]
 
 { #category : #'error handling' }
-P3Client >> error: string [
-	self halt
-]
-
-{ #category : #'error handling' }
 P3Client >> errorNoticeInfo: payload [
 	| info fieldType |
 	info := Dictionary new.
