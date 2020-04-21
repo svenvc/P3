@@ -597,6 +597,13 @@ P3Client >> query: query [
 		runQueryResult
 ]
 
+{ #category : #accessing }
+P3Client >> queryEncoding [
+	"An alias used by PharoDatabaseAccessor, kept for compatibility"
+	
+	^ self serverEncoding
+]
+
 { #category : #'input/output' }
 P3Client >> readMessage [
 	"During normal operations, an error is reported followed by a ready for query so that we can continue to use the connection"
