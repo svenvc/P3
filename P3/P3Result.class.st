@@ -150,9 +150,7 @@ P3Result >> numberOfRecords [
 ]
 
 { #category : #printing }
-P3Result >> printOn: stream [
-	super printOn: stream.
-	stream nextPut: $(.
+P3Result >> printInfoOn: stream [
 	self hasResults
 		ifTrue: [ stream print: results ].
 	self hasData
@@ -162,7 +160,14 @@ P3Result >> printOn: stream [
 				<< (' record' asPluralBasedOn: self numberOfRecords);
 				space;
 				print: self numberOfColumns;
-				<< (' colum' asPluralBasedOn: self numberOfColumns) ].
+				<< (' colum' asPluralBasedOn: self numberOfColumns) ]
+]
+
+{ #category : #printing }
+P3Result >> printOn: stream [
+	super printOn: stream.
+	stream nextPut: $(.
+	self printInfoOn: stream.
 	stream nextPut: $)
 ]
 

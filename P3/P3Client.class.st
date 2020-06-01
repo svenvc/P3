@@ -108,7 +108,6 @@ P3Client >> clearSSL [
 
 { #category : #private }
 P3Client >> clearSession [
-
 	session := nil
 ]
 
@@ -125,6 +124,7 @@ P3Client >> close [
 	connection
 		ifNotNil: [ 
 			[ 
+				self logDisconnecting.
 				self writeMessage: #[] tag: $X. 
 				connection close ] on: Error do: [  ].
 				self clearSession.
@@ -143,7 +143,8 @@ P3Client >> connect [
 		runAuthentication;
 		runStartup;
 		initializeConverter;
-	 	clearSSL
+	 	clearSSL;
+		logConnected
 ]
 
 { #category : #public }
@@ -166,6 +167,17 @@ P3Client >> connection [
 	When I am not connected, return nil."
 	
 	^ connection
+]
+
+{ #category : #'private - logging' }
+P3Client >> connectionIdentification [
+	| url |
+	url := self url.
+	url password ifNotNil: [ url password: 'hiddenpassword' ].
+	url := url printString.
+	^ self isSSL
+		ifTrue: [ url , ' SSL' ]
+		ifFalse: [ url ]
 ]
 
 { #category : #accessing }
@@ -302,11 +314,9 @@ P3Client >> initializeConverter [
 P3Client >> isConnected [
 	"Return true when my connection is in working order (from my end)"
 
-	^ connection notNil and: [ 
-			connection isConnected and: [ 
-				session notNil 
-			] 
-		]
+	^ connection notNil
+			and: [ connection isConnected 
+				and: [ session notNil ] ]
 ]
 
 { #category : #testing }
@@ -373,6 +383,58 @@ P3Client >> loadEnums [
 			type: each second asSymbol 
 			to: #convertSymbolFrom:length:description:.
 		each second asSymbol ]
+]
+
+{ #category : #'private - logging' }
+P3Client >> logConnected [
+	self verbose ifFalse: [ ^ self ].
+	self logMessage: 'CONNECTED ' , self connectionIdentification
+]
+
+{ #category : #'private - logging' }
+P3Client >> logDisconnecting [
+	self verbose ifFalse: [ ^ self ].
+	self logMessage: 'DISCONNECTING ' , self connectionIdentification
+]
+
+{ #category : #'private - logging' }
+P3Client >> logError: error [
+	self verbose ifFalse: [ ^ self ].
+	self logMessage: error
+
+]
+
+{ #category : #'private - logging' }
+P3Client >> logMessage: string [
+	| now |
+	self verbose ifFalse: [ ^ self ].
+	now := DateAndTime now.
+	self crLog: (String streamContents: [ :out |
+		now printYMDOn: out.
+		out space.
+		now printHMSOn: out. 
+		out nextPutAll: ' [P3] '; print: self session.
+		out space; nextPutAll: string ])
+]
+
+{ #category : #'private - logging' }
+P3Client >> logQuery: query [
+	self logMessage: 'QUERY ' , query.
+	properties at: #query_started put: Time millisecondClockValue
+]
+
+{ #category : #'private - logging' }
+P3Client >> logResult: result [
+	| duration |
+	self verbose ifFalse: [ ^ self ].
+	duration := 0.
+	properties at: #query_started ifPresent: [ :initialMilliseconds |
+		duration := Time millisecondsSince: initialMilliseconds ].
+	self logMessage: (String streamContents: [ : out |
+		out nextPutAll: 'RESULT '.
+		result printInfoOn: out.
+		out space; print: duration; nextPutAll: ' ms' ]).
+	properties removeKey: #query_started
 ]
 
 { #category : #'private messages' }
@@ -523,7 +585,6 @@ P3Client >> printOn: stream [
 
 { #category : #private }
 P3Client >> processBackendKeyData: payload [
-
 	session := payload uint32.
 	properties at: 'backend_process_id' put: session.
 	properties at: 'backend_secret_key' put: payload uint32
@@ -710,6 +771,7 @@ P3Client >> runQueryResult [
 	[
 		result addResult: (self converter asciiCStringFrom: message readStream).
 		self readMessage tag = $Z ] whileFalse.
+	self logResult: result.
 	^ result
 ]
 
@@ -761,11 +823,9 @@ P3Client >> serverVersion [
 
 { #category : #accessing }
 P3Client >> session [
-	
 	"Returns the current session identifier (backend process id) if connected"
 	
-	self isConnected ifFalse: [ session := nil ].
-	
+	self isConnected ifFalse: [ self clearSession ].
 	^ session
 ]
 
@@ -782,9 +842,11 @@ P3Client >> setSSL [
 
 { #category : #'error handling' }
 P3Client >> signal: exceptionClass using: info [
-	exceptionClass new 
-		info: info; 
-		signal
+	| exception |
+	(exception := exceptionClass new) 
+		info: info.
+	self logError: exception description.
+	exception signal
 ]
 
 { #category : #'private messages' }
@@ -877,6 +939,23 @@ P3Client >> user: string [
 	settings at: #user put: string
 ]
 
+{ #category : #accessing }
+P3Client >> verbose [
+	"Return true when I am in verbose mode, false otherwise.
+	When in verbose mode, I log information to the Transcript.
+	The default is false."
+
+	^ settings at: #verbose ifAbsentPut: [ false ]
+]
+
+{ #category : #'initialize-release' }
+P3Client >> verbose: boolean [
+	"Set my verbose mode to boolean.
+	When in verbose mode, I log information to the Transcript."
+
+	settings at: #verbose put: boolean
+]
+
 { #category : #'input/output' }
 P3Client >> writeDescribeMessage: aName type: aChar [
 	"Type $S to describe a prepared statement; or $P to describe a portal."
@@ -936,6 +1015,7 @@ P3Client >> writeParseMessage: queryString name: statementName types: paramDataT
 { #category : #'input/output' }
 P3Client >> writeQueryMessage: queryString [
 	| encoder size |
+	self logQuery: queryString.
 	connection nextPut: $Q asInteger.
 	encoder := self converter encoder.
 	size := (encoder encodedByteCountForString: queryString) + 5.
