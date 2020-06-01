@@ -419,6 +419,7 @@ P3Client >> logMessage: string [
 
 { #category : #'private - logging' }
 P3Client >> logQuery: query [
+	self verbose ifFalse: [ ^ self ].
 	self logMessage: 'QUERY ' , query.
 	properties at: #query_started put: Time millisecondClockValue
 ]
