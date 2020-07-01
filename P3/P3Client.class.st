@@ -972,7 +972,7 @@ P3Client >> writeDescribeMessage: aName type: aChar [
 P3Client >> writeMessage: payload [
 	| size |
 	size := payload size + 4.
-	4 to: 1 by: -1 do: [ :index | connection nextPut: (size digitAt: index) ].
+	4 to: 1 by: -1 do: [ :index | connection nextPut: (size byteAt: index) ].
 	payload notEmpty 
 		ifTrue: [ connection nextPutAll: payload ].
 	connection flush
@@ -988,7 +988,7 @@ P3Client >> writeMessage: payload tag: tag [
 P3Client >> writeMessageNoFlush: payload [
 	| size |
 	size := payload size + 4.
-	4 to: 1 by: -1 do: [ :index | connection nextPut: (size digitAt: index) ].
+	4 to: 1 by: -1 do: [ :index | connection nextPut: (size byteAt: index) ].
 	connection nextPutAll: payload.
 
 ]
@@ -1020,7 +1020,7 @@ P3Client >> writeQueryMessage: queryString [
 	connection nextPut: $Q asInteger.
 	encoder := self converter encoder.
 	size := (encoder encodedByteCountForString: queryString) + 5.
-	4 to: 1 by: -1 do: [ :index | connection nextPut: (size digitAt: index) ].
+	4 to: 1 by: -1 do: [ :index | connection nextPut: (size byteAt: index) ].
 	queryString do: [ :each | encoder nextPut: each toStream: connection ].
 	connection nextPut: 0.
 	connection flush

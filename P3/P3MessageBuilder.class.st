@@ -39,13 +39,13 @@ P3MessageBuilder >> nextPutByte: anInteger [
 { #category : #writing }
 P3MessageBuilder >> nextPutInt16: anInteger [
 
-	2 to: 1 by: -1 do: [ :index | byteStream nextPut: (anInteger digitAt: index) ]
+	2 to: 1 by: -1 do: [ :index | byteStream nextPut: (anInteger byteAt: index) ]
 ]
 
 { #category : #writing }
 P3MessageBuilder >> nextPutInt32: anInteger [
 
-	4 to: 1 by: -1 do: [ :index | byteStream nextPut: (anInteger digitAt: index) ]
+	4 to: 1 by: -1 do: [ :index | byteStream nextPut: (anInteger byteAt: index) ]
 ]
 
 { #category : #writing }
