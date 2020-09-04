@@ -21,7 +21,7 @@ Class {
 	#instVars : [
 		'rowCount'
 	],
-	#category : 'P3-Glorp'
+	#category : #'P3-Glorp'
 }
 
 { #category : #executing }
@@ -52,6 +52,19 @@ P3DatabaseDriver >> connect: aLogin [
 		user: aLogin username;
 		password: aLogin password.
 	connection connect
+]
+
+{ #category : #accessing }
+P3DatabaseDriver >> connectSSL: aLogin [
+	connection := self connectionClass new.
+	connection
+		setSSL;
+		host: aLogin host;
+		port: aLogin port asInteger;
+		database: aLogin databaseName;
+		user: aLogin username;
+		password: aLogin password.
+	connection connectSSL
 ]
 
 { #category : #accessing }
