@@ -159,8 +159,9 @@ P3Result >> printInfoOn: stream [
 					results 
 						do: [ :each | stream nextPutAll: each ]
 						separatedBy: [ stream << ', ' ] ] ].
-	self hasData
-		ifTrue: [ stream
+	(self hasData and: [ self data notEmpty ])
+		ifTrue: [ 
+			stream
 				<< ', ';
 				print: self numberOfRecords;
 				<< (' record' asPluralBasedOn: self numberOfRecords);

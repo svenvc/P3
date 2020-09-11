@@ -68,12 +68,13 @@ P3PreparedStatement >> bindStrings: inputValues [
 		do: [ :eachValue :paramDescription | 
 			eachValue
 				ifNil: [ msgBuilder nextPutNullParameter ]
-				ifNotNil: [ msgBuilder nextPutParameterAsText: eachValue description: paramDescription ]
-			].
+				ifNotNil: [ msgBuilder nextPutParameterAsText: eachValue description: paramDescription ] ].
 
-	msgBuilder nextPutInt16: 0.	"All result columns use the text format"
+	msgBuilder nextPutInt16: 0. "All result columns use the text format"
 
-	client writeMessageNoFlush: msgBuilder asBytes tag: $B
+	client writeMessageNoFlush: msgBuilder asBytes tag: $B.
+	
+	client logBinding: self inputValues: inputValues
 ]
 
 { #category : #public }

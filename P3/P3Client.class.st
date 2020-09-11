@@ -375,6 +375,15 @@ P3Client >> loadEnums [
 ]
 
 { #category : #'private - logging' }
+P3Client >> logBinding: statement inputValues: inputValues [
+	(self newLogEvent: P3StatementBoundEvent)
+		statement: statement;
+		inputValues: inputValues;
+		emit.
+	properties at: #query_started put: Time millisecondClockValue
+]
+
+{ #category : #'private - logging' }
 P3Client >> logConnected [
 	(self newLogEvent: P3ConnectionEstablishedEvent)
 		settings: settings copy;
@@ -396,11 +405,19 @@ P3Client >> logError: error [
 ]
 
 { #category : #'private - logging' }
+P3Client >> logPreparedStatement: statement query: query [
+	(self newLogEvent: P3StatementPreparedEvent)
+		statement: statement;
+		query: query;
+		emit
+]
+
+{ #category : #'private - logging' }
 P3Client >> logQuery: query [
 	(self newLogEvent: P3QueryWrittenEvent)
 		query: query;
 		emit.
-	properties at: #query_started put: Time millisecondClockValue
+	properties at: #query_started ifAbsentPut: Time millisecondClockValue
 ]
 
 { #category : #'private - logging' }
@@ -512,7 +529,7 @@ P3Client >> prepare: query named: queryName [
 	Each prepared statement must have a unique name. Note that in a standard Postgres installation 
 	only the first 63 characters of queryName are significant."
 
-	| parameterDescriptions rowDescriptions |
+	| parameterDescriptions rowDescriptions statement |
 
 	self 
 		ensureConnected;
@@ -542,10 +559,14 @@ P3Client >> prepare: query named: queryName [
 	self readMessage tag = $Z
 		ifFalse: [ ^ P3Error readyForQueryExpected signal ].
 
-	^ self 
+	statement := self 
 		createPreparedStatementNamed: queryName 
 		withParameters: parameterDescriptions 
-		andFields: rowDescriptions
+		andFields: rowDescriptions.
+	
+	self logPreparedStatement: statement query: query.
+	 	
+	^ statement
 ]
 
 { #category : #accessing }
@@ -712,7 +733,7 @@ P3Client >> runAuthentication [
 P3Client >> runExtendedQueryResult: descriptions [
 	"Read DataRow ($D) messages until either a CommandComplete ($C) or PortalSuspended ($s) message is received."
 
-	| rows |
+	| rows result |
 
 	"Check for BindComplete message"
 	message tag = $2
@@ -725,19 +746,25 @@ P3Client >> runExtendedQueryResult: descriptions [
 			out nextPut: (self processDataRowUsing: descriptions).
 			self readMessage ] ].
 	
-	^ P3Result descriptions: descriptions
+	result := P3Result descriptions: descriptions
 			rows: rows 
-			message: (self converter asciiCStringFrom: message readStream)
+			message: (self converter asciiCStringFrom: message readStream).
+	
+	self logResult: result.
+	 
+	^ result
 ]
 
 { #category : #protocol }
 P3Client >> runExtendedQueryResults: fieldDescriptions [
 	
-	| results |
+	| results queryStarted |
 
+	queryStarted := Time millisecondClockValue.
 	self readMessage.
 	results := Array streamContents: [ :out |
 		[
+			properties at: #query_started ifAbsentPut: queryStarted. "each result will use the same start"
 			out nextPut: (self runExtendedQueryResult: fieldDescriptions).
 			self readMessage tag = $Z ] whileFalse ].
 	
