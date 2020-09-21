@@ -953,6 +953,17 @@ P3Client >> user: string [
 	settings at: #user put: string
 ]
 
+{ #category : #accessing }
+P3Client >> verbose: flag [
+	"Enable logging to the Transcript when flag is true.
+	Disable logging to the Transcript when flag is false.
+	Note that P3 uses object logging, with which can do much more than output plain strings."
+	
+	flag
+		ifTrue: [ P3LogEvent logToTranscript ] 
+		ifFalse: [ P3LogEvent stopLoggingToTranscript ]
+]
+
 { #category : #'input/output' }
 P3Client >> writeDescribeMessage: aName type: aChar [
 	"Type $S to describe a prepared statement; or $P to describe a portal."
