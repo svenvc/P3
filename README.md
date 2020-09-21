@@ -309,6 +309,57 @@ P3ClientTest url: 'psql://sven@localhost'.
 ```
 
 
+## Logging
+
+P3 uses object logging, an advanced form of code instrumentation.
+This means that during execution instances of subclasses of P3LogEvent
+are created (some including timing information)
+and sent to an Announcer (accessible via P3LogEvent announcer).
+Interested parties can subscribe to these log events
+and use the information contained in them
+to learn about P3 code execution.
+
+The standard print method of a P3LogEvent can be used to generate textual output.
+The following expression enables logging to the Transcript.
+
+```smalltalk
+P3LogEvent logToTranscript.
+```
+
+Executing the four expressions of the Basic Usage section yields the following output.
+
+```
+2020-09-21 16:27:57 001 [P3] 63731 #Connect sven@localhost:5432
+2020-09-21 16:27:57 002 [P3] 63731 #Query SELECT 565 AS N
+2020-09-21 16:27:57 003 [P3] 63731 #Result SELECT 1, 1 record, 1 colum, 4 ms
+2020-09-21 16:27:57 004 [P3] 63731 #Close
+
+2020-09-21 16:28:07 005 [P3] 63733 #Connect sven@localhost:5432
+2020-09-21 16:28:07 006 [P3] 63733 #Query DROP TABLE IF EXISTS table1
+2020-09-21 16:28:07 007 [P3] 63733 #Error P3Notification PostgreSQL table "table1" does not exist, skipping
+2020-09-21 16:28:07 008 [P3] 63733 #Result DROP TABLE, 6 ms
+2020-09-21 16:28:07 009 [P3] 63733 #Query CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN)
+2020-09-21 16:28:07 010 [P3] 63733 #Result CREATE TABLE, 50 ms
+2020-09-21 16:28:07 011 [P3] 63733 #Query INSERT INTO table1 (id, name, enabled) VALUES (1, 'foo', true)
+2020-09-21 16:28:07 012 [P3] 63733 #Result INSERT 0 1, 4 ms
+2020-09-21 16:28:07 013 [P3] 63733 #Query INSERT INTO table1 (id, name, enabled) VALUES (2, 'bar', false)
+2020-09-21 16:28:07 014 [P3] 63733 #Result INSERT 0 1, 0 ms
+2020-09-21 16:28:07 015 [P3] 63733 #Close
+
+2020-09-21 16:28:20 016 [P3] 63737 #Connect sven@localhost:5432
+2020-09-21 16:28:20 017 [P3] 63737 #Query SELECT * FROM table1
+2020-09-21 16:28:20 018 [P3] 63737 #Result SELECT 2, 2 records, 3 colums, 2 ms
+2020-09-21 16:28:20 019 [P3] 63737 #Close
+
+2020-09-21 16:39:52 020 [P3] 63801 #Connect sven@localhost:5432
+2020-09-21 16:39:52 021 [P3] 63801 #Query DROP TABLE table1
+2020-09-21 16:39:52 022 [P3] 63801 #Result DROP TABLE, 13 ms
+2020-09-21 16:39:52 023 [P3] 63801 #Close
+```
+
+Remember that the information inside the log events can be used to build other applications.
+
+
 ## Development, Goals, Contributing
 
 The main goal of P3 is to be a modern, lean and mean PostgreSQL client for Pharo.
