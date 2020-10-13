@@ -154,24 +154,28 @@ P3Converter >> convertCircleFrom: bytes length: length description: description 
 
 { #category : #'converting-chronology' }
 P3Converter >> convertDateAndTimeFrom: bytes length: length description: description [
-	"TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ) is stored internally in Postgres as UTC, but represented in the timezone of the connection, with a correct offset added. In other words, Postgres does the necessary shifting, we just have to read the result"
+	"TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ) is stored internally in Postgres as UTC, but represented in the timezone of the connection, with a correct offset added. In other words, Postgres does the necessary shifting, we just have to read the result. For this to work, the connection output format must be ISO, the default."
 	
-	^ DateAndTime readFrom: (self asciiStreamFor: bytes length: length)
+	^ (P3ISO8601Parser on: (self asciiStreamFor: bytes length: length)) parseDateAndTime
 ]
 
 { #category : #'converting-chronology' }
 P3Converter >> convertDateAndTimeWithoutTimezoneFrom: bytes length: length description: description [
-	"TIMESTAMP WITHOUT TIME ZONE (TIMESTAMP) is stored internally in Postgres the way it was inserted, its representation remains constant, with no offset added. We use the timezone of the connection to do the necessary shifting. This assumes that the timezones used during insert/update and query are the same."
+	"TIMESTAMP WITHOUT TIME ZONE (TIMESTAMP) is stored internally in Postgres the way it was inserted, its representation remains constant, with no offset added. We use the timezone of the connection to do the necessary shifting. This assumes that the timezones used during insert/update and query are the same. For this to work, the connection output format must be ISO, the default."
 
 	| timestamp offset |
-	timestamp := DateAndTime readFrom: (self asciiStreamFor: bytes length: length) defaultOffset: Duration zero.
+	timestamp := (P3ISO8601Parser on: (self asciiStreamFor: bytes length: length)) parseDateAndTime.
 	offset := self timezone offsetForTimestamp: timestamp.
-	^ timestamp translateTo: offset
+	^ offset isZero
+		ifTrue: [ timestamp ]
+		ifFalse: [ timestamp translateTo: offset ]
 ]
 
 { #category : #'converting-chronology' }
 P3Converter >> convertDateFrom: bytes length: length description: description [
-	^ Date readFrom: (self asciiStreamFor: bytes length: length)
+	"For this to work, the connection output format must be ISO, the default"
+	
+	^ (P3ISO8601Parser on: (self asciiStreamFor: bytes length: length)) parseDate
 ]
 
 { #category : #converting }
@@ -287,9 +291,10 @@ P3Converter >> convertSymbolFrom: bytes length: length description: description 
 P3Converter >> convertTimeFrom: bytes length: length description: description [
 	"TIME [ WITHOUT TIME ZONE ] corresponds to Time, i.e. 
 	both have no knowledge about the applicable time zone.
-	We assume the time to be correct as there is no sensible conversion to be done"
+	We assume the time to be correct as there is no sensible conversion to be done.
+	For this to work, the connection output format must be ISO, the default"
 	
-	^ Time readFrom: (self asciiStreamFor: bytes length: length)
+	^ (P3ISO8601Parser on: (self asciiStreamFor: bytes length: length)) parseTime
 ]
 
 { #category : #'converting-chronology' }
@@ -297,12 +302,13 @@ P3Converter >> convertTimeWithTimezoneFrom: bytes length: length description: de
 	"TIME WITH TIME ZONE corresponds to Time plus an offset. 
 	Time does not hold a time zone nor an offset.
 	We comnpare the offset coming in with the offset for that time today 
-	in our connection's timezone, if they differ we correct to compensate"
+	in our connection's timezone, if they differ we correct to compensate.
+	For this to work, the connection output format must be ISO, the default"
 
-	| stream time offset connectionOffset translatedTime |
-	stream := self asciiStreamFor: bytes length: length.
-	time := Time readFrom: stream.
-	offset := DateAndTime readTimezoneOffsetFrom: stream default: Duration zero.
+	| parser time offset connectionOffset translatedTime |
+	parser := P3ISO8601Parser on: (self asciiStreamFor: bytes length: length).
+	time := parser parseTime.
+	offset := parser parseOptionalTimezoneOffset seconds.
 	connectionOffset := self timezone offsetForTimestamp: (ZTimestamp today + time).
 	^ offset = connectionOffset 
 		ifTrue: [ time ]
