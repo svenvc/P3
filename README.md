@@ -250,9 +250,10 @@ P3 cannot convert typeOid XXX, where XXX is the oid in the pg_type table.
 
 ## Authentication
 
-P3 supports plain (#connect) and TLS/SSL encrypted (#connectSSL) connection to PostgreSQL.
+P3 supports plain (#connect) and TLS/SSL encrypted (#connectSSL) connections to PostgreSQL.
 As for authentication, CleartextPassword and MD5Password are supported.
 This means that SCMCredential, GSS, SSPI and SASL are currently not (yet) supported.
+An error will be signalled when the server requests an unsupported authentication.
 
 
 ## Glorp
