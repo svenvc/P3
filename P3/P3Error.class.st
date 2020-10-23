@@ -95,6 +95,13 @@ P3Error class >> unexpectedMessageDuringStartup [
 ]
 
 { #category : #accessing }
+P3Error class >> unsupportedAuthenticationType: type [
+	^ self new 
+		info: { $C->'P3022'. $M->('Unsupported authentication type {1}' format: { type }) } asDictionary; 
+		yourself
+]
+
+{ #category : #accessing }
 P3Error >> code [
 	"Return my unique, locale independent, 5 character string code.
 	The first 2 characters are called the class.

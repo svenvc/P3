@@ -101,6 +101,19 @@ P3Client >> asCString: string [
 	^ bytes
 ]
 
+{ #category : #'private - authentication' }
+P3Client >> authenticationTypes [
+	^ { 
+		0 -> #Ok. 
+		2 -> #KerberosV5. 
+		3 -> #CleartextPassword. 
+		5 -> #MD5Password.
+		6 -> #SCMCredential.
+		7 -> #GSS.
+		9 -> #SSPI.
+		10 -> #SASL } asDictionary
+]
+
 { #category : #private }
 P3Client >> clearSSL [
 	settings removeKey: #ssl ifAbsent: [ ]
@@ -267,6 +280,59 @@ P3Client >> format: anSQLTemplateString [
 		client: self;
 		sql: anSQLTemplateString;
 		yourself
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthentication: code [
+	| type |
+	type := self authenticationTypes 
+		at: code 
+		ifAbsent: [ (P3Error unsupportedAuthenticationType: code) signal ].
+	^ self perform: #handleAuthentication , type
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationCleartextPassword [
+	self writeMessage: self clearTextPasswordMessage tag: $p.
+	^ false
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationGSS [
+	(P3Error unsupportedAuthenticationType: #GSS) signal
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationKerberosV5 [
+	(P3Error unsupportedAuthenticationType: #KerberosV5) signal
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationMD5Password [
+	| salt |
+	salt := message readStream next: 4.
+	self writeMessage: (self md5PasswordMessage: salt) tag: $p.
+	^ false
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationOk [
+	^ true
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationSASL [
+	(P3Error unsupportedAuthenticationType: #SASL) signal
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationSCMCredential [
+	(P3Error unsupportedAuthenticationType: #SCMCredential) signal
+]
+
+{ #category : #'private - authentication' }
+P3Client >> handleAuthenticationSSPI [
+	(P3Error unsupportedAuthenticationType: #SSPI) signal
 ]
 
 { #category : #accessing }
@@ -715,16 +781,10 @@ P3Client >> reset [
 P3Client >> runAuthentication [
 	[
 	self readMessageCloseAfterError tag = $R
-		ifTrue: [ | authenticationCode salt |
-			authenticationCode := message readStream next: 4.
-			authenticationCode = #[ 0 0 0 0 ] "AuthenticationOk"
-				ifTrue: [ ^ self ].
-			authenticationCode = #[ 0 0 0 3 ] "AuthenticationCleartextPassword"
-				ifTrue: [ self writeMessage: self clearTextPasswordMessage tag: $p ].
-			authenticationCode = #[ 0 0 0 5 ] "AuthenticationMD5Password"
-				ifTrue: [
-					salt := message readStream next: 4.
-					self writeMessage: (self md5PasswordMessage: salt) tag: $p ] ]
+		ifTrue: [ | authenticationCode |
+			authenticationCode := (message readStream next: 4) asInteger.
+			(self handleAuthentication: authenticationCode)
+				ifTrue: [ ^ self ] ]
 		ifFalse: [ 
 			^ P3Error unexpectedMessageDuringAuthentication signal ] ] repeat
 ]
