@@ -288,6 +288,7 @@ P3Client >> handleAuthentication: code [
 	type := self authenticationTypes 
 		at: code 
 		ifAbsent: [ (P3Error unsupportedAuthenticationType: code) signal ].
+	properties at: #'authentication_type' put: type.
 	^ self perform: #handleAuthentication , type
 ]
 
@@ -322,6 +323,10 @@ P3Client >> handleAuthenticationOk [
 
 { #category : #'private - authentication' }
 P3Client >> handleAuthenticationSASL [
+	| saslAuthenticationMechanisms |
+	saslAuthenticationMechanisms := Array streamContents: [ :out | | line |
+		[ (line := self converter asciiCStringFrom: message readStream) isEmpty ]
+			whileFalse: [ out nextPut: line ] ].
 	(P3Error unsupportedAuthenticationType: #SASL) signal
 ]
 
