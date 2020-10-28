@@ -248,6 +248,14 @@ When you do a query that results in data of an unknown type you will get an erro
 P3 cannot convert typeOid XXX, where XXX is the oid in the pg_type table. 
 
 
+## Authentication
+
+P3 supports plain (#connect) and TLS/SSL encrypted (#connectSSL) connections to PostgreSQL.
+As for authentication, CleartextPassword and MD5Password are supported.
+This means that SCMCredential, GSS, SSPI and SASL are currently not (yet) supported.
+An error will be signalled when the server requests an unsupported authentication.
+
+
 ## Glorp
 
 Included is **P3DatabaseDriver**, an interface between Glorp, an advanced object-relational mapper, and P3Client.
