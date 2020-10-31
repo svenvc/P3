@@ -151,13 +151,21 @@ P3Client >> connect [
 	
 	self 
 		ensureOpen;
+		connectInternal;
+	 	clearSSL;
+		logConnected
+]
+
+{ #category : #protocol }
+P3Client >> connectInternal [
+	"Run the authentication and startup protocols. Configure the session."
+	
+	self 
 		writeMessage: self startupMessage;
 		reset;
 		runAuthentication;
 		runStartup;
-		initializeConverter;
-	 	clearSSL;
-		logConnected
+		initializeConverter
 ]
 
 { #category : #public }
@@ -167,10 +175,10 @@ P3Client >> connectSSL [
 	
 	self 
 		ensureOpen;
-	 	writeMessage: self sslRequestMessage;
 	 	upgradeToSSL;
-		connect;
-	 	setSSL
+		connectInternal;
+	 	setSSL;
+		logConnected 
 
 ]
 
@@ -288,7 +296,7 @@ P3Client >> handleAuthentication: code [
 	type := self authenticationTypes 
 		at: code 
 		ifAbsent: [ (P3Error unsupportedAuthenticationType: code) signal ].
-	properties at: #'authentication_type' put: type.
+	properties at: #'authentication_type' ifAbsentPut: type. "else OK will overwrite"
 	^ self perform: #handleAuthentication , type
 ]
 
@@ -961,6 +969,7 @@ P3Client >> timeout: seconds [
 { #category : #protocol }
 P3Client >> upgradeToSSL [
 	| reply |
+	self writeMessage: self sslRequestMessage.
 	reply := connection next asCharacter.
 	reply = $S
 		ifTrue: [ 
@@ -1032,6 +1041,7 @@ P3Client >> verbose: flag [
 { #category : #'input/output' }
 P3Client >> writeDescribeMessage: aName type: aChar [
 	"Type $S to describe a prepared statement; or $P to describe a portal."
+	
 	| msgBuilder |
 	msgBuilder := self newMessageBuilder.
 	msgBuilder
@@ -1100,7 +1110,6 @@ P3Client >> writeQueryMessage: queryString [
 
 { #category : #'input/output' }
 P3Client >> writeSyncMessage [
-
 	self writeMessage: #[] tag: $S. 
 
 ]

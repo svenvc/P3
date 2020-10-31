@@ -16,6 +16,17 @@ Class {
 	#category : #'P3-Logging'
 }
 
+{ #category : #accessing }
+P3ConnectionEstablishedEvent >> authenticationType [
+	^ self properties 
+		at: #'authentication_type' 
+		ifPresent: [ :authenticationType |
+			authenticationType = #Ok
+				ifTrue: [ #Trust ]
+				ifFalse: [ authenticationType ] ]
+		ifAbsent: [ nil ]
+]
+
 { #category : #initialization }
 P3ConnectionEstablishedEvent >> clearPassword [
 	settings removeKey: #password
@@ -53,7 +64,8 @@ P3ConnectionEstablishedEvent >> printContentsOn: stream [
 	self user ifNotNil: [ :user | stream nextPutAll: user; nextPut: $@ ].
 	stream nextPutAll: self host; nextPut: $:; print: self port.
 	self database ifNotNil: [ :database | stream nextPut: $/; nextPutAll: database ].
-	self isSSL ifTrue: [ stream nextPutAll: ' SSL' ]
+	self isSSL ifTrue: [ stream nextPutAll: ' SSL' ].
+	self authenticationType ifNotNil: [ :type | stream space; nextPutAll: type ]
 ]
 
 { #category : #accessing }
