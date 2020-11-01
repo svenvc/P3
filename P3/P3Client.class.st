@@ -335,6 +335,10 @@ P3Client >> handleAuthenticationSASL [
 	saslAuthenticationMechanisms := Array streamContents: [ :out | | line |
 		[ (line := self converter asciiCStringFrom: message readStream) isEmpty ]
 			whileFalse: [ out nextPut: line ] ].
+	(saslAuthenticationMechanisms includes: 'SCRAM-SHA-256')
+		ifTrue: [
+			self runSASLSCRAMSHA256Authentication. 
+			^ false ].
 	(P3Error unsupportedAuthenticationType: #SASL) signal
 ]
 
@@ -862,6 +866,22 @@ P3Client >> runQueryResult [
 	^ result
 ]
 
+{ #category : #'private - authentication' }
+P3Client >> runSASLSCRAMSHA256Authentication [
+	| scram  |
+	scram := self scramSHA256.
+	self writeMessage: (self saslSCRAMSHA256FirstMessage: scram) tag: $p. "SASLInitialResponse"
+	self readMessageCloseAfterError tag = $R "AuthenticationSASLContinue"
+		ifFalse: [ P3Error unexpectedMessageDuringAuthentication signal ].
+	self assert: (message readStream next: 4) asInteger = 11.
+	scram serverFirstMessage: message readStream upToEnd asString.
+	self writeMessage: scram clientFinalMessage asByteArray tag: $p. "SASLResponse"
+	self readMessageCloseAfterError tag = $R "AuthenticationSASLFinal"
+		ifFalse: [ P3Error unexpectedMessageDuringAuthentication signal ].
+	self assert: (message readStream next: 4) asInteger = 12.
+	scram serverFinalMessage: message readStream upToEnd asString
+]
+
 { #category : #protocol }
 P3Client >> runStartup [
 	session := 999999 atRandom. "Sometimes $K is not sent and we need a nonNil session"
@@ -874,6 +894,25 @@ P3Client >> runStartup [
 			message tag = $K
 				ifTrue: [ self processBackendKeyData: message readStream ]
 				ifFalse: [ ^ P3Error unexpectedMessageDuringStartup signal ] ] ] repeat
+]
+
+{ #category : #'private messages' }
+P3Client >> saslSCRAMSHA256FirstMessage: scram [
+	| saslMessage |
+	saslMessage := scram clientFirstMessage.
+	^ (self asCString: 'SCRAM-SHA-256')
+		, (saslMessage size asByteArrayOfSize: 4) 
+		, saslMessage asByteArray
+
+]
+
+{ #category : #'private - authentication' }
+P3Client >> scramSHA256 [
+	self password ifNil: [ P3Error passwordRequired signal ].
+	^ P3SCRAM new 
+		sha256; 
+		password: self password; 
+		yourself
 ]
 
 { #category : #accessing }

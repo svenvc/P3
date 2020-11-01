@@ -102,9 +102,8 @@ P3SCRAM >> clientFirstMessage [
 
 { #category : #private }
 P3SCRAM >> clientFirstMessageBare [
-	^ self user
-		ifNil: [ 'r=' , self clientNounce ] 
-		ifNotNil: [ 'n=' , self user , ',r=' , self clientNounce ]
+	^ 'n=' , (self user ifNil: [ '' ])
+		, ',r=' , self clientNounce
 ]
 
 { #category : #private }
