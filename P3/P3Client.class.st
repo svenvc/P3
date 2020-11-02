@@ -7,7 +7,7 @@ I use frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later), i
 
 I can be configured manually or through a URL.
 
-  P3Client new url: 'psql://username:password@localhost:5432/databasename'.
+  P3Client new url: 'psql://username:password@localhost:5432/databasename?sslmode=require'.
 
 Not all properties need to be specified, the minimum is the following URL.
 
@@ -378,7 +378,6 @@ P3Client >> initialize [
 
 { #category : #private }
 P3Client >> initializeConverter [
-
 	self converter initializeFrom: properties
 ]
 
@@ -538,7 +537,6 @@ P3Client >> newLogEvent: logEventClass [
 
 { #category : #private }
 P3Client >> newMessageBuilder [
-
 	^ P3MessageBuilder newWithEncoder: self converter encoder
 ]
 
@@ -788,7 +786,6 @@ P3Client >> readMessageOnError: block [
 
 { #category : #private }
 P3Client >> reset [
-
 	self clearSession.
 	properties removeAll.
 	converter := nil
@@ -955,14 +952,11 @@ P3Client >> session [
 	^ session
 ]
 
-{ #category : #private }
-P3Client >> setConnected [
-
-	settings at: #connected put: true
-]
-
-{ #category : #private }
+{ #category : #'initialize-release' }
 P3Client >> setSSL [
+	"Set a flag to make me use TLS/SSL when connecting to PostgrSQL.
+	The default is to use a plain unencrypted network connection."
+	
 	settings at: #ssl put: true
 ]
 
@@ -1023,20 +1017,22 @@ P3Client >> upgradeToSSL [
 P3Client >> url [
 	"Return my connection URL"
 	
-	^ ZnUrl new
+	| url |
+	(url := ZnUrl new)
 		scheme: #psql;
 		host: self host;
 		port: self port;
 		username: self user;
-		password: self password;
-		addPathSegments: (self database ifNotNil: [ { self database } ] ifNil: [ #() ]);
-		yourself
+		password: self password.
+	self database ifNotNil: [ url addPathSegment: self database ].
+	self isSSL ifTrue: [ url queryAt: #sslmode put: #require ].
+	^ url
 ]
 
 { #category : #'initialize-release' }
 P3Client >> url: stringOrUrl [
 	"Set my connection settings from stringOrUrl according to the format
-	psql://username:password@localhost:5432/databasename 
+	psql://username:password@localhost:5432/databasename?sslmode=require
 	with the minimum being psql://user@localhost"
 	
 	| url |
@@ -1047,7 +1043,9 @@ P3Client >> url: stringOrUrl [
 		port: (url portIfAbsent: [ 5432 ]);
 		user: url username;
 		password: url password;
-		database: url firstPathSegment 
+		database: url firstPathSegment.
+	(url queryAt: #sslmode ifAbsent: [ #disable ]) = #require
+		ifTrue: [ self setSSL ]
 ]
 
 { #category : #accessing }
