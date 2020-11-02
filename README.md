@@ -8,7 +8,7 @@ P3 is a modern, lean and mean PostgreSQL client for Pharo.
 
 **P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later),
 implementing the simple and extended query cycles. 
-It supports plaintext and md5 password authentication.
+It supports plaintext, md5 and scram-sha-256 password authentication.
 When SQL queries return row data, it efficiently converts incoming data to objects.
 P3Client supports most common PostgreSQL types.
 
@@ -32,6 +32,8 @@ Opening a connection to the server (#open) and running the authentication
 and startup protocols (#connect) are done automatically when needed from #query.
 
 P3Client also supports SSL connections. Use #connectSSL to initiate such a connection.
+Alternatively you can add sslmode=require to the connection URL, as in
+'psql://username:password@localhost:5432/databasename?sslmode=require'.
 
 Through the #prepare: message, you can ask P3Client to prepare/parse an SQL statement or
 query with parameters. This will give you a P3PreparedStatement instance than you can then
@@ -248,12 +250,32 @@ When you do a query that results in data of an unknown type you will get an erro
 P3 cannot convert typeOid XXX, where XXX is the oid in the pg_type table. 
 
 
-## Authentication
+## Connection and Authentication
 
-P3 supports plain (#connect) and TLS/SSL encrypted (#connectSSL) connections to PostgreSQL.
-As for authentication, CleartextPassword and MD5Password are supported.
-This means that SCMCredential, GSS, SSPI and SASL are currently not (yet) supported.
+P3 connects over the network (TCP) to PostgreSQL and
+supports plain (#connect) and TLS/SSL encrypted (#connectSSL) connections.
+
+It is out of the scope of this README to explain how to install and configure
+an advanced database like PostgreSQL. There is extensive high quality documentation
+available convering all aspect of PostgreSQL, see https://postgresql.org
+
+Out of the box, most PostgreSQL installations do not allow for network connections
+from other machines, only for local connections.
+Check the listen_addresses directive in postgresql.conf
+
+As for authentication, CleartextPassword, MD5Password and SCRAM-SHA-256 are supported.
+This means that SCMCredential, GSS, SSPI are currently not (yet) supported.
 An error will be signalled when the server requests an unsupported authentication.
+
+You have to create database users, called roles and give them a password.
+In SQL you can do this with CREATE|ALTER ROLE user1 LOGIN PASSWORD 'secret'
+
+Next you have to tell PostgreSQL how network users should authenticate themselves.
+This is done by editing pg_hba.conf choosing specific methods,
+trust (no password, no authentication), password, md5 and scram-sha-256 work with P3.
+
+Note that for SCRAM-SHA-256 to work, you need to change the password_encryption
+directive in postgresql.conf to scam-sha-256, restart and reenter all user passwords.
 
 
 ## Glorp
@@ -337,12 +359,12 @@ P3LogEvent logToTranscript.
 Executing the four expressions of the Basic Usage section yields the following output.
 
 ```
-2020-09-21 16:27:57 001 [P3] 63731 #Connect sven@localhost:5432
+2020-09-21 16:27:57 001 [P3] 63731 #Connect sven@localhost:5432 Trust
 2020-09-21 16:27:57 002 [P3] 63731 #Query SELECT 565 AS N
 2020-09-21 16:27:57 003 [P3] 63731 #Result SELECT 1, 1 record, 1 colum, 4 ms
 2020-09-21 16:27:57 004 [P3] 63731 #Close
 
-2020-09-21 16:28:07 005 [P3] 63733 #Connect sven@localhost:5432
+2020-09-21 16:28:07 005 [P3] 63733 #Connect sven@localhost:5432 Trust
 2020-09-21 16:28:07 006 [P3] 63733 #Query DROP TABLE IF EXISTS table1
 2020-09-21 16:28:07 007 [P3] 63733 #Error P3Notification PostgreSQL table "table1" does not exist, skipping
 2020-09-21 16:28:07 008 [P3] 63733 #Result DROP TABLE, 6 ms
@@ -354,12 +376,12 @@ Executing the four expressions of the Basic Usage section yields the following o
 2020-09-21 16:28:07 014 [P3] 63733 #Result INSERT 0 1, 0 ms
 2020-09-21 16:28:07 015 [P3] 63733 #Close
 
-2020-09-21 16:28:20 016 [P3] 63737 #Connect sven@localhost:5432
+2020-09-21 16:28:20 016 [P3] 63737 #Connect sven@localhost:5432 Trust
 2020-09-21 16:28:20 017 [P3] 63737 #Query SELECT * FROM table1
 2020-09-21 16:28:20 018 [P3] 63737 #Result SELECT 2, 2 records, 3 colums, 2 ms
 2020-09-21 16:28:20 019 [P3] 63737 #Close
 
-2020-09-21 16:39:52 020 [P3] 63801 #Connect sven@localhost:5432
+2020-09-21 16:39:52 020 [P3] 63801 #Connect sven@localhost:5432 Trust
 2020-09-21 16:39:52 021 [P3] 63801 #Query DROP TABLE table1
 2020-09-21 16:39:52 022 [P3] 63801 #Result DROP TABLE, 13 ms
 2020-09-21 16:39:52 023 [P3] 63801 #Close
