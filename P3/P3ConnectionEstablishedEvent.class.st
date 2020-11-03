@@ -60,7 +60,7 @@ P3ConnectionEstablishedEvent >> port [
 { #category : #printing }
 P3ConnectionEstablishedEvent >> printContentsOn: stream [
 	stream print: #Connect.
-	stream space.
+	stream space; nextPutAll: 'psql://'.
 	self user ifNotNil: [ :user | stream nextPutAll: user; nextPut: $@ ].
 	stream nextPutAll: self host; nextPut: $:; print: self port.
 	self database ifNotNil: [ :database | stream nextPut: $/; nextPutAll: database ].

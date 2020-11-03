@@ -30,6 +30,21 @@ SCRAM is a client-first protocol, I implement the client side.
 
 	scram serverFinalMessage: 'v=VVVV'.
 
+Performance note
+
+The computation of the saltedPasssword takes a noticeable amount of time,
+especially with SHA-256 and the conventional 4096 iterations.
+For this reason this computation is cached.
+
+Furthermore, to save time between usages, clients can store my instances
+in my store, under a key, so they can reuse them, potentially gaining
+speed by using a cached result. See P3SCRAM class>>#storeAt:ifAbsentPut:
+This speedup is for all but the first execution of a particular authentication.
+
+Security note
+
+The information held in my instances is sensitive.
+For this reason, my class side store will be reset before each image save.
 "
 Class {
 	#name : #P3SCRAM,
@@ -45,8 +60,19 @@ Class {
 		'serverNounce',
 		'saltedPassword'
 	],
+	#classVars : [
+		'Store'
+	],
 	#category : #'P3-Support'
 }
+
+{ #category : #'class initialization' }
+P3SCRAM class >> initialize [
+	self environment 
+		at: #SessionManager 
+		ifPresent: [ :manager | manager default registerNetworkClassNamed: self name ]
+		ifAbsent: [ Smalltalk addToShutDownList: self ]
+]
 
 { #category : #private }
 P3SCRAM class >> parseMessage: string [
@@ -64,6 +90,38 @@ P3SCRAM class >> parseMessage: string [
 	^ info
 ]
 
+{ #category : #'class initialization' }
+P3SCRAM class >> reset [
+	"Completely throw away my store. It contains sensitive information."
+	
+	Store := nil
+]
+
+{ #category : #'system startup' }
+P3SCRAM class >> shutDown [
+	"Prevent my store of sensitive information to be saved with an image"
+	
+	self reset
+]
+
+{ #category : #accessing }
+P3SCRAM class >> store [
+	"I maintain a store with instances registered under a key"
+	
+	^ Store ifNil: [ Store := Dictionary new ]
+]
+
+{ #category : #accessing }
+P3SCRAM class >> storeAt: key ifAbsentPut: block [
+	"If my store holds a previously registered and used instance, return it,
+	else evaluate block, which should return a newly created instance, that I store and return.
+	Used instances cache their saltedPassword for imrpoved performance."
+
+	^ self store 
+		at: key 
+		ifAbsentPut: block
+]
+
 { #category : #private }
 P3SCRAM >> authMessage [
 	^ self clientFirstMessageBare , ',' 
@@ -74,6 +132,11 @@ P3SCRAM >> authMessage [
 { #category : #accessing }
 P3SCRAM >> channelBinding [
 	^ 'n,,'
+]
+
+{ #category : #private }
+P3SCRAM >> clearSaltedPassword [
+	saltedPassword := nil
 ]
 
 { #category : #public }
@@ -147,7 +210,10 @@ P3SCRAM >> iterations [
 
 { #category : #accessing }
 P3SCRAM >> iterations: count [
-	iteratedHash iterations: count
+	self iterations = count
+		ifTrue: [ ^ self ].
+	iteratedHash iterations: count.
+	self clearSaltedPassword 
 ]
 
 { #category : #accessing }
@@ -157,8 +223,10 @@ P3SCRAM >> password [
 
 { #category : #accessing }
 P3SCRAM >> password: string [
+	password = string
+		ifTrue: [ ^ self ].
 	password := string.
-	saltedPassword := nil
+	self clearSaltedPassword
 ]
 
 { #category : #accessing }
@@ -168,8 +236,10 @@ P3SCRAM >> salt [
 
 { #category : #accessing }
 P3SCRAM >> salt: byteArray [
+	salt = byteArray
+		ifTrue: [ ^ self ].
 	salt := byteArray.
-	saltedPassword := nil
+	self clearSaltedPassword 
 ]
 
 { #category : #private }
