@@ -45,6 +45,17 @@ Security note
 
 The information held in my instances is sensitive.
 For this reason, my class side store will be reset before each image save.
+
+About PostgreSQL's password storage 
+
+If you execute 'SELECT rolname,rolpassword FROM pg_authid' with enough priviledges,
+you can see how PostgreSQL stores passwords. In the case of SCRAM-SHA-256, 
+rolpassword seems to have the following format (using terms used in this implementation): 
+
+SCRAM-SHA-256$<iterations>:<salt(base64>$<storedKey(base64>:<serverKey(base64)>
+
+Using iterations and salt, and of course the password itself, constitutes 
+enough information to calculate everything that does not depend on the nounces.
 "
 Class {
 	#name : #P3SCRAM,
