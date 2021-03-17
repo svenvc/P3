@@ -31,11 +31,11 @@ Class {
 { #category : #accessing }
 P3ClientTest class >> url [
 	"Return the default connection URL to use for P3 clients in the unit tests.
-	Note that the default here corresponds to the default on Travis CI's postgresql service,
-	user postgres with a blank password on localhost.
+	Note that the coded default here corresponds to the GitHub Action CI's postgresql service:
+	user postgres with password postgres, host postgres, port 5432 and databasse postgres. 
 	You should set an appropriate connection string yourself, see #url:"
 	
-	^ Url ifNil: [ Url := 'psql://postgres@localhost' ]
+	^ Url ifNil: [ Url := 'psql://postgres:postgres:5432@postgres/postgres' ]
 ]
 
 { #category : #accessing }
