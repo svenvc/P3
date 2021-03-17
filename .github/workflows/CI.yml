@@ -11,11 +11,14 @@ jobs:
         image: postgres:latest
         # empty password
         env:
-          POSTGRES_PASSWORD:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
         ports:
           - 5432:5432
         # the connect string should now be
-        # postgres://postgres@postgres:5432/postgres
+        # postgres://postgres:postgres@postgres:5432/postgres
         # health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
