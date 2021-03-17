@@ -35,7 +35,7 @@ P3ClientTest class >> url [
 	user postgres with password postgres, host postgres, port 5432 and databasse postgres. 
 	You should set an appropriate connection string yourself, see #url:"
 	
-	^ Url ifNil: [ Url := 'psql://postgres:postgres:5432@postgres/postgres' ]
+	^ Url ifNil: [ Url := 'psql://postgres:postgres@postgres:5432/postgres' ]
 ]
 
 { #category : #accessing }
