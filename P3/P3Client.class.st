@@ -398,6 +398,20 @@ P3Client >> isSSL [
 ]
 
 { #category : #testing }
+P3Client >> isServerVersionAtLeastMajor: major minor: minor [
+	"Return true when the server version if at least major.minor, false otherwise"
+	
+	| serverVersion |
+	serverVersion := ($. split: self serverVersion) collect: [ :each |
+		"try to be robust for non-numeric version elements"
+		Number readFrom: each ifFail: [ nil ] ].
+	^ serverVersion first > major
+			or: [ 
+				serverVersion first = major 
+					and: [ serverVersion second >= minor ] ]
+]
+
+{ #category : #testing }
 P3Client >> isWorking [
 	"Do a trivial query to confirm that I can interact with the server.
 	Return true if successful"

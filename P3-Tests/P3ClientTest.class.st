@@ -52,15 +52,6 @@ P3ClientTest >> benchmark1Size [
 	^ 10000
 ]
 
-{ #category : #testing }
-P3ClientTest >> isServerVersionAtLeastMajor: major minor: minor [
-	| serverVersion |
-	serverVersion := ($. split: client serverVersion) collect: #asNumber.
-	^ serverVersion first > major
-		or:
-			[ serverVersion first = major and: [ serverVersion second >= minor ] ]
-]
-
 { #category : #benchmarking }
 P3ClientTest >> runAllTests [
 	"Runs all tests on the same connection/session"
@@ -226,6 +217,7 @@ P3ClientTest >> testChronology [
 { #category : #tests }
 P3ClientTest >> testCircleConversion [
 	| result |
+	(client isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
 	result := client query: 'SELECT circle ''<(1,2),100>'''.
 	self 
 		assert: result firstFieldOfFirstRecord 
@@ -331,7 +323,7 @@ P3ClientTest >> testIntervalConversion [
 P3ClientTest >> testJsonConversion [
 	| data result |
 	
-	(self isServerVersionAtLeastMajor: 9 minor: 5) ifFalse: [ ^ self skip ].
+	(client isServerVersionAtLeastMajor: 9 minor: 5) ifFalse: [ ^ self skip ].
 	data := NeoJSONObject new 
 		x: 1; 
 		str: 'les élève Français'; 
@@ -347,7 +339,7 @@ P3ClientTest >> testJsonConversion [
 { #category : #tests }
 P3ClientTest >> testLineConversion [
 	| result |
-	(self isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
+	(client isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
 	result := client query: 'SELECT line''{1,2,3}'''.
 	self 
 		assert: result firstFieldOfFirstRecord 
