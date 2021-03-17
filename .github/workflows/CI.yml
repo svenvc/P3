@@ -1,0 +1,36 @@
+name: CI
+
+on: [ push, pull_request, workflow_dispatch ]
+          
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: node:latest
+    services:
+      postgres:
+        image: postgres:latest
+        # empty password
+        env:
+          POSTGRES_PASSWORD:
+        ports:
+          - 5432:5432
+        # the connect string should now be
+        # postgres://postgres@postgres:5432/postgres
+        # health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        smalltalk: [ Pharo64-7.0 ]
+    name: ${{ matrix.smalltalk }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hpi-swa/setup-smalltalkCI@v1
+        with:
+          smalltalk-version: ${{ matrix.smalltalk }}
+      - run: smalltalkci -s ${{ matrix.smalltalk }}
+        shell: bash
+        timeout-minutes: 1
