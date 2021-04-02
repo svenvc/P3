@@ -51,7 +51,7 @@ P3LogEvent class >> logToTranscript [
 	self stopLoggingToTranscript.
 	^ self announcer 
 		when: self 
-		do: [ :event | event crLog ]
+		do: [ :event | Transcript crShow: event ]
 ]
 
 { #category : #accessing }
