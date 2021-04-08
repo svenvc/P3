@@ -49,7 +49,7 @@ BaselineOfP3 >> baselineOf: spec [
 		do: [
 			spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON:master/repository' ].
 			spec baseline: 'ZTimestamp' with: [ spec repository: 'github://svenvc/ztimestamp:master/repository' ].
-			spec baseline: 'Glorp' with: [ spec repository: 'github://pharo-rdbms/glorp:master/'].
+			spec baseline: 'Glorp' with: [ spec repository: 'github://ba-st-dependencies/Glorp:release-candidate/'].
 			spec package: 'P3' with: [ spec requires: #('NeoJSON' 'ZTimestamp') ].
 			spec package: 'P3-Tests' with: [ spec requires: #('P3') ].
 			spec package: 'P3-Glorp' with: [ spec requires: #('P3' 'Glorp') ].
