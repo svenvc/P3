@@ -48,8 +48,10 @@ P3MessageBuffer >> rawByteBuffer [
 
 { #category : #initialization }
 P3MessageBuffer >> readFrom: readStream [
-	| length |
-	self tag: readStream next asCharacter.
+	| byte length |
+	(byte := readStream next)
+		ifNil: [ ^ ConnectionClosed signal ].
+	self tag: byte asCharacter.
 	length := (self uint32From: readStream) - 4.
 	self initializeForSize: length.
 	length > 0
