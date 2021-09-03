@@ -36,18 +36,18 @@ Use a login that looks as follows
 
 "
 Class {
-	#name : #BaselineOfP3,
-	#superclass : #BaselineOf,
+	#name : 'BaselineOfP3',
+	#superclass : 'BaselineOf',
 	#category : 'BaselineOfP3'
 }
 
-{ #category : #baseline }
+{ #category : 'baseline' }
 BaselineOfP3 >> baselineOf: spec [
 	<baseline>
 	spec
 		for: #common
 		do: [
-			spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON:master/repository' ].
+			spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON:v17/repository' ].
 			spec baseline: 'ZTimestamp' with: [ spec repository: 'github://svenvc/ztimestamp:master/repository' ].
 			spec baseline: 'Glorp' with: [ spec repository: 'github://pharo-rdbms/glorp:master/'].
 			spec package: 'P3' with: [ spec requires: #('NeoJSON' 'ZTimestamp') ].
