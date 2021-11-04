@@ -530,6 +530,14 @@ P3Client >> logResult: result [
 	properties removeKey: #query_started
 ]
 
+{ #category : #'private - logging' }
+P3Client >> logRetryConnection: remaining [
+	(self newLogEvent: P3RetryConnectionEvent)
+		remaining: remaining;
+		delay: self retryDelay;
+		emit
+]
+
 { #category : #'private messages' }
 P3Client >> md5PasswordMessage: salt [
 	"concat('md5', md5(concat(md5(concat(password, username)), random-salt))).
@@ -755,10 +763,11 @@ P3Client >> query: query [
 	Descriptions is a collection of row field description objects, if any.
 	Data is a collection of rows with fully converted field values as objects, if any."
 
-	^ self 
-		ensureConnected;
-		writeQueryMessage: query;
-		runQueryResult
+	^ self withConnection: [
+		self 
+			ensureConnected;
+			writeQueryMessage: query;
+			runQueryResult ]
 ]
 
 { #category : #accessing }
@@ -803,6 +812,38 @@ P3Client >> reset [
 	self clearSession.
 	properties removeAll.
 	converter := nil
+]
+
+{ #category : #accessing }
+P3Client >> retryCount [
+	"Return how many times a reconnection will be tried on a failed connection, the default being 10 times.
+	See also #retryDelay."
+	
+	^ settings at: #retryCount ifAbsentPut: [ 10 ]
+]
+
+{ #category : #'initialize-release' }
+P3Client >> retryCount: count [
+	"Set how many times a reconnection will be tried on a failed connection, the default being 10 times.
+	See also #retryDelay:"
+	
+	^ settings at: #retryCount put: count
+]
+
+{ #category : #accessing }
+P3Client >> retryDelay [
+	"Return the delay after which a reconnection will be tried on a failed connection, the default being 5 seconds.
+	See also #retryCount."
+	
+	^ settings at: #retryDelay ifAbsentPut: [ 5 ]
+]
+
+{ #category : #'initialize-release' }
+P3Client >> retryDelay: seconds [
+	"Set the delay after which a reconnection will be tried on a failed connection, the default being 5 seconds.
+	See also #retryCount:"
+	
+	^ settings at: #retryDelay put: 5
 ]
 
 { #category : #protocol }
@@ -1090,6 +1131,25 @@ P3Client >> verbose: flag [
 	flag
 		ifTrue: [ P3LogEvent logToTranscript ] 
 		ifFalse: [ P3LogEvent stopLoggingToTranscript ]
+]
+
+{ #category : #private }
+P3Client >> withConnection: block [
+	"Execute block, code that will use my conneciton.
+	Handle network errors with a retry/reconnection scheme"
+	
+	^ [ block value "first try" ] 
+		on: NetworkError 
+		do: [ 
+			self close. "first immediate retry"
+			self retryCount to: 1 by: -1 do: [ :remaining | 
+				[ ^ block value ]
+					on: NetworkError 
+					do: [ 
+						self close. "retry after wait"
+						self logRetryConnection: remaining.
+						self retryDelay seconds wait ] ].
+			block value "final unprotected try" ]
 ]
 
 { #category : #'input/output' }

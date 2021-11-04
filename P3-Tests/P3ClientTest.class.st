@@ -579,6 +579,7 @@ P3ClientTest >> testTimeout [
 	client close.
 	client url: Url.
 	client timeout: 1. "second"
+	client retryCount: 0; retryDelay: 0. "make sure there is no retry waiting"
 	self assert: client isWorking.
 	"The following (sleeping for 0.5 seconds) should just pass successfully"
 	client execute: 'SELECT pg_sleep(0.5)'.

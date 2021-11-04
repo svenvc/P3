@@ -124,7 +124,8 @@ P3LogEvent >> printOn: stream [
 	timestamp printHMSOn: stream. 
 	stream space.
 	id \\ 1000 printOn: stream base: 10 length: 3 padded: true.
-	stream nextPutAll: ' [P3] '; print: session; space.
+	stream nextPutAll: ' [P3] '.
+	session ifNotNil: [ stream print: session; space ].
 	self printContentsOn: stream
 ]
 
