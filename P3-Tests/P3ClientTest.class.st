@@ -388,6 +388,23 @@ P3ClientTest >> testMultiStatement [
 ]
 
 { #category : #tests }
+P3ClientTest >> testMultipleCommandsInOneRequest [
+	| result |
+	result := client query: 'SELECT 100'.
+	self assert: result firstFieldOfFirstRecord equals: 100.
+	self assert: result results equals: 'SELECT 1'.
+	self assert: result firstResult equals: 'SELECT 1'.
+	result := client query: 'SELECT 100; SELECT 200'.
+	self assert: result firstFieldOfFirstRecord equals: 200.
+	self assert: result results equals: #('SELECT 1' 'SELECT 1').
+	self assert: result lastResult equals: 'SELECT 1'.
+	result := client query: 'SELECT 10; SELECT 20; SELECT 30'.
+	self assert: result firstFieldOfFirstRecord equals: 30.
+	self assert: result results equals: #('SELECT 1' 'SELECT 1' 'SELECT 1').
+	self assert: result lastResult equals: 'SELECT 1'
+]
+
+{ #category : #tests }
 P3ClientTest >> testNonAsciiStrings [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
