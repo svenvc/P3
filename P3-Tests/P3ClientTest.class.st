@@ -388,6 +388,28 @@ P3ClientTest >> testMultiStatement [
 ]
 
 { #category : #tests }
+P3ClientTest >> testMultipleCommandeInOneRequest [
+	| result |
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	result := client
+		query:
+			'CREATE TABLE table1 (id INTEGER, name TEXT, enabled BOOLEAN);
+INSERT INTO table1 (id, name, enabled) VALUES (1, ''foo'', true);
+INSERT INTO table1 (id, name, enabled) VALUES (2, ''bar'', false);
+INSERT INTO table1 (id, name, enabled) VALUES (NULL, NULL, NULL);
+SELECT id, name, enabled FROM table1 WHERE id = 1;
+SELECT id, name, enabled FROM table1 WHERE id = 2'.
+	self assert: result firstRecord equals: #(2 'bar' false).
+	result := client
+		query:
+			'DELETE FROM table1 WHERE id IS NULL;
+UPDATE table1 SET name = ''xxx'' WHERE id = 2;
+SELECT id, name, enabled FROM table1 WHERE id = 2'.
+	self assert: result firstRecord equals: #(2 'xxx' false).
+	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #tests }
 P3ClientTest >> testNonAsciiStrings [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
