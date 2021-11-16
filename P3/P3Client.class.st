@@ -915,7 +915,9 @@ P3Client >> runQueryResult [
 						self assert: message tag = $D.
 						out nextPut: (self processDataRowUsing: result descriptions) ] ]) ].
 		result addResult: (self converter asciiCStringFrom: message readStream).
-		self readMessage tag = $Z ] whileFalse.
+		self readMessage tag = $S
+			ifTrue: [ self processParameterStatus: message readStream; readMessage ].
+		message tag = $Z ] whileFalse.
 	self logResult: result.
 	^ result
 ]
