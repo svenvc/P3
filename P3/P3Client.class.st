@@ -902,7 +902,7 @@ P3Client >> runExtendedQueryResults: fieldDescriptions [
 
 { #category : #protocol }
 P3Client >> runQueryResult [
-	| result tag |
+	| result |
 	result := P3Result new.
 	self readMessage tag. 
 	[ 
