@@ -636,6 +636,39 @@ P3ClientTest >> testTimezone [
 ]
 
 { #category : #tests }
+P3ClientTest >> testTimezoneZTimestamp [
+	| result originalTimezone |
+	client close; timestampClass: ZTimestamp.
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, t1 TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP, t2 TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP)'.
+	originalTimezone := client converter timezone id.
+	client execute: ('INSERT INTO table1 (name) VALUES (''{1}'')' format: { originalTimezone }).
+	result := client query: 'SELECT id, name, t1, t2 FROM table1 WHERE id = 1'.
+	self assert: result firstRecord first equals: 1.
+	self assert: result firstRecord second equals: client converter timezone id.
+	self assert: (ZTimestamp now - result firstRecord third) abs < 30 seconds.
+	self assert: (ZTimestamp now - result firstRecord fourth) abs < 30 seconds.
+	client execute: 'SET TIMEZONE TO ''GMT'''.
+	result := client query: 'SHOW TIMEZONE'.
+	self assert: result firstFieldOfFirstRecord equals: 'GMT'.
+	client converter timezone: ZTimezone gmt.
+	client execute: ('INSERT INTO table1 (name) VALUES (''{1}'')' format: { client converter timezone id }).
+	result := client query: 'SELECT id, name, t1, t2 FROM table1 WHERE id = 1'.
+	self assert: result firstRecord first equals: 1.
+	"t1 is now off, since postgres did not adjust it"
+	self assert: (((ZTimezone id: originalTimezone) gmtToLocal: ZTimestamp now) - result firstRecord third) abs < 30 seconds.
+	self assert: (ZTimestamp now - result firstRecord fourth) abs < 30 seconds.
+	result := client query: 'SELECT id, name, t1, t2 FROM table1 WHERE id = 2'.
+	self assert: result firstRecord first equals: 2.
+	self assert: result firstRecord second equals: client converter timezone id.
+	self assert: (ZTimestamp now - result firstRecord third) abs < 30 seconds.
+	self assert: (ZTimestamp now - result firstRecord fourth) abs < 30 seconds.
+	client execute: ('SET TIMEZONE TO ''{1}''' format: { originalTimezone }).
+	client converter timezone: (ZTimezone id: originalTimezone).
+	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #tests }
 P3ClientTest >> testUuid [
 
 	| result uuid num |
@@ -652,4 +685,51 @@ P3ClientTest >> testUuid [
 	self assert: result firstRecord equals: { uuid. num }.
 	
 	client execute: 'DROP TABLE testUUID'
+]
+
+{ #category : #tests }
+P3ClientTest >> testZTimestamp [
+	| result |
+	client close; timestampClass: ZTimestamp.
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP)'.
+	client execute: 'INSERT INTO table1 (name) VALUES (''Chronology'')'.
+	result := client query: 'SELECT id, name, timestamp_created FROM table1 WHERE id = 1'.
+	self assert: result firstRecord first equals: 1.
+	self assert: result firstRecord second equals: 'Chronology'.
+	"For TIMESTAMP WITHOUT TIMEZONE, CURRENT_TIMESTAMP looks at the TIMEZONE set for the session and inserts those values as such,
+	Postgres will not do any conversions, not at insert time, not at query time. P3 will assume the TIMEZONE of the session is
+	still correct and applies the offset, keeping the same UTC timestamp"
+	self assert: (ZTimestamp now - result firstRecord third) abs < 30 seconds.
+	"When inserting into a TIMESTAMP WITHOUT TIMEZONE Postgres will do no conversions and assume you know what you are doing,
+	which means that we have to supply a timestamp with values matching the TIMEZONE set for the session"
+	client execute: ('INSERT INTO table1 (name, timestamp_created) VALUES (''{1}'', ''{2}'')'
+		format: { 'Pharo'. client converter timezone gmtToLocal: ZTimestamp now }).
+	result := client query: 'SELECT id, name, timestamp_created FROM table1 WHERE id = 2'.
+	self assert: result firstRecord first equals: 2.
+	self assert: result firstRecord second equals: 'Pharo'.
+	"P3 will assume the TIMEZONE of the session is still correct and apply the offset, keeping the same UTC timestamp,
+	it basically does a #gmtToLocal:"
+	self assert: (ZTimestamp now - result firstRecord third) abs < 30 seconds.
+	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #tests }
+P3ClientTest >> testZTimestampWithTimezone [
+	| result |
+	client close; timestampClass: ZTimestamp.
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id SERIAL PRIMARY KEY, name TEXT, timestamp_created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP)'.
+	client execute: 'INSERT INTO table1 (name) VALUES (''Chronology'')'.
+	result := client query: 'SELECT id, name, timestamp_created FROM table1 WHERE id = 1'.
+	self assert: result firstRecord first equals: 1.
+	self assert: result firstRecord second equals: 'Chronology'.
+	self assert: (ZTimestamp now - result firstRecord third) abs < 30 seconds.
+	client execute: ('INSERT INTO table1 (name, timestamp_created) VALUES (''{1}'', ''{2}'')'
+		format: { 'Pharo'. ZTimestamp now }).
+	result := client query: 'SELECT id, name, timestamp_created FROM table1 WHERE id = 2'.
+	self assert: result firstRecord first equals: 2.
+	self assert: result firstRecord second equals: 'Pharo'.
+	self assert: (ZTimestamp now - result firstRecord third) abs < 30 seconds.
+	client execute: 'DROP TABLE table1'
 ]

@@ -44,3 +44,14 @@ P3ISO8601ParserTest >> testTime [
 		equals: (Time hour: 1 minute: 2 second: 3 nanoSecond: 123000).
 
 ]
+
+{ #category : #tests }
+P3ISO8601ParserTest >> testZTimestamp [
+	self 
+		assert: ((P3ISO8601Parser on: '2020-10-13 10:49:48.251174+02') timestampClass: ZTimestamp; parseDateAndTime)
+		equals: (ZTimestamp year: 2020 month: 10 day: 13 hour: 10 minute: 49 second: 48 nanoSecond: 251174000 offset: 2 hours).
+	self 
+		assert: ((P3ISO8601Parser on: '2020-10-13 10:49:48.251174') timestampClass: ZTimestamp; parseDateAndTime)
+		equals: (ZTimestamp year: 2020 month: 10 day: 13 hour: 10 minute: 49 second: 48 nanoSecond: 251174000 offset: Duration zero).
+
+]

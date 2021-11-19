@@ -12,7 +12,8 @@ Class {
 	#name : #P3ISO8601Parser,
 	#superclass : #Object,
 	#instVars : [
-		'stream'
+		'stream',
+		'timestampClass'
 	],
 	#category : #'P3-Support'
 }
@@ -24,7 +25,12 @@ P3ISO8601Parser class >> on: stringOrReadSstream [
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : #initialization }
+P3ISO8601Parser >> initialize [
+	timestampClass := DateAndTime
+]
+
+{ #category : #initialization }
 P3ISO8601Parser >> on: readStream [
 	stream := readStream 
 ]
@@ -50,7 +56,7 @@ P3ISO8601Parser >> parseDateAndTime [
 	stream peekFor: $ .
 	time := self parseTimeElements.
 	timezoneOffset := self parseOptionalTimezoneOffset.
-	^ DateAndTime 
+	^ timestampClass 
 			year: date first 
 			month: date second 
 			day: date third 
@@ -147,4 +153,11 @@ P3ISO8601Parser >> parseTimezoneOffset [
 		ifTrue: [ self parsePositiveInteger ]
 		ifFalse: [ 0 ].
 	^ sign * ((hours * 3600) + (minutes * 60))
+]
+
+{ #category : #initialization }
+P3ISO8601Parser >> timestampClass: aClass [
+	"Set the class for timestamps, which will be sent #year:month:day:hour:minute:second:nanoSecond:offset:"
+	
+	timestampClass := aClass
 ]

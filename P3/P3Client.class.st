@@ -378,7 +378,8 @@ P3Client >> initialize [
 
 { #category : #private }
 P3Client >> initializeConverter [
-	self converter initializeFrom: properties
+	self converter initializeFrom: properties.
+	self converter timestampClass: self timestampClass
 ]
 
 { #category : #testing }
@@ -827,7 +828,7 @@ P3Client >> retryCount: count [
 	"Set how many times a reconnection will be tried on a failed connection, the default being 10 times.
 	See also #retryDelay:"
 	
-	^ settings at: #retryCount put: count
+	settings at: #retryCount put: count
 ]
 
 { #category : #accessing }
@@ -843,7 +844,7 @@ P3Client >> retryDelay: seconds [
 	"Set the delay after which a reconnection will be tried on a failed connection, the default being 5 seconds.
 	See also #retryCount:"
 	
-	^ settings at: #retryDelay put: 5
+	settings at: #retryDelay put: 5
 ]
 
 { #category : #protocol }
@@ -1061,6 +1062,24 @@ P3Client >> timeout: seconds [
 	settings at: #timeout put: seconds
 ]
 
+{ #category : #accessing }
+P3Client >> timestampClass [
+	"Return the class used to create instances for TIMESTAMP WITH[OUT] TIME ZONE
+	by sending it #year:month:day:hour:minute:second:nanoSecond:offset:
+	The default is DateAndTime. A good alternative is ZTimestamp."
+	
+	^ settings at: #timestampClass ifAbsentPut: [ DateAndTime ]
+]
+
+{ #category : #'initialize-release' }
+P3Client >> timestampClass: timestampClass [
+	"Set the class used to create instances for TIMESTAMP WITH[OUT] TIME ZONE
+	by sending it #year:month:day:hour:minute:second:nanoSecond:offset:
+	The default is DateAndTime. A good alternative is ZTimestamp."
+	
+	settings at: #timestampClass put: timestampClass
+]
+
 { #category : #protocol }
 P3Client >> upgradeToSSL [
 	| reply |
@@ -1130,7 +1149,7 @@ P3Client >> user: string [
 P3Client >> verbose: flag [
 	"Enable logging to the Transcript when flag is true.
 	Disable logging to the Transcript when flag is false.
-	Note that P3 uses object logging, with which can do much more than output plain strings."
+	Note that P3 uses object logging, with which you can do much more than output plain strings."
 	
 	flag
 		ifTrue: [ P3LogEvent logToTranscript ] 
