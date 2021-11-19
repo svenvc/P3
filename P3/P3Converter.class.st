@@ -306,7 +306,7 @@ P3Converter >> convertTimeFrom: bytes length: length description: description [
 P3Converter >> convertTimeWithTimezoneFrom: bytes length: length description: description [
 	"TIME WITH TIME ZONE corresponds to Time plus an offset. 
 	Time does not hold a time zone nor an offset.
-	We comnpare the offset coming in with the offset for that time today 
+	We compare the offset coming in with the offset for that time today 
 	in our connection's timezone, if they differ we correct to compensate.
 	For this to work, the connection output format must be ISO, the default"
 
