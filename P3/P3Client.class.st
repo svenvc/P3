@@ -1118,7 +1118,7 @@ P3Client >> url: stringOrUrl [
 	
 	| url |
 	url := stringOrUrl asUrl.
-	self assert: url scheme = #psql.
+	self assert: (#(psql postgres postgresql) includes: url scheme).
 	self
 		host: url host;
 		port: (url portIfAbsent: [ 5432 ]);
