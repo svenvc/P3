@@ -19,9 +19,9 @@ Class {
 }
 
 { #category : #'instance creation' }
-P3ISO8601Parser class >> on: stringOrReadSstream [
+P3ISO8601Parser class >> on: stringOrReadStream [
 	^ self new 
-		on: stringOrReadSstream readStream; 
+		on: stringOrReadStream readStream; 
 		yourself
 ]
 

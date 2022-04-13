@@ -45,7 +45,7 @@ Now we can query the contents of the simple table we just created.
 
 The result is an instance of P3Result
 
-    a P3Result('SELECT 2' 2 records 3 colums)
+    a P3Result('SELECT 2' 2 records 3 columns)
 
 P3Result contains 3 elements,  results, descriptions & data:
 - Results is a string (collection of strings for multiple embedded queries) indicating successful execution.
@@ -1158,7 +1158,7 @@ P3Client >> verbose: flag [
 
 { #category : #private }
 P3Client >> withConnection: block [
-	"Execute block, code that will use my conneciton.
+	"Execute block, code that will use my connection.
 	Handle network errors with a retry/reconnection scheme"
 	
 	^ [ block value "first try" ] 

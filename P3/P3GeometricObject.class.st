@@ -1,6 +1,6 @@
 "
-I am P3GeometricObject, the abstract superclass for all PostgreSQL geometric data tyoes, 
-representing two-dimenional spatial objects.
+I am P3GeometricObject, the abstract superclass for all PostgreSQL geometric data types, 
+representing two-dimensional spatial objects.
 "
 Class {
 	#name : #P3GeometricObject,
