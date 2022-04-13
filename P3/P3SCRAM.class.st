@@ -48,7 +48,7 @@ For this reason, my class side store will be reset before each image save.
 
 About PostgreSQL's password storage 
 
-If you execute 'SELECT rolname,rolpassword FROM pg_authid' with enough priviledges,
+If you execute 'SELECT rolname,rolpassword FROM pg_authid' with enough privileges,
 you can see how PostgreSQL stores passwords. In the case of SCRAM-SHA-256, 
 rolpassword seems to have the following format (using terms used in this implementation): 
 
