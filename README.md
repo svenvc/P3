@@ -222,7 +222,7 @@ tsvector | text search document | 3614
 txid_snapshot | user-level transaction ID snapshot | 2970
 xml | XML data | 142
 
-Additionally, the following 9 common types are also implemented,
+Additionally, the following 10 common types are also implemented,
 with the Pharo class they map to.
 
 Name | Description | Oid | Class
@@ -231,11 +231,12 @@ oid | object identifier | 26 | Integer
 name | name | 19 | String
 bpchar | text | 1042 | String
 void | void | 2278 | UndefinedObject
-_bool | boolean array | 1000 | Array<Boolean>
-_int4  | integer array | 1007 | Array<Integer>
-_text | string array | 1009 | Array<String>
-_varchar | string array | 1015 | Array<String>
-_float8 | float array | 1022 | Array<Float>
+_bool | boolean array | 1000 | Array\<Boolean\>
+_int4  | integer array | 1007 | Array\<Integer\>
+_oid | oid array | 1028 | Array\<Integer\>
+_text | string array | 1009 | Array\<String\>
+_varchar | string array | 1015 | Array\<String\>
+_float8 | float array | 1022 | Array\<Float\>
 
 P3 also supports enums. Each enum definition creates a new type.
 You can send #loadEnums to P3Client to create mappings for all visible enums.
