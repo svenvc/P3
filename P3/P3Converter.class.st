@@ -63,6 +63,7 @@ P3Converter class >> typeMap [
 			1009 #(#'_text' #convertStringArrayFrom:length:description:)
 			1015 #(#'_varchar' #convertStringArrayFrom:length:description:)
 			1022 #(#'_float8' #convertFloatArrayFrom:length:description:)
+			1028 #(#'_oid' #convertIntegerArrayFrom:length:description:)
 			"geometric"
 			600 #(point #convertPointFrom:length:description:)
 			601 #(lseg #convertLineSegmentFrom:length:description:)
