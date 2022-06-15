@@ -72,6 +72,8 @@ P3Converter class >> typeMap [
 			604 #(polygon #convertPolygonFrom:length:description:)
 			628 #(line #convertLineFrom:length:description:)
 			718 #(circle #convertCircleFrom:length:description:)
+			"vectors"
+			30 #( oidvector #convertIntegerVectorFrom:length:description: )
 		)
 ]
 
@@ -219,6 +221,16 @@ P3Converter >> convertIntegerArrayFrom: bytes length: length description: descri
 { #category : #converting }
 P3Converter >> convertIntegerFrom: bytes length: length description: description [
 	^ Integer readFrom: (self asciiStreamFor: bytes length: length) base: 10
+]
+
+{ #category : #'converting-arrays' }
+P3Converter >> convertIntegerVectorFrom: bytes length: length description: description [
+	| input |
+	input := ZnLimitedReadStream on: bytes limit: length.
+	input := ZnCharacterReadStream on: input encoding: self encoder.
+	^ P3IntegerVectorValueParser new
+		  on: input;
+		  next
 ]
 
 { #category : #'converting-chronology' }
