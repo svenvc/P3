@@ -321,6 +321,34 @@ P3ClientTest >> testIntegerConversion [
 ]
 
 { #category : #tests }
+P3ClientTest >> testIntegerVector [
+
+	| result statement |
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'CREATE TABLE table1 (id INTEGER, v oidvector)'.
+	client execute:
+		'INSERT INTO table1 (id, v) VALUES (1, ''0 1 2 3 4 5 67890 1234567'')'.
+	result := client query: 'SELECT id, v FROM table1 WHERE id = 1'.
+	self
+		assert: result firstRecord
+		equals: #( 1 #( 0 1 2 3 4 5 67890 1234567 ) ).
+
+
+	"statement := client prepare:
+		             'INSERT INTO table1 (id, v) VALUES ($1, $2)'.
+	statement execute: { 
+			1.
+			#( 77 1974 1945 ) }.
+			
+	result := client query: 'SELECT id, v FROM table1 WHERE id = 2'.
+	self assert: result firstRecord equals: { 
+			2.
+			#( 77 1974 1945 ) }."
+
+	client execute: 'DROP TABLE table1'
+]
+
+{ #category : #tests }
 P3ClientTest >> testIntervalConversion [
 	| result |
 	result := client query: 'SELECT INTERVAL ''1 years 1 mons 1 days 1 hours 1 minutes 1 seconds'''.

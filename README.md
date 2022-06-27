@@ -1,6 +1,5 @@
 # P3
 
-
 P3 is a modern, lean and mean PostgreSQL client for Pharo.
 
 [![CI](https://github.com/svenvc/P3/actions/workflows/CI.yml/badge.svg)](https://github.com/svenvc/P3/actions/workflows/CI.yml)
@@ -39,7 +38,6 @@ query with parameters. This will give you a P3PreparedStatement instance than yo
 execute with specific parameters. Polymorphic to this there is also P3FormattedStatement
 which you create using the #format: message. These work at the textual, client side level.
 
-
 ## Basic Usage
 
 Here is the simplest test that does an actual query, it should return true.
@@ -70,7 +68,7 @@ Now we can query the contents of the simple table we just created.
 The result is an instance of P3Result
 
 ```smalltalk
-   a P3Result('SELECT 2' 2 records 3 colums)
+   a P3Result('SELECT 2' 2 records 3 columns)
 ```
 
 P3Result contains 3 elements,  results, descriptions & data:
@@ -91,13 +89,11 @@ Finally we can clean up.
    [ client execute: 'DROP TABLE table1' ] ensure: [ client close ] ].
 ```
 
-
 ## References
 
 -  https://postgresql.org
 -  https://en.wikipedia.org/wiki/PostgreSQL
 -  https://www.postgresql.org/docs/9.6/static/protocol.html
-
 
 ## Using Prepared and Formatted Statements
 
@@ -108,15 +104,15 @@ error prone (because you might violate syntax rules) and dangerous (due to SQL i
 
 P3 can help here with two mechanisms: prepared and formatted statements.
 They are mostly polymorphic and use the same template notation.
-They allow you to create a statement once, specifying placeholders with $n, 
+They allow you to create a statement once, specifying placeholders with $n,
 and execute it once or multiple times with concrete arguments,
 with the necessary conversions happening automatically.
 
-The difference between the two is that formatted statements are implemented 
+The difference between the two is that formatted statements are implemented
 using simple textual substitution on the client side, while
 prepared statements are evaluated on the server side with full syntax checking,
 and are executed with more type checks.
-Prepared statements are more efficient since the server can do part of its optimalization
+Prepared statements are more efficient since the server can do part of its optimization
 in the prepare phase, saving time on each execution.
 
 Here is a transcript of how to use them. First we set up a client and create a test table.
@@ -168,7 +164,6 @@ And finally we clean up.
 client execute: 'DROP TABLE table1'.
 client close.
 ```
-
 
 ## Supported Data Types
 
@@ -227,27 +222,27 @@ tsvector | text search document | 3614
 txid_snapshot | user-level transaction ID snapshot | 2970
 xml | XML data | 142
 
-Additionally, the following 9 common types are also implemented, 
+Additionally, the following 10 common types are also implemented,
 with the Pharo class they map to.
 
-Name | Description | Oid | Class 
+Name | Description | Oid | Class
 -----|-------------|-----|------
-oid | object identifier | 26 | Integer 
+oid | object identifier | 26 | Integer
 name | name | 19 | String
 bpchar | text | 1042 | String
 void | void | 2278 | UndefinedObject
-_bool | boolean array | 1000 | Array<Boolean>
-_int4  | integer array | 1007 | Array<Integer>
-_text |	string	array |	1009 | Array<String>
-_varchar | string array | 1015 | Array<String>
-_float8 | float array |	1022 | Array<Float>
+_bool | boolean array | 1000 | Array\<Boolean\>
+_int4  | integer array | 1007 | Array\<Integer\>
+_oid | oid array | 1028 | Array\<Integer\>
+_text | string array | 1009 | Array\<String\>
+_varchar | string array | 1015 | Array\<String\>
+_float8 | float array | 1022 | Array\<Float\>
 
 P3 also supports enums. Each enum definition creates a new type.
 You can send #loadEnums to P3Client to create mappings for all visible enums.
 
 When you do a query that results in data of an unknown type you will get an error,
-P3 cannot convert typeOid XXX, where XXX is the oid in the pg_type table. 
-
+P3 cannot convert typeOid XXX, where XXX is the oid in the pg_type table.
 
 ## Connection and Authentication
 
@@ -256,7 +251,7 @@ supports plain (#connect) and TLS/SSL encrypted (#connectSSL) connections.
 
 It is out of the scope of this README to explain how to install and configure
 an advanced database like PostgreSQL. There is extensive high quality documentation
-available convering all aspect of PostgreSQL, see https://postgresql.org
+available covering all aspect of PostgreSQL, see https://postgresql.org
 
 Out of the box, most PostgreSQL installations do not allow for network connections
 from other machines, only for local connections.
@@ -275,7 +270,6 @@ trust (no password, no authentication), password, md5 and scram-sha-256 work wit
 
 Note that for SCRAM-SHA-256 to work, you need to change the password_encryption
 directive in postgresql.conf to scam-sha-256, restart and reenter all user passwords.
-
 
 ## Glorp
 
@@ -299,7 +293,6 @@ Login new
    yourself.
 ```
 
-
 ## Code loading
 
 The default group loads P3Client and its basic dependencies NeoJSON and ZTimestamp
@@ -320,7 +313,6 @@ Metacello new
    load: 'glorp'.
 ```
 
-
 ## Unit tests
 
 **P3ClientTest** holds unit tests for the P3 PSQL client.
@@ -336,7 +328,6 @@ The minimal being the following:
 ```smalltalk
 P3ClientTest url: 'psql://sven@localhost'.
 ```
-
 
 ## Logging
 
@@ -357,7 +348,7 @@ P3LogEvent logToTranscript.
 
 Executing the four expressions of the Basic Usage section yields the following output.
 
-```
+```bash
 2020-09-21 16:27:57 001 [P3] 63731 #Connect sven@localhost:5432 Trust
 2020-09-21 16:27:57 002 [P3] 63731 #Query SELECT 565 AS N
 2020-09-21 16:27:57 003 [P3] 63731 #Result SELECT 1, 1 record, 1 colum, 4 ms
@@ -377,7 +368,7 @@ Executing the four expressions of the Basic Usage section yields the following o
 
 2020-09-21 16:28:20 016 [P3] 63737 #Connect sven@localhost:5432 Trust
 2020-09-21 16:28:20 017 [P3] 63737 #Query SELECT * FROM table1
-2020-09-21 16:28:20 018 [P3] 63737 #Result SELECT 2, 2 records, 3 colums, 2 ms
+2020-09-21 16:28:20 018 [P3] 63737 #Result SELECT 2, 2 records, 3 columns, 2 ms
 2020-09-21 16:28:20 019 [P3] 63737 #Close
 
 2020-09-21 16:39:52 020 [P3] 63801 #Connect sven@localhost:5432 Trust
@@ -388,7 +379,6 @@ Executing the four expressions of the Basic Usage section yields the following o
 
 Remember that the information inside the log events can be used to build other applications.
 
-
 ## Development, Goals, Contributing
 
 The main goal of P3 is to be a modern, lean and mean PostgreSQL client for Pharo.
@@ -396,8 +386,8 @@ Right now, P3 is functional and usable.
 
 The quality of open source software is determined by it being alive, supported and maintained.
 
-The first way to help is to simply use P3 in your projects and tells us about 
-your successes and the issues that you encounter. 
+The first way to help is to simply use P3 in your projects and tells us about
+your successes and the issues that you encounter.
 You can ask questions on the Pharo mailing lists.
 
 Development happens on GitHub, where you can create issues.

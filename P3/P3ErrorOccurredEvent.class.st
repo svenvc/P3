@@ -2,7 +2,7 @@
 I am P3ErrorOccurredEvent.
 I am a P3LogEvent.
 
-I represent the occurence of a P3Error or P3Notification.
+I represent the occurrence of a P3Error or P3Notification.
 "
 Class {
 	#name : #P3ErrorOccurredEvent,
