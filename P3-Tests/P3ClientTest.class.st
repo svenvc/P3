@@ -750,14 +750,14 @@ P3ClientTest >> testValuesArray1 [
 	statement := client format: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES ($1, $2, $3, $4)'.
 	statement execute: { 1. 'foo'. P3ValuesArray withAll: #('foo' 'bar'). P3ValuesArray withAll: #(1 2) }.
 	statement execute: { 2. 'null'. P3ValuesArray withAll: #('NULL' nil). P3ValuesArray withAll: #(0 nil) }.
-	"statement execute: { 3. 'zero'. P3ValuesArray empty. P3ValuesArray empty }."
+	statement execute: { 3. 'zero'. P3ValuesArray empty. P3ValuesArray empty }.
 	statement execute: { 4. 'escape'. P3ValuesArray withAll: #('a"b' 'c\d'). P3ValuesArray withAll: #(1 2) }.
 	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 1'.
 	self assert: result firstRecord equals: #(1 'foo' #('foo' 'bar') #(1 2)).
 	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 2'.
 	self assert: result firstRecord equals: #(2 'null' #('NULL' nil) #(0 nil)).
-	"result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 3'.
-	self assert: result firstRecord equals: #(3 'zero' #() #())."
+	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 3'.
+	self assert: result firstRecord equals: #(3 'zero' #() #()).
 	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 4'.
 	self assert: result firstRecord equals: #(4 'escape' #('a"b' 'c\d') #(1 2)).
 	client execute: 'DROP TABLE table_a'
