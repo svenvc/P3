@@ -273,6 +273,26 @@ P3ClientTest >> testConvenienceMetaAccess [
 ]
 
 { #category : #tests }
+P3ClientTest >> testCustomCompositeType [
+	| result oid |
+	client execute: 'DROP TABLE IF EXISTS table1'.
+	client execute: 'DROP TYPE IF EXISTS money_with_currency'.
+	client execute: 'CREATE TYPE money_with_currency AS (currency_code CHAR(3), amount NUMERIC(20,8))'.
+	"Our custom composite type will result in a new type oid that must be mapped, here simply to a string, before it can be used."
+	oid := (client query: 'SELECT oid FROM pg_type WHERE typname = ''money_with_currency''') firstFieldOfFirstRecord.
+	client converter mapOid: oid type: #money_with_currency to: #convertStringFrom:length:description:.
+	client execute: 'CREATE TABLE table1 (id INTEGER, value money_with_currency)'.
+	client execute: 'INSERT INTO table1 (id, value) VALUES (1, ROW(''EUR'', 199.95))'.
+	client execute: 'INSERT INTO table1 (id, value) VALUES (2, ROW(''EUR'', 99.99))'.
+	result := client query: 'SELECT id, value FROM table1 WHERE id = 1'.
+	self assert: result firstRecord equals: #(1 '(EUR,199.95000000)').
+	result := client query: 'SELECT id, value FROM table1 WHERE id = 2'.
+	self assert: result firstRecord equals: #(2 '(EUR,99.99000000)').
+	client execute: 'DROP TABLE table1'.
+	client execute: 'DROP TYPE money_with_currency'
+]
+
+{ #category : #tests }
 P3ClientTest >> testEmptyString [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
