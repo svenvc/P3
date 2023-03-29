@@ -23,7 +23,7 @@ Select query:
 	statement := client prepare: 'SELECT name, enabled FROM table1 WHERE id = $1'.
 	result := statement query: #( 123 ).
 
-When I'm no longer needed I should be closed so that the PostgreSQL server side resources for this prepared statemed are freed.
+When I'm no longer needed I should be closed so that the PostgreSQL server side resources for this prepared statement are freed.
 
 See also https://en.wikipedia.org/wiki/Prepared_statement
 
@@ -114,7 +114,7 @@ P3PreparedStatement >> execute: inputRow [
 
 { #category : #public }
 P3PreparedStatement >> executeBatch: inputRows [
-	"Execute this SQL query mutiple (inputRow size) times in a single network roundtrip.
+	"Execute this SQL query multiple (inputRow size) times in a single network roundtrip.
 	Assume no rows will be returned."
 
 	inputRows isEmpty

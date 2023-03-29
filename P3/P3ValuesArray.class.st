@@ -23,6 +23,11 @@ Class {
 	#category : #'P3-Objects'
 }
 
+{ #category : #requirements }
+P3ValuesArray class >> empty [
+	^ self withAll: #()
+]
+
 { #category : #'instance creation' }
 P3ValuesArray class >> withAll: collection [
 	^ self new

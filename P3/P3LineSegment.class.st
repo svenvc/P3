@@ -5,7 +5,7 @@ I am P3LineSegment
 
 I am a P3GeometricObject
 
-My internal reperesentation is a start and stop point
+My internal representation is a start and stop point
 "
 Class {
 	#name : #P3LineSegment,

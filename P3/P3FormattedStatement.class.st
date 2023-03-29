@@ -174,6 +174,8 @@ P3FormattedStatement >> printTime: time on: stream [
 { #category : #'printing-dispatched' }
 P3FormattedStatement >> printValuesArray: valuesArray on: stream [
 	| first |
+	valuesArray isEmpty 
+		ifTrue: [ ^ stream nextPutAll: '''{}''' ]. "prevent untyped empty array error"
 	first := true.
 	stream nextPutAll: #array.
 	stream nextPut: $[.
