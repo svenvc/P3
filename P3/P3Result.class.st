@@ -10,6 +10,7 @@ I hold 3 things:
 - data - a collection of records with each field value converted to objects, nil if there is no data
 
 Even if there are multiple queries, there can only be one stream of records. Most of the time, results is singular.
+In the case of multiple queries, there will be multiple results (an array of results), one for each query. However, only the last record stream will be in the data and descriptions.
 "
 Class {
 	#name : #P3Result,
@@ -131,6 +132,14 @@ P3Result >> hasDescriptions [
 { #category : #testing }
 P3Result >> hasResults [
 	^ results notNil
+]
+
+{ #category : #accessing }
+P3Result >> lastResult [
+	"Return the SQL query execution result, or the last one if there are multiple results.
+	Among other things, the result indicates how many rows were returned or modified."
+	
+	^ results isString ifTrue: [ results ] ifFalse: [ results last ]
 ]
 
 { #category : #accessing }
