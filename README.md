@@ -5,11 +5,10 @@ P3 is a modern, lean and mean PostgreSQL client for Pharo.
 [![CI](https://github.com/svenvc/P3/actions/workflows/CI.yml/badge.svg)](https://github.com/svenvc/P3/actions/workflows/CI.yml)
 
 **P3Client** uses frontend/backend protocol 3.0 (PostgreSQL version 7.4 [2003] and later),
-implementing the simple and extended query cycles. 
+implementing the simple and extended query cycles.
 It supports plaintext, md5 and scram-sha-256 password authentication.
 When SQL queries return row data, it efficiently converts incoming data to objects.
 P3Client supports most common PostgreSQL types.
-
 
 P3Client can be configured manually or through a URL.
 
@@ -23,15 +22,14 @@ Not all properties need to be specified, the minimum is the following URL.
 P3Client new url: 'psql://user@localhost'.
 ```
 
-
 P3Client has a minimal public protocol, basically #query: (#execute: is an alias).
 
 Opening a connection to the server (#open) and running the authentication
 and startup protocols (#connect) are done automatically when needed from #query.
 
 P3Client also supports SSL connections. Use #connectSSL to initiate such a connection.
-Alternatively you can add sslmode=require to the connection URL, as in
-'psql://username:password@localhost:5432/databasename?sslmode=require'.
+Alternatively you can add `sslmode=require` to the connection URL, as in
+`'psql://username:password@localhost:5432/databasename?sslmode=require'`.
 
 Through the #prepare: message, you can ask P3Client to prepare/parse an SQL statement or
 query with parameters. This will give you a P3PreparedStatement instance than you can then
@@ -71,7 +69,8 @@ The result is an instance of P3Result
    a P3Result('SELECT 2' 2 records 3 columns)
 ```
 
-P3Result contains 3 elements,  results, descriptions & data:
+P3Result contains 3 elements, results, descriptions & data:
+
 - Results is a string (collection of strings for multiple embedded queries) indicating successful execution.
 - Descriptions is a collection of row field description objects.
 - Data is a collection of rows with fully converted field values as objects.
@@ -100,7 +99,7 @@ Finally we can clean up.
 Although you are free to create your SQL statements in any way you see fit,
 feeding them to #execute: and #query:,
 inserting arguments in SQL statements can be hard (because you have to know the correct syntax),
-error prone (because you might violate syntax rules) and dangerous (due to SQL injection attacks).
+error-prone (because you might violate syntax rules) and dangerous (due to SQL injection attacks).
 
 P3 can help here with two mechanisms: prepared and formatted statements.
 They are mostly polymorphic and use the same template notation.
@@ -145,7 +144,6 @@ Prepared statements exist in the scope of a single session/connection.
 
 Next we start over and do the same insert and query using formatted statements.
 
-
 ```smalltalk
 client execute: 'TRUNCATE TABLE table1'.
 
@@ -185,7 +183,7 @@ bytea | | binary data (byte array) | 17 | ByteArray
 character [n] | char | fixed-length character string | 1042 | String
 character varying | varchar | variable-length character string | 1043 | String
 circle | | circle on a plane (center, radius) | 718 | P3Circle
-date | | calendar date (year,month,day) | 1082 | Date 
+date | | calendar date (year,month,day) | 1082 | Date
 double precision | float8 | double precision floating point number (8 bytes) | 701 | Float
 integer | int, int4 | signed four-byte integer | 23 | Integer
 interval | | time span | 114 | P3Interval
