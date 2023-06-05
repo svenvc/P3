@@ -528,7 +528,7 @@ P3Client >> logResult: result [
 		result: result;
 		duration: duration;
 		emit.
-	properties removeKey: #query_started
+	properties removeKey: #query_started ifAbsent: [  ]
 ]
 
 { #category : #'private - logging' }
