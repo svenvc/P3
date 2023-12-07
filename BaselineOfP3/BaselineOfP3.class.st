@@ -38,7 +38,7 @@ Use a login that looks as follows
 Class {
 	#name : #BaselineOfP3,
 	#superclass : #BaselineOf,
-	#category : 'BaselineOfP3'
+	#category : #BaselineOfP3
 }
 
 { #category : #baseline }
