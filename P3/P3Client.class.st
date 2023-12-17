@@ -425,7 +425,8 @@ P3Client >> isWorking [
 
 { #category : #convenience }
 P3Client >> listDatabases [
-	"Return the list of known database names"
+	"Return the list of known database names.
+	I can only be connected to a single database, see #database"
 	
 	^ (self query: 'SELECT datname FROM pg_database ORDER BY 1') firstColumnData
 ]
@@ -442,17 +443,16 @@ P3Client >> listEnums [
 P3Client >> listSchemas [
 	"Return the list of known schema or namespace names"
 	
-	^ (self query: 'SELECT nspname FROM pg_namespace ORDER BY 1') firstColumnData
+	^ (self query: 'SELECT schema_name FROM information_schema.schemata ORDER BY 1') firstColumnData
 ]
 
 { #category : #convenience }
 P3Client >> listTablesInSchema: schemaName [
-	"Return the list of known table names in a given schema"
+	"Return the list of known table names in a given schema as table name, table type pairs."
 	
-	| query |
-	query := 'SELECT tablename FROM pg_tables WHERE schemaname=''{1}'' ORDER BY 1' 
-		format: { schemaName }.
-	^ (self query: query) firstColumnData
+	| statement |
+	statement := self format: 'SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = $1 ORDER BY 1'.
+	^ (statement query: { schemaName } ) data
 ]
 
 { #category : #configuration }
