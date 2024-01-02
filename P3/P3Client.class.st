@@ -413,6 +413,13 @@ P3Client >> isServerVersionAtLeastMajor: major minor: minor [
 ]
 
 { #category : #testing }
+P3Client >> isUsingUnixSocket [
+	"Following the PostgreSQL convention a host starting with a / is a path to a Unix Socket"
+	
+	^ self host notNil and: [ self host first = $/ ]
+]
+
+{ #category : #testing }
 P3Client >> isWorking [
 	"Do a trivial query to confirm that I can interact with the server.
 	Return true if successful"
@@ -568,20 +575,12 @@ P3Client >> open [
 	"Open my connection with the server (do not yet #connect)"
 	
 	self close.
-	connection := ZdcSocketStream openConnectionToHostNamed: self host port: self port.
-	connection timeout: self timeout.
-	message := P3MessageBuffer new
-
-]
-
-{ #category : #'initialize-release' }
-P3Client >> openUnixSocket: socketPath [
-	"Open a connection with the server through the Unix Socket at socketPath (do not yet #connect)"
-	
-	| unixSocket |
-	self close.
-	unixSocket := ZnNetworkingUtils default unixSocketOnFile: socketPath asFileReference.
-	connection := ZdcSocketStream on: unixSocket.
+	connection := self isUsingUnixSocket
+		ifTrue: [ | unixSocket |
+			unixSocket := ZnNetworkingUtils default unixSocketOnFile: self host asFileReference.
+			ZdcSocketStream on: unixSocket]
+		ifFalse: [ 
+			ZdcSocketStream openConnectionToHostNamed: self host port: self port ].
 	connection timeout: self timeout.
 	message := P3MessageBuffer new
 ]
@@ -1111,12 +1110,18 @@ P3Client >> url [
 	"Return my connection URL"
 	
 	| url |
-	(url := ZnUrl new)
-		scheme: #psql;
-		host: self host;
-		port: self port;
-		username: self user;
-		password: self password.
+	(url := ZnUrl new) scheme: #postgresql.
+	self isUsingUnixSocket
+		ifTrue: [ 
+			url queryAt: #host put: self host.
+			self user ifNotNil: [ url queryAt: #user put: self user ].
+			self password ifNotNil: [ url queryAt: #password put: self password ] ]
+		ifFalse: [
+			url 
+				host: self host;
+				port: self port;
+				username: self user;
+				password: self password ].
 	self database ifNotNil: [ url addPathSegment: self database ].
 	self isSSL ifTrue: [ url queryAt: #sslmode put: #require ].
 	^ url
@@ -1125,18 +1130,25 @@ P3Client >> url [
 { #category : #'initialize-release' }
 P3Client >> url: stringOrUrl [
 	"Set my connection settings from stringOrUrl according to the format
-	psql://username:password@localhost:5432/databasename?sslmode=require
-	with the minimum being psql://user@localhost"
+	postgresql://username:password@localhost:5432/databasename?sslmode=require
+	with the minimum being psql://user@localhost , for a unix socket the format is
+	postgresql:///databasename?host=/path/to/psql.socket&user=username&password=password"
 	
 	| url |
 	url := stringOrUrl asUrl.
 	self assert: (#(psql postgres postgresql) includes: url scheme).
-	self
-		host: url host;
-		port: (url portIfAbsent: [ 5432 ]);
-		user: url username;
-		password: url password;
-		database: url firstPathSegment.
+	url host
+		ifNil: [
+			url queryAt: #host ifPresent: [ :host | self host: host ].
+			url queryAt: #user ifPresent: [ :user | self user: user ].
+			url queryAt: #password ifPresent: [ :password | self password: password ] ]
+		ifNotNil: [
+			self
+				host: url host;
+				port: (url portIfAbsent: [ 5432 ]);
+				user: url username;
+				password: url password ].
+	self database: url firstPathSegment.
 	(url queryAt: #sslmode ifAbsent: [ #disable ]) = #require
 		ifTrue: [ self setSSL ]
 ]
