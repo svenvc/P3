@@ -266,6 +266,48 @@ P3ClientTest >> testConnection [
 ]
 
 { #category : #tests }
+P3ClientTest >> testConstraints [
+	| statement constraints constraint |
+	client execute: 'DROP TABLE IF EXISTS orders'.
+	client execute: 'DROP TABLE IF EXISTS suppliers'.
+	client execute: 'CREATE TABLE suppliers (id INTEGER, name TEXT)'.
+	client execute: 'CREATE TABLE orders (id INTEGER, description TEXT, supplier_id INTEGER)'.
+	client execute: 'ALTER TABLE suppliers ADD CONSTRAINT suppliers_pkey PRIMARY KEY (id)'.
+	client execute: 'ALTER TABLE orders ADD CONSTRAINT orders_pkey PRIMARY KEY (id)'.
+	client execute: 'ALTER TABLE orders ADD CONSTRAINT orders_suppliers_fkey FOREIGN KEY (supplier_id) REFERENCES suppliers (id)'.
+	statement := client format: 'INSERT INTO suppliers (id, name) VALUES ($1, $2)'.
+	statement executeBatch: #((1 'Foo')(2 'Bar')).
+	statement := client format: 'INSERT INTO orders (id, description, supplier_id) VALUES ($1, $2, $3)'.
+	statement executeBatch: #((1 'AAA' 1)(2 'BBB' 1)(3 'CCC' 2)).	
+	constraints := P3Constraint allForTable: 'suppliers' in: 'public' using: client.
+	constraint := constraints 
+		detect: [ :each | each constraintName = 'suppliers_pkey' ] 
+		ifNone: [ self fail ].
+	self assert: constraint isPrimaryKey.
+	self assert: constraint tableName equals: 'suppliers'.
+	self assert: constraint constraintColumns equals: #(id).
+	constraints := P3Constraint allForTable: 'orders' in: 'public' using: client.	
+	constraint := constraints 
+		detect: [ :each | each constraintName = 'orders_pkey' ] 
+		ifNone: [ self fail ].
+	self assert: constraint isPrimaryKey.
+	self assert: constraint tableName equals: 'orders'.
+	self assert: constraint constraintColumns equals: #(id).
+	constraint := constraints 
+		detect: [ :each | each constraintName = 'orders_suppliers_fkey' ] 
+		ifNone: [ self fail ].
+	self assert: constraint isForeignKey.
+	self assert: constraint tableName equals: 'orders'.
+	self assert: constraint constraintColumns equals: #(supplier_id).
+	self assert: constraint foreignKeyTable equals: 'suppliers'.
+	self assert: constraint foreignKeyColumns equals: #(id).
+	constraints := P3Constraint referencingConstraintNamesForTable: 'suppliers' in: 'public' using: client.
+	self assert: constraints equals: #(('orders' 'orders_suppliers_fkey')).
+	client execute: 'DROP TABLE orders'.
+	client execute: 'DROP TABLE suppliers'
+]
+
+{ #category : #tests }
 P3ClientTest >> testConvenienceMetaAccess [
 	self deny: client listDatabases isEmpty.
 	self assert: (client listSchemas includes: 'public').
