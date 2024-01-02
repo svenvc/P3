@@ -574,6 +574,18 @@ P3Client >> open [
 
 ]
 
+{ #category : #'initialize-release' }
+P3Client >> openUnixSocket: socketPath [
+	"Open a connection with the server through the Unix Socket at socketPath (do not yet #connect)"
+	
+	| unixSocket |
+	self close.
+	unixSocket := ZnNetworkingUtils default unixSocketOnFile: socketPath asFileReference.
+	connection := ZdcSocketStream on: unixSocket.
+	connection timeout: self timeout.
+	message := P3MessageBuffer new
+]
+
 { #category : #accessing }
 P3Client >> password [
 	"Return the password of my database connection.
