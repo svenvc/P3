@@ -22,7 +22,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'client',
-		'sql'
+		'source'
 	],
 	#category : #'P3-Core'
 }
@@ -32,7 +32,7 @@ P3FormattedStatement >> bind: arguments [
 	"Build and return the actual SQL statement by splicing in the arguments for all placeholders in the template"
 	
 	^ String streamContents: [ :out | | readStream |
-			readStream := sql readStream.
+			readStream := self source readStream.
 			[ readStream atEnd ] whileFalse: [ | char |
 				(char := readStream next) = $$
 					ifTrue: [ | index argument |
@@ -202,7 +202,14 @@ P3FormattedStatement >> queryAll: argumentsCollection [
 	^ argumentsCollection collect: [ :each | self query: each ]
 ]
 
+{ #category : #accessing }
+P3FormattedStatement >> source [
+	"Return my SQL source"
+	
+	^ source
+]
+
 { #category : #initialization }
 P3FormattedStatement >> sql: anSQLTemplateString [
-	sql := anSQLTemplateString 
+	source := anSQLTemplateString 
 ]

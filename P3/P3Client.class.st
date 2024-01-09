@@ -695,6 +695,8 @@ P3Client >> prepare: query named: queryName [
 			createPreparedStatementNamed: queryName 
 			withParameters: parameterDescriptions 
 			andFields: rowDescriptions.
+			
+		statement source: query.
 	
 		self logPreparedStatement: statement query: query ].
 
@@ -794,6 +796,7 @@ P3Client >> query: query [
 
 	^ self critical: [
 		self withConnection: [
+			properties at: #sql_source put: query.
 			self 
 				ensureConnected;
 				writeQueryMessage: query;
@@ -905,10 +908,13 @@ P3Client >> runExtendedQueryResult: descriptions [
 			out nextPut: (self processDataRowUsing: descriptions).
 			self readMessage ] ].
 	
-	result := P3Result descriptions: descriptions
-			rows: rows 
-			message: (self converter asciiCStringFrom: message readStream).
-	
+	result := P3Result 
+		descriptions: descriptions
+		data: rows 
+		results: (self converter asciiCStringFrom: message readStream).
+
+	result source: (properties at: #sql_source ifAbsent: nil).
+
 	self logResult: result.
 	 
 	^ result
@@ -950,6 +956,7 @@ P3Client >> runQueryResult [
 		self readMessage tag = $S
 			ifTrue: [ self processParameterStatus: message readStream; readMessage ].
 		message tag = $Z ] whileFalse.
+	result source: (properties at: #sql_source ifAbsent: nil).
 	self logResult: result.
 	^ result
 ]
@@ -1052,6 +1059,11 @@ P3Client >> setSSL [
 	The default is to use a plain unencrypted network connection."
 	
 	settings at: #ssl put: true
+]
+
+{ #category : #private }
+P3Client >> setSource: sql [
+	properties at: #sql_source put: sql
 ]
 
 { #category : #'error handling' }
