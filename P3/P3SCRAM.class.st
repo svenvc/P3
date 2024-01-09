@@ -117,16 +117,16 @@ P3SCRAM class >> shutDown [
 
 { #category : #accessing }
 P3SCRAM class >> store [
-	"I maintain a store with instances registered under a key"
+	"I maintain a store with instances registered under a key, using a TTLCache of 1 hour"
 	
-	^ Store ifNil: [ Store := Dictionary new ]
+	^ Store ifNil: [ Store := TTLCache new timeToLive: 1 hour; yourself ]
 ]
 
 { #category : #accessing }
 P3SCRAM class >> storeAt: key ifAbsentPut: block [
 	"If my store holds a previously registered and used instance, return it,
 	else evaluate block, which should return a newly created instance, that I store and return.
-	Used instances cache their saltedPassword for imrpoved performance."
+	Used instances cache their saltedPassword for improved performance for 1 hour."
 
 	^ self store 
 		at: key 
