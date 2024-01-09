@@ -796,11 +796,10 @@ P3Client >> query: query [
 
 	^ self critical: [
 		self withConnection: [
+			self ensureConnected.
 			properties at: #sql_source put: query.
-			self 
-				ensureConnected;
-				writeQueryMessage: query;
-				runQueryResult ] ]
+			self writeQueryMessage: query.
+			self runQueryResult ] ]
 ]
 
 { #category : #accessing }
