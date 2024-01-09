@@ -1,13 +1,15 @@
 "
 I am P3Result, I encapsulate the result from a PostgreSQL query.
 
-I hold 3 things:
+I hold 4 things:
 
 - results -  the command completion tags, a String (singular if there was only one query) or a collection of Strings (if there were multiple queries) in the form of 'SELECT 100'
 
 - descriptions - a collection of P3RowFieldDescription objects (one for each column, nil if there is no data)
 
 - data - a collection of records with each field value converted to objects, nil if there is no data
+
+- source - the SQL source string that generated me, nil if unavailable
 
 Even if there are multiple queries, there can only be one stream of records. Most of the time, results is singular.
 In the case of multiple queries, there will be multiple results (an array of results), one for each query. However, only the last record stream will be in the data and descriptions.
@@ -18,19 +20,19 @@ Class {
 	#instVars : [
 		'results',
 		'descriptions',
-		'data'
+		'data',
+		'source'
 	],
 	#category : #'P3-Core'
 }
 
 { #category : #'instance creation' }
-P3Result class >> descriptions: descriptions rows: aRowArray message: aString [
-
+P3Result class >> descriptions: descriptions data: aRowArray results: aString [
 	^ self new
-			descriptions: descriptions;
-			data: aRowArray;
-			results: aString;
-			yourself
+		descriptions: descriptions;
+		data: aRowArray;
+		results: aString;
+		yourself
 ]
 
 { #category : #'private-accessing' }
@@ -132,6 +134,11 @@ P3Result >> hasDescriptions [
 { #category : #testing }
 P3Result >> hasResults [
 	^ results notNil
+]
+
+{ #category : #testing }
+P3Result >> hasSource [
+	^ source notNil
 ]
 
 { #category : #accessing }
@@ -242,6 +249,25 @@ P3Result >> rowCountFromCommandResultTag: string [
 
 	string ifEmpty: [ ^ 0 ].
 	^ ($ split: string) last asInteger
+]
+
+{ #category : #convenience }
+P3Result >> rows [
+	"Return the rows that I hold, also known as my data"
+	
+	^ data
+]
+
+{ #category : #accessing }
+P3Result >> source [
+	"Return the SQL source that generated me (if available)"
+	
+	^ source
+]
+
+{ #category : #accessing }
+P3Result >> source: sqlString [
+	source := sqlString
 ]
 
 { #category : #accessing }

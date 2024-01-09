@@ -40,7 +40,8 @@ Class {
 		'client',
 		'name',
 		'paramDescriptions',
-		'fieldDescriptions'
+		'fieldDescriptions',
+		'source'
 	],
 	#category : #'P3-Core'
 }
@@ -105,6 +106,7 @@ P3PreparedStatement >> execute: inputRow [
 	"Execute this SQL query with inputRow as the ordered collection of parameters.
 	Assume no rows will be returned."
 
+	client setSource: self source.
 	self bindStrings: inputRow.
 	self writeExecuteMessage: 0.
 	client writeSyncMessage.
@@ -120,6 +122,7 @@ P3PreparedStatement >> executeBatch: inputRows [
 	inputRows isEmpty
 		ifTrue: [ ^ #() ].
 
+	client setSource: self source.
 	inputRows do: [ :eachRow |
 		self bindStrings: eachRow.
 		self writeExecuteMessage: 0 ].
@@ -173,6 +176,7 @@ P3PreparedStatement >> query: inputRow [
 	"Execute this SQL query with inputRow as the ordered collection of parameters.
 	Answer a P3Result object with the field descriptions and rows."
 
+	client setSource: self source.
 	self bindStrings: inputRow.
 	self writeExecuteMessage: 0.
 	client writeSyncMessage.
@@ -188,12 +192,25 @@ P3PreparedStatement >> queryAll: inputRows [
 	inputRows isEmpty
 		ifTrue: [ ^ #() ].
 
+	client setSource: self source.
 	inputRows do: [ :eachRow |
 		self bindStrings: eachRow.
 		self writeExecuteMessage: 0 ].
 	client writeSyncMessage.
 	
 	^ client runExtendedQueryResults: fieldDescriptions
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> source [
+	"Return my SQL source"
+	
+	^ source
+]
+
+{ #category : #accessing }
+P3PreparedStatement >> source: anSQLTemplateString [
+	source := anSQLTemplateString
 ]
 
 { #category : #'input/output' }
