@@ -1088,7 +1088,20 @@ P3Client >> startupMessage [
 			self database ifNotNil: [ 
 				out nextPutAll: (self asCString: 'database').
 				out nextPutAll: (self asCString: self database) ].
+			self startupOptions ifNotNil: [
+				out nextPutAll: (self asCString: 'options').
+				out nextPutAll: (self asCString: self startupOptions) ].
 			out nextPut: 0 ]
+]
+
+{ #category : #accessing }
+P3Client >> startupOptions [
+	^ settings at: #options ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
+P3Client >> startupOptions: optionsString [
+	settings at: #options put: optionsString
 ]
 
 { #category : #accessing }
@@ -1155,6 +1168,7 @@ P3Client >> url [
 				password: self password ].
 	self database ifNotNil: [ url addPathSegment: self database ].
 	self isSSL ifTrue: [ url queryAt: #sslmode put: #require ].
+	self startupOptions ifNotNil: [ :options | url queryAt: #options put: options ].
 	^ url
 ]
 
@@ -1181,7 +1195,8 @@ P3Client >> url: stringOrUrl [
 				password: url password ].
 	self database: url firstPathSegment.
 	(url queryAt: #sslmode ifAbsent: [ #disable ]) = #require
-		ifTrue: [ self setSSL ]
+		ifTrue: [ self setSSL ].
+	url queryAt: #options ifPresent: [ :options | self startupOptions: options ]
 ]
 
 { #category : #accessing }
