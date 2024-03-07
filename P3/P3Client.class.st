@@ -142,14 +142,22 @@ P3Client >> clearTextPasswordMessage [
 P3Client >> close [
 	"Cleanly close my connection with the server"
 
-	connection
-		ifNotNil: [ 
-			[ 
-				self logDisconnecting.
-				self writeMessage: #[] tag: $X. 
-				connection close ] on: Error do: [  ].
-				self clearSession.
-			connection := nil ]
+	connection ifNotNil: [ 
+		[ 
+			self writeMessage: #[] tag: $X.
+			connection close ] on: Error do: [  ].
+		self clearSession.
+		connection := nil.
+		self logDisconnected ]
+]
+
+{ #category : #accessing }
+P3Client >> compactUrl [
+	^ self url
+		scheme: #psql;
+		password: nil;
+		queryRemoveAll;
+		yourself
 ]
 
 { #category : #public }
@@ -514,7 +522,7 @@ P3Client >> logConnected [
 ]
 
 { #category : #'private - logging' }
-P3Client >> logDisconnecting [
+P3Client >> logDisconnected [
 	(self newLogEvent: P3ConnectionClosedEvent)
 		emit 
 ]
@@ -720,9 +728,14 @@ P3Client >> preparedStatementNamed: name [
 P3Client >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(.
-	stream print: self url.
-	self session ifNotNil: [ stream space; print: session ].
+	self printStateOn:  stream.
 	stream nextPut: $)
+]
+
+{ #category : #printing }
+P3Client >> printStateOn: stream [
+	stream print: self compactUrl.
+	self session ifNotNil: [ stream space; print: session ]
 ]
 
 { #category : #private }
@@ -1102,6 +1115,11 @@ P3Client >> startupOptions [
 { #category : #accessing }
 P3Client >> startupOptions: optionsString [
 	settings at: #options put: optionsString
+]
+
+{ #category : #printing }
+P3Client >> statePrintString [
+	^ String streamContents: [ :out | self printStateOn: out ]
 ]
 
 { #category : #accessing }
