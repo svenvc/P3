@@ -151,6 +151,15 @@ P3Client >> close [
 		self logDisconnected ]
 ]
 
+{ #category : #accessing }
+P3Client >> compactUrl [
+	^ self url
+		scheme: #psql;
+		password: nil;
+		queryRemoveAll;
+		yourself
+]
+
 { #category : #public }
 P3Client >> connect [
 	"Connect me to a PostgreSQL database. 
@@ -719,9 +728,14 @@ P3Client >> preparedStatementNamed: name [
 P3Client >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(.
-	stream print: self url.
-	self session ifNotNil: [ stream space; print: session ].
+	self printStateOn:  stream.
 	stream nextPut: $)
+]
+
+{ #category : #printing }
+P3Client >> printStateOn: stream [
+	stream print: self compactUrl.
+	self session ifNotNil: [ stream space; print: session ]
 ]
 
 { #category : #private }
@@ -1101,6 +1115,11 @@ P3Client >> startupOptions [
 { #category : #accessing }
 P3Client >> startupOptions: optionsString [
 	settings at: #options put: optionsString
+]
+
+{ #category : #printing }
+P3Client >> statePrintString [
+	^ String streamContents: [ :out | self printStateOn: out ]
 ]
 
 { #category : #accessing }
