@@ -212,6 +212,24 @@ P3FormattedStatementTest >> testNull [
 ]
 
 { #category : #tests }
+P3FormattedStatementTest >> testPrintOn [
+"client format: returns a P3FormattedStatement. Use result to test printOn:"
+
+	| sql p3fs result|
+	
+	sql := 'INSERT INTO table1 (id, name) VALUES ($1, $2)'.
+	
+	p3fs := client format: sql.
+	
+	result := String streamContents: [ :stream | p3fs printOn: stream ].
+	
+	self assert: result contents equals: ('a P3FormattedStatement({1})' format: { sql })
+	
+	
+	
+]
+
+{ #category : #tests }
 P3FormattedStatementTest >> testSimple [
 	| statement result |
 	

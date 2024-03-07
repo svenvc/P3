@@ -139,7 +139,7 @@ P3FormattedStatement >> printObject: object on: stream [
 { #category : #printing }
 P3FormattedStatement >> printOn: stream [
 	super printOn: stream.
-	stream nextPut: $(; << sql; nextPut: $)
+	stream nextPut: $(; << source; nextPut: $)
 ]
 
 { #category : #'printing-dispatched' }
