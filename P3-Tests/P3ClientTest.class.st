@@ -17,18 +17,19 @@ Benchmarks
   P3ClientTest new runAllTests.
 "
 Class {
-	#name : #P3ClientTest,
-	#superclass : #TestCase,
+	#name : 'P3ClientTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'client'
 	],
 	#classVars : [
 		'Url'
 	],
-	#category : #'P3-Tests'
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ClientTest class >> url [
 	"Return the default connection URL to use for P3 clients in the unit tests.
 	Note that the coded default here corresponds to the GitHub Action CI's postgresql service:
@@ -38,7 +39,7 @@ P3ClientTest class >> url [
 	^ Url ifNil: [ Url := 'psql://postgres:postgres@postgres:5432/postgres' ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ClientTest class >> url: stringOrUrl [
 	"Set the connection URL to be used for P3 Clients in the unit tests.
 	The general syntax is psql://sven:secret@localhost:5432/database
@@ -47,12 +48,12 @@ P3ClientTest class >> url: stringOrUrl [
 	Url := stringOrUrl asUrl
 ]
 
-{ #category : #benchmarking }
+{ #category : 'benchmarking' }
 P3ClientTest >> benchmark1Size [
 	^ 10000
 ]
 
-{ #category : #benchmarking }
+{ #category : 'benchmarking' }
 P3ClientTest >> runAllTests [
 	"Runs all tests on the same connection/session"
 	
@@ -64,7 +65,7 @@ P3ClientTest >> runAllTests [
 	^ timeToRun 
 ]
 
-{ #category : #benchmarking }
+{ #category : 'benchmarking' }
 P3ClientTest >> runBenchmark1 [
 	| result timeToRun |
 	result := nil.
@@ -75,7 +76,7 @@ P3ClientTest >> runBenchmark1 [
 	^ timeToRun 
 ]
 
-{ #category : #benchmarking }
+{ #category : 'benchmarking' }
 P3ClientTest >> runBenchmark1Bench [
 	| result timeToRun |
 	result := nil.
@@ -86,7 +87,7 @@ P3ClientTest >> runBenchmark1Bench [
 	^ timeToRun 
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 P3ClientTest >> setUp [
 	super setUp.
 	client := P3Client new.
@@ -94,7 +95,7 @@ P3ClientTest >> setUp [
 	client connect
 ]
 
-{ #category : #benchmarking }
+{ #category : 'benchmarking' }
 P3ClientTest >> setupBenchmark1 [
 	| timeToRun |
 	self setUp. 
@@ -110,13 +111,13 @@ P3ClientTest >> setupBenchmark1 [
 	^ timeToRun  
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 P3ClientTest >> tearDown [
 	client close.
 	super tearDown
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testArrayTypes [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table_a'.
@@ -136,7 +137,7 @@ P3ClientTest >> testArrayTypes [
 	client execute: 'DROP TABLE table_a'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testBitStringConversion [
 	| result |
 	result := client query: 'SELECT B''11001111'''.
@@ -145,14 +146,14 @@ P3ClientTest >> testBitStringConversion [
 	self assert: result firstFieldOfFirstRecord equals: (P3BitString bits: 2r11110011).
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testBooleanConversion [
 	| result |
 	result := client query: 'SELECT b::boolean FROM (VALUES (true), (false), (NULL)) t(b)'.
 	self assert: result data equals: #((true) (false) (nil))
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testBoxConversion [
 	| result |
 	result := client query: 'SELECT box ''(3,4),(1,2)'''.
@@ -169,7 +170,7 @@ P3ClientTest >> testBoxConversion [
 		equals: P3Box unit
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testByteArrayConversion [
 
 	| result bytes |
@@ -191,7 +192,7 @@ P3ClientTest >> testByteArrayConversion [
 	client execute: 'DROP TABLE testBytea'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testChronology [
 	| result now |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -216,7 +217,7 @@ P3ClientTest >> testChronology [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testChronologyWithTimezone [
 	| result now |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -241,7 +242,7 @@ P3ClientTest >> testChronologyWithTimezone [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testCircleConversion [
 	| result |
 	(client isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
@@ -259,13 +260,13 @@ P3ClientTest >> testCircleConversion [
 	self assert: (result firstFieldOfFirstRecord radius closeTo: 20.5).
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testConnection [
 	self assert: client isConnected.
 	self assert: client isWorking.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testConstraints [
 	| statement constraints constraint |
 	client execute: 'DROP TABLE IF EXISTS orders'.
@@ -307,14 +308,14 @@ P3ClientTest >> testConstraints [
 	client execute: 'DROP TABLE suppliers'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testConvenienceMetaAccess [
 	self deny: client listDatabases isEmpty.
 	self assert: (client listSchemas includes: 'public').
 	self assert: (client listTablesInSchema: 'public') isCollection.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testCustomCompositeType [
 	| result oid |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -334,7 +335,7 @@ P3ClientTest >> testCustomCompositeType [
 	client execute: 'DROP TYPE money_with_currency'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testEmptyString [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -348,7 +349,7 @@ P3ClientTest >> testEmptyString [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testEnum [
 	| result |
 
@@ -370,19 +371,19 @@ P3ClientTest >> testEnum [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testError [
 	self should: [ client query: 'SELECT * FROM abcdef' ] raise: P3Error
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testIntegerConversion [
 	| result |
 	result := client query: 'SELECT i::integer FROM (VALUES (-1), (1), (NULL), (1234567890)) t(i)'.
 	self assert: result data equals: #((-1) (1) (nil) (1234567890))
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testIntegerVector [
 
 	| result statement |
@@ -410,7 +411,7 @@ P3ClientTest >> testIntegerVector [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testIntervalConversion [
 	| result |
 	result := client query: 'SELECT INTERVAL ''1 years 1 mons 1 days 1 hours 1 minutes 1 seconds'''.
@@ -436,7 +437,7 @@ P3ClientTest >> testIntervalConversion [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testJsonConversion [
 	| data result |
 	
@@ -453,7 +454,7 @@ P3ClientTest >> testJsonConversion [
 	self assert: result firstFieldOfFirstRecord equals: data
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testLineConversion [
 	| result |
 	(client isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
@@ -471,7 +472,7 @@ P3ClientTest >> testLineConversion [
 		equals: P3Line yAxis.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testLineSegmentConversion [
 	| result |
 	result := client query: 'SELECT lseg ''(1,2),(3,4)'''.
@@ -488,7 +489,7 @@ P3ClientTest >> testLineSegmentConversion [
 		equals: P3LineSegment yAxisUnit 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testMultiStatement [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -504,7 +505,7 @@ P3ClientTest >> testMultiStatement [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testMultipleCommandsInOneRequest [
 	| result |
 	result := client query: 'SELECT 100'.
@@ -521,7 +522,7 @@ P3ClientTest >> testMultipleCommandsInOneRequest [
 	self assert: result lastResult equals: 'SELECT 1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testNonAsciiStrings [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -535,7 +536,7 @@ P3ClientTest >> testNonAsciiStrings [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testNotification [
 	| raised |
 	raised := false.
@@ -550,7 +551,7 @@ P3ClientTest >> testNotification [
 	self assert: raised description: 'no notification triggered'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testPathConversion [
 	| result |
 	result := client query: 'SELECT path ''((1,2),(3,4),(5,6))'''.
@@ -565,7 +566,7 @@ P3ClientTest >> testPathConversion [
 	self assert: result firstFieldOfFirstRecord isOpen.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testPointConversion [
 	| result |
 	result := client query: 'SELECT point (1,2)'.
@@ -579,7 +580,7 @@ P3ClientTest >> testPointConversion [
 	self assert: (result firstFieldOfFirstRecord y closeTo: -1.5).
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testPolygonConversion [
 	| result |
 	result := client query: 'SELECT polygon ''((1,2),(3,4),(5,6))'''.
@@ -588,7 +589,7 @@ P3ClientTest >> testPolygonConversion [
 		equals: (P3Polygon points: { P3Point x: 1 y: 2. P3Point x: 3 y: 4. P3Point x: 5 y: 6 })
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testQueryCatalog [
 	| result |
 	result := client query: 'SELECT schemaname,tablename FROM pg_catalog.pg_tables'.
@@ -602,7 +603,7 @@ P3ClientTest >> testQueryCatalog [
 	self assert: (result data allSatisfy: [ :each | each size = 2])
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testSession [
 
 	| session |
@@ -638,7 +639,7 @@ P3ClientTest >> testSession [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testSimpleTable [
 	| result |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -659,7 +660,7 @@ P3ClientTest >> testSimpleTable [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testSqlFunction [
 	| x y result |
 	client execute: 'DROP FUNCTION IF EXISTS my_add(x INTEGER, y INTEGER)'.
@@ -671,7 +672,7 @@ P3ClientTest >> testSqlFunction [
 	client execute: 'DROP FUNCTION my_add(x INTEGER, y INTEGER)'.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testStringEscaping [
 	| result string |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -684,7 +685,7 @@ P3ClientTest >> testStringEscaping [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testTimeConversion [
 	| result offset formattedOffset |
 	"TIME WITHOUT TIME ZONE maps 1 on 1"
@@ -707,7 +708,7 @@ P3ClientTest >> testTimeConversion [
 		equals: ((Time hour: 1 minute: 2 second: 3) addTime: offset).
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testTimeout [
 	"Reconnect with an explicit timeout"
 	client close.
@@ -721,7 +722,7 @@ P3ClientTest >> testTimeout [
 	self should: [ client execute: 'SELECT pg_sleep(1.5)' ] raise: ConnectionTimedOut 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testTimezone [
 	| result originalTimezone |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -752,7 +753,7 @@ P3ClientTest >> testTimezone [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testTimezoneZTimestamp [
 	| result originalTimezone |
 	client close; timestampClass: ZTimestamp.
@@ -785,7 +786,7 @@ P3ClientTest >> testTimezoneZTimestamp [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testUuid [
 
 	| result uuid num |
@@ -804,16 +805,16 @@ P3ClientTest >> testUuid [
 	client execute: 'DROP TABLE testUUID'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testValuesArray1 [
 	| statement result |
 	client execute: 'DROP TABLE IF EXISTS table_a'.
 	client execute: 'CREATE TABLE table_a (id INTEGER, name TEXT, text_a TEXT[], int_a INTEGER[])'.
 	statement := client format: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES ($1, $2, $3, $4)'.
-	statement execute: { 1. 'foo'. P3ValuesArray withAll: #('foo' 'bar'). P3ValuesArray withAll: #(1 2) }.
-	statement execute: { 2. 'null'. P3ValuesArray withAll: #('NULL' nil). P3ValuesArray withAll: #(0 nil) }.
-	statement execute: { 3. 'zero'. P3ValuesArray empty. P3ValuesArray empty }.
-	statement execute: { 4. 'escape'. P3ValuesArray withAll: #('a"b' 'c\d'). P3ValuesArray withAll: #(1 2) }.
+	statement execute: { 1. 'foo'. #('foo' 'bar'). #(1 2) }.
+	statement execute: { 2. 'null'. #('NULL' nil). #(0 nil) }.
+	statement execute: { 3. 'zero'. #(). #() }.
+	statement execute: { 4. 'escape'. #('a"b' 'c\d'). #(1 2) }.
 	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 1'.
 	self assert: result firstRecord equals: #(1 'foo' #('foo' 'bar') #(1 2)).
 	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 2'.
@@ -825,16 +826,16 @@ P3ClientTest >> testValuesArray1 [
 	client execute: 'DROP TABLE table_a'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testValuesArray2 [
 	| statement result |
 	client execute: 'DROP TABLE IF EXISTS table_a'.
 	client execute: 'CREATE TABLE table_a (id INTEGER, name TEXT, text_a TEXT[], int_a INTEGER[])'.
 	statement := client prepare: 'INSERT INTO table_a (id, name, text_a, int_a) VALUES ($1, $2, $3, $4)'.
-	statement execute: { 1. 'foo'. P3ValuesArray withAll: #('foo' 'bar'). P3ValuesArray withAll: #(1 2) }.
+	statement execute: { 1. 'foo'. #('foo' 'bar'). #(1 2) }.
 	"statement execute: { 2. 'null'. P3ValuesArray withAll: #('NULL' nil). P3ValuesArray withAll: #(0 nil) }."
-	statement execute: { 3. 'zero'. P3ValuesArray empty. P3ValuesArray empty }.
-	"statement execute: { 4. 'escape'. P3ValuesArray withAll: #('a""b' 'c\d'). P3ValuesArray withAll: #(1 2) }."
+	statement execute: { 3. 'zero'. #(). #() }.
+	"statement execute: { 4. 'escape'. P3ValuesArray withAll: #('a""""b' 'c\d'). P3ValuesArray withAll: #(1 2) }."
 	result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 1'.
 	self assert: result firstRecord equals: #(1 'foo' #('foo' 'bar') #(1 2)).
 	"result := client query: 'SELECT id, name, text_a, int_a FROM table_a WHERE id = 2'.
@@ -846,7 +847,7 @@ P3ClientTest >> testValuesArray2 [
 	client execute: 'DROP TABLE table_a'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testZTimestamp [
 	| result |
 	client close; timestampClass: ZTimestamp.
@@ -873,7 +874,7 @@ P3ClientTest >> testZTimestamp [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ClientTest >> testZTimestampWithTimezone [
 	| result |
 	client close; timestampClass: ZTimestamp.

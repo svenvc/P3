@@ -25,23 +25,25 @@ When an error occurs, the connection should not be reused and be closed by the c
 
 "
 Class {
-	#name : #P3ConnectionPool,
-	#superclass : #Object,
+	#name : 'P3ConnectionPool',
+	#superclass : 'Object',
 	#instVars : [
 		'url',
 		'configurator',
 		'pool',
 		'access'
 	],
-	#category : #'P3-Core'
+	#category : 'P3-Core',
+	#package : 'P3',
+	#tag : 'Core'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3ConnectionPool class >> url: anUrl [
 	^ self new url: anUrl
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3ConnectionPool >> acquireConnection [
 	"Return a connection (P3Client) from the pool or create a new one.
 	While in use the connection (P3Client) is removed from the pool."
@@ -52,12 +54,12 @@ P3ConnectionPool >> acquireConnection [
 			ifNotEmpty: [ pool removeLast ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ConnectionPool >> capacity [
 	^ pool capacity 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ConnectionPool >> close [
 	"Close all pooled connections and remove them"
 	
@@ -65,7 +67,7 @@ P3ConnectionPool >> close [
 	pool removeAll
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ConnectionPool >> configurator: oneArgumentBlock [
 	"Set oneArgumentBlock to be my configurator.
 	This is code that will be executed once on each newly created connection (P3Client).
@@ -74,7 +76,7 @@ P3ConnectionPool >> configurator: oneArgumentBlock [
 	configurator := oneArgumentBlock 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ConnectionPool >> initialize [
 	super initialize.
 	access := Mutex new.
@@ -82,7 +84,7 @@ P3ConnectionPool >> initialize [
 	configurator := [ :p3Client | self assert: p3Client isWorking ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3ConnectionPool >> makeP3Client [
 	| p3Client |
 	p3Client := P3Client url: url.
@@ -90,7 +92,7 @@ P3ConnectionPool >> makeP3Client [
 	^ p3Client
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3ConnectionPool >> printOn: stream [
 	super printOn: stream.
 	stream 
@@ -100,7 +102,7 @@ P3ConnectionPool >> printOn: stream [
 		nextPut: $)
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3ConnectionPool >> releaseConnection: connection [
 	"Return connection (a P3Client) to the pool.
 	If the pool is at its capacity, close it.
@@ -112,31 +114,31 @@ P3ConnectionPool >> releaseConnection: connection [
 			ifFalse: [ connection close ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ConnectionPool >> size [
 	^ pool size
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ConnectionPool >> size: capacity [
 	"Size me to capacity: the maximum number of connections (P3Clients) that I will hold"
 	
 	pool := OrderedCollection new: capacity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ConnectionPool >> url [
 	^ url
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ConnectionPool >> url: aPsqlUrl [
 	"Set the P3Client url"
 	
 	url := aPsqlUrl 
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3ConnectionPool >> warmUp [
 	"Warm up the receiver to its full capacity.
 	This will create all pooled connections at once."
@@ -144,7 +146,7 @@ P3ConnectionPool >> warmUp [
 	self warmUp: self capacity
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3ConnectionPool >> warmUp: numberOfConnections [
 	"Warm up the pool to numberOfConnections.
 	Effectively creating that many connections at once"
@@ -156,7 +158,7 @@ P3ConnectionPool >> warmUp: numberOfConnections [
 	connections do: [ :each | self releaseConnection: each ]
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3ConnectionPool >> withConnection: oneArgumentBlock [
 	"Execute oneArgumentBlock with a connection (P3Client) as argument,
 	acquiring it from the pool and releasing it to the pool when done,

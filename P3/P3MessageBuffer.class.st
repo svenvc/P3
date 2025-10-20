@@ -7,28 +7,30 @@ I try to prevent allocations as much as possible.
 I grow as needed.
 "
 Class {
-	#name : #P3MessageBuffer,
-	#superclass : #Object,
+	#name : 'P3MessageBuffer',
+	#superclass : 'Object',
 	#instVars : [
 		'tag',
 		'payload',
 		'size'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3MessageBuffer >> capacity [
 	^ self rawByteBuffer size
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3MessageBuffer >> initialize [
 	super initialize.
 	self initializeForSize: 0
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3MessageBuffer >> initializeForSize: actualSize [
 	(payload isNil or: [ actualSize > self capacity ])
 		ifTrue: [ payload := (ByteArray new: ((actualSize // 1024) + 1) * 1024) readStream ].
@@ -36,17 +38,17 @@ P3MessageBuffer >> initializeForSize: actualSize [
 	payload setFrom: 1 to: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3MessageBuffer >> payloadCopy [
 	^ self rawByteBuffer copyFrom: 1 to: size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3MessageBuffer >> rawByteBuffer [
 	^ payload originalContents
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3MessageBuffer >> readFrom: readStream [
 	| byte length |
 	(byte := readStream next)
@@ -58,27 +60,27 @@ P3MessageBuffer >> readFrom: readStream [
 		ifTrue: [ readStream next: self size into: self rawByteBuffer ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3MessageBuffer >> readStream [
 	^ payload
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3MessageBuffer >> size [
 	^ size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3MessageBuffer >> tag [
 	^ tag
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3MessageBuffer >> tag: character [
 	tag := character
 ]
 
-{ #category : #reading }
+{ #category : 'reading' }
 P3MessageBuffer >> uint32From: stream [
 	| uint32 |
 	uint32 := stream next.

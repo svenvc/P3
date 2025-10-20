@@ -8,16 +8,18 @@ I am a P3GeometricObject
 My internal representation is an upper right and lower left point
 "
 Class {
-	#name : #P3Box,
-	#superclass : #P3GeometricObject,
+	#name : 'P3Box',
+	#superclass : 'P3GeometricObject',
 	#instVars : [
 		'upperRight',
 		'lowerLeft'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Box class >> readFrom: stream [
 	| upperRight lowerLeft |
 	upperRight := P3Point readFrom: stream.
@@ -27,17 +29,17 @@ P3Box class >> readFrom: stream [
 	^ self upperRight: upperRight lowerLeft: lowerLeft
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box class >> tag [
 	^ #box
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Box class >> unit [
 	^ self upperRight: P3Point unit lowerLeft: P3Point zero
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Box class >> upperRight: upperRight lowerLeft: lowerLeft [
 	^ self new
 		upperRight: upperRight;
@@ -45,66 +47,66 @@ P3Box class >> upperRight: upperRight lowerLeft: lowerLeft [
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Box class >> zero [
 	^ self upperRight: P3Point zero lowerLeft: P3Point zero
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Box >> = anotherBox [
 	self == anotherBox ifTrue: [ ^ true ].
 	self class = anotherBox class ifFalse: [ ^ false ].
 	^ upperRight = anotherBox upperRight and: [ lowerLeft = anotherBox lowerLeft ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box >> area [
 	^ self width * self height
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box >> center [
 	^ P3Point x: (self width / 2 + lowerLeft x) y: (self height / 2 + lowerLeft y)
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Box >> hash [
 	^ (upperRight hash + lowerLeft hash) hashMultiply
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box >> height [
 	^ upperRight y - lowerLeft y
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box >> lowerLeft [
 	^ lowerLeft 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Box >> lowerLeft: point [
 	lowerLeft := point
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Box >> printOn: stream [
 	upperRight printOn: stream.
 	stream nextPut: $,.
 	lowerLeft printOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box >> upperRight [
 	^ upperRight
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Box >> upperRight: point [
 	upperRight := point
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Box >> width [
 	^ upperRight x - lowerLeft x
 ]

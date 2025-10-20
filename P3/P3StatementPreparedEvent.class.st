@@ -5,16 +5,18 @@ I am a P3LogEvent.
 I represent a P3PreparedStatement, an SQL query (statement) prepared (preparsed) by PostgreSQL.
 "
 Class {
-	#name : #P3StatementPreparedEvent,
-	#superclass : #P3LogEvent,
+	#name : 'P3StatementPreparedEvent',
+	#superclass : 'P3LogEvent',
 	#instVars : [
 		'statement',
 		'query'
 	],
-	#category : #'P3-Logging'
+	#category : 'P3-Logging',
+	#package : 'P3',
+	#tag : 'Logging'
 }
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3StatementPreparedEvent >> printContentsOn: stream [
 	stream print: #Prepare.
 	stream space.
@@ -28,22 +30,22 @@ P3StatementPreparedEvent >> printContentsOn: stream [
 		nextPutAll: (' parameter' asPluralBasedOn: self statement paramCount)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3StatementPreparedEvent >> query [
 	^ query
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3StatementPreparedEvent >> query: anObject [
 	query := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3StatementPreparedEvent >> statement [
 	^ statement
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3StatementPreparedEvent >> statement: anObject [
 	statement := anObject
 ]

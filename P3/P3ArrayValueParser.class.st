@@ -13,16 +13,18 @@ We do minimal error checking / error handling since this is a representation gen
 
 "
 Class {
-	#name : #P3ArrayValueParser,
-	#superclass : #Object,
+	#name : 'P3ArrayValueParser',
+	#superclass : 'Object',
 	#instVars : [
 		'stream',
 		'converter'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3ArrayValueParser >> consumeWhitespace [
 	"Strip whitespaces from the input stream."
 
@@ -30,21 +32,21 @@ P3ArrayValueParser >> consumeWhitespace [
 		stream next ]
 ]
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3ArrayValueParser >> convertElement: string [
 	^ converter 
 		ifNil: [ string ]
 		ifNotNil: [ converter value: string ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3ArrayValueParser >> converter: block [
 	"Set my converter to block, which will parse the text of array elements"
 	
 	converter := block
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ArrayValueParser >> next [
 	"Parse and return the next array value"
 
@@ -58,14 +60,14 @@ P3ArrayValueParser >> next [
 	^ self convertElement: str
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3ArrayValueParser >> on: readStream [
 	"Initialize me on the textual readStream given"
 	
 	stream := readStream
 ]
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3ArrayValueParser >> parseArray [
 	stream next. "Consume opening curly brace"
 	^ Array streamContents: [ :array | 
@@ -75,14 +77,14 @@ P3ArrayValueParser >> parseArray [
 			stream peekFor: $, ] ]
 ]
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3ArrayValueParser >> parseElement [
 	^ String streamContents: [ :string | 
 		[ stream atEnd or: [ ',}' includes: stream peek ] ] whileFalse: [ 
 			string nextPut: stream next ] ]
 ]
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3ArrayValueParser >> parseString [
 	stream next. "Consume opening double quote"
 	^ String streamContents: [ :string | 

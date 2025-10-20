@@ -5,12 +5,14 @@ I am a P3LogEvent.
 I represent the closing of PostgreSQL client connection.
 "
 Class {
-	#name : #P3ConnectionClosedEvent,
-	#superclass : #P3LogEvent,
-	#category : #'P3-Logging'
+	#name : 'P3ConnectionClosedEvent',
+	#superclass : 'P3LogEvent',
+	#category : 'P3-Logging',
+	#package : 'P3',
+	#tag : 'Logging'
 }
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3ConnectionClosedEvent >> printContentsOn: stream [	
 	stream print: #Close
 ]

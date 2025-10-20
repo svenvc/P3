@@ -19,16 +19,18 @@ select distinct typname from pg_type where typname ~ '^[^_].*vector';
 ```
 "
 Class {
-	#name : #P3IntegerVectorValueParser,
-	#superclass : #Object,
+	#name : 'P3IntegerVectorValueParser',
+	#superclass : 'Object',
 	#instVars : [
 		'stream',
 		'converter'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3IntegerVectorValueParser >> consumeWhitespace [
 
 	"Strip whitespaces from the input stream."
@@ -37,21 +39,21 @@ P3IntegerVectorValueParser >> consumeWhitespace [
 		whileTrue: [ stream next ]
 ]
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3IntegerVectorValueParser >> convertElement: string [
 	^ converter 
 		ifNil: [ string ]
 		ifNotNil: [ converter value: string ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3IntegerVectorValueParser >> converter: block [
 	"Set my converter to block, which will parse the text of array elements"
 	
 	converter := block
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3IntegerVectorValueParser >> initialize [
 
 	"set default converter"
@@ -60,7 +62,7 @@ P3IntegerVectorValueParser >> initialize [
 	converter := [ :string |  string asInteger]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3IntegerVectorValueParser >> next [
 
 	"Parse and return the next array value"
@@ -73,14 +75,14 @@ P3IntegerVectorValueParser >> next [
 				  self consumeWhitespace.] ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3IntegerVectorValueParser >> on: readStream [
 	"Initialize me on the textual readStream given"
 	
 	stream := readStream
 ]
 
-{ #category : #'private-parsing' }
+{ #category : 'private-parsing' }
 P3IntegerVectorValueParser >> parseElement [
 
 	^ String streamContents: [ :string | 

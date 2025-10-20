@@ -2,12 +2,13 @@
 P3ArrayValueParserTest holds unit tests for P3ArrayValueParser.
 "
 Class {
-	#name : #P3ArrayValueParserTest,
-	#superclass : #TestCase,
-	#category : #'P3-Tests'
+	#name : 'P3ArrayValueParserTest',
+	#superclass : 'TestCase',
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ArrayValueParserTest >> testIntegers [
 	self 
 		assert: (P3ArrayValueParser new 
@@ -17,7 +18,7 @@ P3ArrayValueParserTest >> testIntegers [
 		equals: #( (1 2) (3 4) (0 -1) )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ArrayValueParserTest >> testPlain [
 	self 
 		assert: (P3ArrayValueParser new 
@@ -26,7 +27,7 @@ P3ArrayValueParserTest >> testPlain [
 		equals: #( ('one' 'two') ('three' 'four') (nil '') )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ArrayValueParserTest >> testSpecial [
 	self 
 		assert: (P3ArrayValueParser new 

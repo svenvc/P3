@@ -6,21 +6,22 @@ https://tools.ietf.org/html/rfc7677
 
 "
 Class {
-	#name : #P3SCRAMTest,
-	#superclass : #TestCase,
+	#name : 'P3SCRAMTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'scram'
 	],
-	#category : #'P3-Tests'
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 P3SCRAMTest >> setUp [
 	super setUp.
 	scram := P3SCRAM new
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3SCRAMTest >> testSHA1 [
 	scram sha1.
 	scram user: 'user'.
@@ -40,7 +41,7 @@ P3SCRAMTest >> testSHA1 [
 	
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3SCRAMTest >> testSHA256 [
 	scram sha256.
 	scram user: 'user'.

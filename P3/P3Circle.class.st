@@ -8,16 +8,18 @@ I am a P3GeometricObject
 My internal representation is a center point and a radius
 "
 Class {
-	#name : #P3Circle,
-	#superclass : #P3GeometricObject,
+	#name : 'P3Circle',
+	#superclass : 'P3GeometricObject',
 	#instVars : [
 		'center',
 		'radius'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Circle class >> center: center radius: radius [
 	^ self new
 		center: center;
@@ -25,7 +27,7 @@ P3Circle class >> center: center radius: radius [
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Circle class >> readFrom: stream [
 	| center radius |
 	(stream peekFor: $<) ifFalse: [ 
@@ -40,54 +42,54 @@ P3Circle class >> readFrom: stream [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Circle class >> tag [
 	^ #circle
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Circle class >> unit [
 	^ self center: P3Point origin radius: 1 
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Circle >> = anotherCircle [
 	self == anotherCircle ifTrue: [ ^ true ].
 	self class = anotherCircle class ifFalse: [ ^ false ].
 	^ center = anotherCircle center and: [ radius = anotherCircle radius ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Circle >> area [
 	^ Float pi * radius squared 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Circle >> center [
 	^ center
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Circle >> center: point [
 	center := point
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Circle >> circumference [
 	^ 2 * Float pi * radius
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Circle >> diameter [
 	^ radius * 2
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Circle >> hash [
 	^ (center hash hashMultiply + radius hash) hashMultiply
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Circle >> printOn: stream [
 	stream nextPut: $<.
 	center printOn: stream.
@@ -96,12 +98,12 @@ P3Circle >> printOn: stream [
 	stream nextPut: $>
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Circle >> radius [
 	^ radius
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Circle >> radius: number [
 	radius := number
 ]

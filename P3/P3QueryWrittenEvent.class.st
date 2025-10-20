@@ -5,15 +5,17 @@ I am a P3LogEvent.
 I represent an SQL query (statement) that was sent to PostgreSQL.
 "
 Class {
-	#name : #P3QueryWrittenEvent,
-	#superclass : #P3LogEvent,
+	#name : 'P3QueryWrittenEvent',
+	#superclass : 'P3LogEvent',
 	#instVars : [
 		'query'
 	],
-	#category : #'P3-Logging'
+	#category : 'P3-Logging',
+	#package : 'P3',
+	#tag : 'Logging'
 }
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3QueryWrittenEvent >> printContentsOn: stream [
 	stream print: #Query.
 	stream space.
@@ -23,12 +25,12 @@ P3QueryWrittenEvent >> printContentsOn: stream [
 			ifFalse: [ stream nextPut: each ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3QueryWrittenEvent >> query [
 	^ query
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3QueryWrittenEvent >> query: anObject [
 	query := anObject
 ]

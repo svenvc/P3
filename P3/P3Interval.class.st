@@ -10,8 +10,8 @@ I can also print myself using the 'iso8601 with designators' format.
 This is currently an MVP implementation.
 "
 Class {
-	#name : #P3Interval,
-	#superclass : #Object,
+	#name : 'P3Interval',
+	#superclass : 'Object',
 	#instVars : [
 		'years',
 		'months',
@@ -20,10 +20,12 @@ Class {
 		'minutes',
 		'seconds'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 P3Interval class >> readDesignator: stream [
 	self skipSeparators: stream.
 	^ String streamContents: [ :out |
@@ -31,7 +33,7 @@ P3Interval class >> readDesignator: stream [
 			whileTrue: [ out nextPut: stream next ] ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Interval class >> readFrom: stream [
 	| years months days hours minutes seconds number word helper count |
 	years := months := days := hours := minutes := seconds := 0.
@@ -59,12 +61,12 @@ P3Interval class >> readFrom: stream [
 	^ self years: years months: months days: days hours: hours minutes: minutes seconds: seconds
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Interval class >> skipSeparators: stream [
 	[ stream atEnd not and: [ stream peek isSeparator ] ] whileTrue: [ stream next ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Interval class >> years: years months: months days: days hours: hours minutes: minutes seconds: seconds [
 	^ self new
 		years: years;
@@ -76,12 +78,12 @@ P3Interval class >> years: years months: months days: days hours: hours minutes:
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Interval class >> zero [
 	^ self new
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Interval >> = anotherInterval [
 	self == anotherInterval
 		ifTrue: [ ^ true ].
@@ -95,68 +97,68 @@ P3Interval >> = anotherInterval [
 										and: [ seconds = anotherInterval seconds ] ] ] ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> days [
 	^ days
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> days: anObject [
 	days := anObject
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Interval >> hash [
 	^ ((years hash + months hash + days hash) hashMultiply
 		+ (hours hash + minutes hash + seconds hash) hashMultiply)
 		hashMultiply
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> hours [
 	^ hours
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> hours: anObject [
 	hours := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3Interval >> initialize [
 	super initialize.
 	years := months := days := hours := minutes := seconds := 0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> minutes [
 	^ minutes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> minutes: anObject [
 	minutes := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> months [
 	^ months
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> months: anObject [
 	months := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Interval >> p3PrintUsing: delegate on: stream [
 	"Print me on stream via double dispatch on delegate.
-	Check the implementors of #p3PrintOn:using:"
+	Check the implementors of #p3PrintUsing:on:"
 
 	delegate printInterval: self on: stream
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Interval >> printIso8601On: stream [
 	stream nextPut: $P.
 	years = 0 ifFalse: [ 
@@ -174,7 +176,7 @@ P3Interval >> printIso8601On: stream [
 		stream print: seconds; nextPut: $S ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Interval >> printOn: stream [
 	| space |
 	space := false.
@@ -201,22 +203,22 @@ P3Interval >> printOn: stream [
 	seconds printOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> seconds [
 	^ seconds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> seconds: anObject [
 	seconds := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> years [
 	^ years
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Interval >> years: anObject [
 	years := anObject
 ]

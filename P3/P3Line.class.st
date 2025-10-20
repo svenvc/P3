@@ -8,17 +8,19 @@ I am a P3GeometricObject
 My internal representation consists of my 3 coefficients, a, b and c
 "
 Class {
-	#name : #P3Line,
-	#superclass : #P3GeometricObject,
+	#name : 'P3Line',
+	#superclass : 'P3GeometricObject',
 	#instVars : [
 		'a',
 		'b',
 		'c'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Line class >> a: a b: b c: c [
 	^ self new
 		a: a;
@@ -27,7 +29,7 @@ P3Line class >> a: a b: b c: c [
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Line class >> readFrom: stream [
 	| a b c |
 	(stream peekFor: ${) ifFalse: [ 
@@ -44,64 +46,64 @@ P3Line class >> readFrom: stream [
 	^ self a: a b: b c: c
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Line class >> tag [
 	^ #line
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Line class >> xAxis [
 	^ self a: 0 b: 1 c: 0
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Line class >> yAxis [
 	^ self a: 1 b: 0 c: 0
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Line >> = anotherLine [
 	self == anotherLine ifTrue: [ ^ true ].
 	self class = anotherLine class ifFalse: [ ^ false ].
 	^ a = anotherLine a and: [ b = anotherLine b and: [ c = anotherLine c ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Line >> a [
 	^ a
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Line >> a: number [
 	a := number
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Line >> b [
 	^ b
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Line >> b: number [
 	b := number
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Line >> c [
 	^ c
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Line >> c: number [
 	c := number
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Line >> hash [ 
 	^ ((a hash + b hash) hashMultiply + c hash) hashMultiply 
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Line >> printOn: stream [
 	stream 
 		nextPut: ${;

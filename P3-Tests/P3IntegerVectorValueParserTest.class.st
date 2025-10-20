@@ -1,10 +1,11 @@
 Class {
-	#name : #P3IntegerVectorValueParserTest,
-	#superclass : #TestCase,
-	#category : #'P3-Tests'
+	#name : 'P3IntegerVectorValueParserTest',
+	#superclass : 'TestCase',
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3IntegerVectorValueParserTest >> testPlain [
 
 	"assuming PostgreSQL will always use exactly one space as separator, but we parse multispace as well"

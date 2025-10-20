@@ -8,16 +8,18 @@ I am a P3GeometricObject
 My internal representation is a start and stop point
 "
 Class {
-	#name : #P3LineSegment,
-	#superclass : #P3GeometricObject,
+	#name : 'P3LineSegment',
+	#superclass : 'P3GeometricObject',
 	#instVars : [
 		'start',
 		'stop'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3LineSegment class >> readFrom: stream [
 	| start stop |
 	(stream peekFor: $[) ifFalse: [ 
@@ -31,7 +33,7 @@ P3LineSegment class >> readFrom: stream [
 	^ self start: start stop: stop
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3LineSegment class >> start: start stop: stop [
 	^ self new
 		start: start;
@@ -39,39 +41,39 @@ P3LineSegment class >> start: start stop: stop [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LineSegment class >> tag [
 	^ #lseg
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3LineSegment class >> xAxisUnit [
 	^ self start: P3Point zero stop: (P3Point x: 1 y: 0) 
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3LineSegment class >> yAxisUnit [
 	^ self start: P3Point zero stop: (P3Point x: 0 y: 1) 
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3LineSegment >> = anotherLineSegment [
 	self == anotherLineSegment ifTrue: [ ^ true ].
 	self class = anotherLineSegment class ifFalse: [ ^ false ].
 	^ start = anotherLineSegment start and: [ stop = anotherLineSegment stop ]
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3LineSegment >> hash [
 	^ (start hash + stop hash) hashMultiply
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LineSegment >> length [
 	^ ((stop x - start x) squared + (stop y - start y) squared) sqrt
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3LineSegment >> printOn: stream [
 	stream nextPut: $[.
 	start printOn: stream.
@@ -80,22 +82,22 @@ P3LineSegment >> printOn: stream [
 	stream nextPut: $]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LineSegment >> start [
 	^ start
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3LineSegment >> start: point [
 	start := point
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LineSegment >> stop [
 	^ stop
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3LineSegment >> stop: point [
 	stop := point
 ]

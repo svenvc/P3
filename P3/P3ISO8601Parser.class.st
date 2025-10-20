@@ -9,33 +9,35 @@ I only accept the PostgreSQL ISO output format.
 
 "
 Class {
-	#name : #P3ISO8601Parser,
-	#superclass : #Object,
+	#name : 'P3ISO8601Parser',
+	#superclass : 'Object',
 	#instVars : [
 		'stream',
 		'timestampClass'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3ISO8601Parser class >> on: stringOrReadStream [
 	^ self new 
 		on: stringOrReadStream readStream; 
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ISO8601Parser >> initialize [
 	timestampClass := DateAndTime
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ISO8601Parser >> on: readStream [
 	stream := readStream 
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseDate [
 	| year month day |
 	year := self parsePositiveInteger.
@@ -49,7 +51,7 @@ P3ISO8601Parser >> parseDate [
 	^ Date year: year month: month day: day 
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseDateAndTime [
 	| date time timezoneOffset |
 	date := self parseDateElements.
@@ -67,7 +69,7 @@ P3ISO8601Parser >> parseDateAndTime [
 			offset: timezoneOffset seconds  
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseDateElements [
 	| year month day |
 	year := self parsePositiveInteger.
@@ -81,7 +83,7 @@ P3ISO8601Parser >> parseDateElements [
 	^ Array with: year with: month with: day
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseDecimalFraction [
 	| integer power |
 	integer := 0.
@@ -93,14 +95,14 @@ P3ISO8601Parser >> parseDecimalFraction [
 	^ integer / power
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseOptionalTimezoneOffset [
 	^ ('+-' includes: stream peek)
 			ifTrue: [ self parseTimezoneOffset ]
 			ifFalse: [ 0 ]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parsePositiveInteger [
 	| integer |
 	integer := 0.
@@ -110,7 +112,7 @@ P3ISO8601Parser >> parsePositiveInteger [
 	^ integer
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseTime [
 	| hours minutes seconds nanoSeconds |
 	hours := self parsePositiveInteger.
@@ -127,7 +129,7 @@ P3ISO8601Parser >> parseTime [
 	^ Time hour: hours minute: minutes second: seconds nanoSecond: nanoSeconds  
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseTimeElements [
 	| hours minutes seconds nanoSeconds |
 	hours := self parsePositiveInteger.
@@ -144,7 +146,7 @@ P3ISO8601Parser >> parseTimeElements [
 	^ Array with: hours with: minutes with: seconds with: nanoSeconds  
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 P3ISO8601Parser >> parseTimezoneOffset [
 	| sign hours minutes |
 	sign := stream next = $- ifTrue: [ -1 ] ifFalse: [ 1 ].
@@ -155,7 +157,7 @@ P3ISO8601Parser >> parseTimezoneOffset [
 	^ sign * ((hours * 3600) + (minutes * 60))
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3ISO8601Parser >> timestampClass: aClass [
 	"Set the class for timestamps, which will be sent #year:month:day:hour:minute:second:nanoSecond:offset:"
 	

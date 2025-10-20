@@ -5,15 +5,17 @@ I am used to support the extended query protocol.
 In particular, after the prepare/parse phase, my instances describe the type of each binding parameter.
 "
 Class {
-	#name : #P3ParameterDescription,
-	#superclass : #Object,
+	#name : 'P3ParameterDescription',
+	#superclass : 'Object',
 	#instVars : [
 		'typeOid'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3ParameterDescription >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(.
@@ -21,17 +23,17 @@ P3ParameterDescription >> printOn: stream [
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ParameterDescription >> typeName [
 	^ (P3Converter typeMap at: self typeOid ifAbsent: [ ^ self typeOid ]) first
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ParameterDescription >> typeOid [
 	^ typeOid
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ParameterDescription >> typeOid: anObject [
 	typeOid := anObject
 ]

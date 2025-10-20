@@ -18,16 +18,18 @@ The syntax that I use ($n) and my public API is mostly polymorphic with P3Prepar
 
 "
 Class {
-	#name : #P3FormattedStatement,
-	#superclass : #Object,
+	#name : 'P3FormattedStatement',
+	#superclass : 'Object',
 	#instVars : [
 		'client',
 		'source'
 	],
-	#category : #'P3-Core'
+	#category : 'P3-Core',
+	#package : 'P3',
+	#tag : 'Core'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 P3FormattedStatement >> bind: arguments [
 	"Build and return the actual SQL statement by splicing in the arguments for all placeholders in the template"
 	
@@ -42,16 +44,16 @@ P3FormattedStatement >> bind: arguments [
 					ifFalse: [ out nextPut: char ] ] ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3FormattedStatement >> client: aP3Client [
 	client := aP3Client
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3FormattedStatement >> close [
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3FormattedStatement >> execute: arguments [
 	"Bind the arguments given to the placeholders in my SQL template and
 	execute this statement using my client, returning the result"
@@ -59,7 +61,7 @@ P3FormattedStatement >> execute: arguments [
 	^ client execute: (self bind: arguments)
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3FormattedStatement >> executeBatch: argumentsCollection [
 	"Bind each set of arguments from the argumentsCollection given
 	to the placeholders in my SQL template and execute this statement using my client, 
@@ -68,14 +70,14 @@ P3FormattedStatement >> executeBatch: argumentsCollection [
 	^ argumentsCollection collect: [ :each | self execute: each ]
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printBitString: bitString on: stream [
 	"Use the B'0101' syntax for bit strings"
 	
 	stream nextPut: $B; nextPut: $'; print: bitString; nextPut: $'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printByteArray: byteArray on: stream [
 	"Use the bytea Hex Format for bytes (ByteArray),
 	as in '\xDEADBEEF'"
@@ -90,7 +92,7 @@ P3FormattedStatement >> printByteArray: byteArray on: stream [
 	stream nextPut: $'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printDate: date on: stream [
 	"Use ISO 8601 YYYY-MM-DD"
 	
@@ -99,7 +101,7 @@ P3FormattedStatement >> printDate: date on: stream [
 	stream nextPut: $'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printDateAndTime: dateAndTime on: stream [
 	"Use ISO 8601 YYYY-MM-DDThh:mm:ss.s+ZZ:zz"
 	
@@ -108,41 +110,41 @@ P3FormattedStatement >> printDateAndTime: dateAndTime on: stream [
 	stream nextPut: $' 
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printGeometricObject: geometricObject on: stream [
 	"Delegate to P3GeometricObject that knows how to print itself in typed quoted PSQL text format"
 	
 	geometricObject printPsqlOn: stream
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printInterval: interval on: stream [
 	"Delegate partially to P3Interval that knows how to print itself in postgresql style"
 	
 	stream nextPutAll: #interval; space; nextPut: $'; print: interval; nextPut: $'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printNullOn: stream [
 	"nil becomes NULL"
 	
 	stream nextPutAll: 'NULL'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printObject: object on: stream [
 	"In general, just use the standard print string representation"
 	
 	object printOn: stream 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3FormattedStatement >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(; << source; nextPut: $)
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printScaledDecimal: scaledDecimal on: stream [
 	"For ScaledDecimals, use a regular floating point like representation"
 	
@@ -151,7 +153,7 @@ P3FormattedStatement >> printScaledDecimal: scaledDecimal on: stream [
 		showingDecimalPlaces: scaledDecimal scale
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printString: string on: stream [
 	"For strings use single quotes and the doubling of single quotes when they are part of the string"
 	
@@ -162,7 +164,7 @@ P3FormattedStatement >> printString: string on: stream [
 	stream nextPut: $'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printTime: time on: stream [
 	"Use ISO 8601 hh:mm:ss"
 	
@@ -171,7 +173,7 @@ P3FormattedStatement >> printTime: time on: stream [
 	stream nextPut: $'
 ]
 
-{ #category : #'printing-dispatched' }
+{ #category : 'printing-dispatched' }
 P3FormattedStatement >> printValuesArray: valuesArray on: stream [
 	| first |
 	valuesArray isEmpty 
@@ -185,7 +187,7 @@ P3FormattedStatement >> printValuesArray: valuesArray on: stream [
 	stream nextPut: $]
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3FormattedStatement >> query: arguments [
 	"Bind the arguments given to the placeholders in my SQL template and
 	execute this query using my client, returning the result"
@@ -193,7 +195,7 @@ P3FormattedStatement >> query: arguments [
 	^ client query: (self bind: arguments)
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3FormattedStatement >> queryAll: argumentsCollection [
 	"Bind each set of arguments from the argumentsCollection given
 	to the placeholders in my SQL template and execute this query using my client, 
@@ -202,14 +204,14 @@ P3FormattedStatement >> queryAll: argumentsCollection [
 	^ argumentsCollection collect: [ :each | self query: each ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3FormattedStatement >> source [
 	"Return my SQL source"
 	
 	^ source
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3FormattedStatement >> sql: anSQLTemplateString [
 	source := anSQLTemplateString 
 ]

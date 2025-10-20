@@ -15,18 +15,20 @@ Even if there are multiple queries, there can only be one stream of records. Mos
 In the case of multiple queries, there will be multiple results (an array of results), one for each query. However, only the last record stream will be in the data and descriptions.
 "
 Class {
-	#name : #P3Result,
-	#superclass : #Object,
+	#name : 'P3Result',
+	#superclass : 'Object',
 	#instVars : [
 		'results',
 		'descriptions',
 		'data',
 		'source'
 	],
-	#category : #'P3-Core'
+	#category : 'P3-Core',
+	#package : 'P3',
+	#tag : 'Core'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Result class >> descriptions: descriptions data: aRowArray results: aString [
 	^ self new
 		descriptions: descriptions;
@@ -35,7 +37,7 @@ P3Result class >> descriptions: descriptions data: aRowArray results: aString [
 		yourself
 ]
 
-{ #category : #'private-accessing' }
+{ #category : 'private-accessing' }
 P3Result >> addResult: subResult [
 	results := results
 		ifNil: [ subResult ]
@@ -44,21 +46,21 @@ P3Result >> addResult: subResult [
 				ifFalse: [ results copyWith: subResult ] ]
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> columnNames [
 	"Return the names of the columns of the data that I hold"
 	
 	^ descriptions collect: #fieldName
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> columns [
 	"Return the P3RowFieldDescriptions of the columns of the data that I hold"
 
 	^ descriptions
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> data [
 	"Return the data that I represent, 
 	an Array containing equal sized Arrays for each record in the result"
@@ -66,12 +68,12 @@ P3Result >> data [
 	^ data
 ]
 
-{ #category : #'private-accessing' }
+{ #category : 'private-accessing' }
 P3Result >> data: collection [
 	data := collection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> descriptions [
 	"Return the P3RowFieldDescriptions of the result that I represent.
 	There will be one such description for each column."
@@ -79,33 +81,33 @@ P3Result >> descriptions [
 	^ descriptions
 ]
 
-{ #category : #'private-accessing' }
+{ #category : 'private-accessing' }
 P3Result >> descriptions: collectionOfRowFieldDescriptions [
 	descriptions := collectionOfRowFieldDescriptions
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> firstColumnData [
 	"Return a flat collection of the data in the first column that I hold"
 	
 	^ data collect: #first
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> firstFieldOfFirstRecord [
 	"Return the value of the first field of the first record that I hold"
 	
 	^ self firstRecord first
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> firstRecord [
 	"Return the first record of the result, which will be an Array"
 	
 	^ self records first
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> firstResult [
 	"Return the SQL query execution result, or the first one if there are multiple results.
 	Among other things, the result indicates how many rows were returned or modified."
@@ -113,7 +115,7 @@ P3Result >> firstResult [
 	^ results isString ifTrue: [ results ] ifFalse: [ results first ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> firstRowCount [
 	"Return the row count for the first result that I hold.
 	This is the integer count of the the number of records returned or modified"
@@ -121,27 +123,27 @@ P3Result >> firstRowCount [
 	^ self rowCountFromCommandResultTag: self firstResult
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Result >> hasData [
 	^ data notNil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Result >> hasDescriptions [
 	^ descriptions notNil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Result >> hasResults [
 	^ results notNil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Result >> hasSource [
 	^ source notNil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> lastResult [
 	"Return the SQL query execution result, or the last one if there are multiple results.
 	Among other things, the result indicates how many rows were returned or modified."
@@ -149,7 +151,7 @@ P3Result >> lastResult [
 	^ results isString ifTrue: [ results ] ifFalse: [ results last ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> numberOfColumns [
 	"Return the number of columns that I hold.
 	Each record in my data will be of this size."
@@ -157,7 +159,7 @@ P3Result >> numberOfColumns [
 	^ self hasDescriptions ifTrue: [ self descriptions size ] ifFalse: [ 0 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> numberOfRecords [
 	"Return the actual number of records that are in the data that I hold.
 	In principle this equals #rowCount"
@@ -165,7 +167,7 @@ P3Result >> numberOfRecords [
 	^ self hasData ifTrue: [ self data size ] ifFalse: [ 0 ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Result >> printInfoOn: stream [
 	self hasResults
 		ifTrue: [ 
@@ -186,7 +188,7 @@ P3Result >> printInfoOn: stream [
 				<< (' colum' asPluralBasedOn: self numberOfColumns) ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Result >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(.
@@ -194,14 +196,14 @@ P3Result >> printOn: stream [
 	stream nextPut: $)
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> records [
 	"Return the records that I hold, also known as my data"
 	
 	^ data
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> recordsAsDictionaries [
 	"Return the data that I hold as a collection where each record 
 	is represented by a Dictionary whose keys are the column names.
@@ -215,7 +217,7 @@ P3Result >> recordsAsDictionaries [
 		dictionary ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> result [
 	"Return the result.
 	As this is the most common case, we assume a single result."
@@ -223,7 +225,7 @@ P3Result >> result [
 	^ self firstResult
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> results [
 	"Return the SQL query execution results, possibly a collection.
 	Among other things, the results indicates how many rows were returned or modified."
@@ -231,12 +233,12 @@ P3Result >> results [
 	^ results
 ]
 
-{ #category : #'private-accessing' }
+{ #category : 'private-accessing' }
 P3Result >> results: stringOrCollectionOfStrings [
 	results := stringOrCollectionOfStrings
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> rowCount [
 	"Return the integer count of the number of records returned or modified.
 	If there is data, this equals #numberOfRecords"
@@ -244,33 +246,33 @@ P3Result >> rowCount [
 	^ self firstRowCount
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Result >> rowCountFromCommandResultTag: string [
 
 	string ifEmpty: [ ^ 0 ].
 	^ ($ split: string) last asInteger
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3Result >> rows [
 	"Return the rows that I hold, also known as my data"
 	
 	^ data
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> source [
 	"Return the SQL source that generated me (if available)"
 	
 	^ source
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> source: sqlString [
 	source := sqlString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Result >> totalRowCount [
 	"Return the total integer count of the number of record returned or modified in all results"
 

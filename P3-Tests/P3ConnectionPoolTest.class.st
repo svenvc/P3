@@ -4,27 +4,28 @@ P3ConnectionPoolTest holds unit tests for the P3ConnectionPool class.
 I reuse the configuration of P3ClientTest.
 "
 Class {
-	#name : #P3ConnectionPoolTest,
-	#superclass : #TestCase,
+	#name : 'P3ConnectionPoolTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'pool'
 	],
-	#category : #'P3-Tests'
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 P3ConnectionPoolTest >> setUp [
 	super setUp.
 	pool := P3ConnectionPool new.
 	pool url: P3ClientTest url
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 P3ConnectionPoolTest >> tearDown [
 	pool close
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ConnectionPoolTest >> testError [
 	self assert: pool size equals: 0.
 	self 
@@ -34,7 +35,7 @@ P3ConnectionPoolTest >> testError [
 	self assert: pool size equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ConnectionPoolTest >> testOne [
 	self assert: pool size equals: 0.
 	self 
@@ -48,7 +49,7 @@ P3ConnectionPoolTest >> testOne [
 	self assert: pool size equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ConnectionPoolTest >> testWarmUp [
 	self assert: pool size equals: 0.
 	pool warmUp.

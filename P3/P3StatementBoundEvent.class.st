@@ -7,26 +7,28 @@ I represent binding of a previously prepared P3PreparedStatement.
 Note that I hold all data used.
 "
 Class {
-	#name : #P3StatementBoundEvent,
-	#superclass : #P3LogEvent,
+	#name : 'P3StatementBoundEvent',
+	#superclass : 'P3LogEvent',
 	#instVars : [
 		'statement',
 		'inputValues'
 	],
-	#category : #'P3-Logging'
+	#category : 'P3-Logging',
+	#package : 'P3',
+	#tag : 'Logging'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3StatementBoundEvent >> inputValues [
 	^ inputValues
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3StatementBoundEvent >> inputValues: anObject [
 	inputValues := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3StatementBoundEvent >> printContentsOn: stream [
 	stream print: #Bind.
 	stream space.
@@ -40,12 +42,12 @@ P3StatementBoundEvent >> printContentsOn: stream [
 		nextPutAll: (' value' asPluralBasedOn: self statement paramCount)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3StatementBoundEvent >> statement [
 	^ statement
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3StatementBoundEvent >> statement: anObject [
 	statement := anObject
 ]

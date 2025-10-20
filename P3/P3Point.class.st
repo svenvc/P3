@@ -8,21 +8,23 @@ I am a P3GeometricObject
 My internal representation consists of my x and y coordinate
 "
 Class {
-	#name : #P3Point,
-	#superclass : #P3GeometricObject,
+	#name : 'P3Point',
+	#superclass : 'P3GeometricObject',
 	#instVars : [
 		'x',
 		'y'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Point class >> origin [
 	^ self zero
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Point class >> readFrom: stream [
 	| x y |
 	(stream peekFor: $() ifFalse: [ 
@@ -36,17 +38,17 @@ P3Point class >> readFrom: stream [
 	^ self x: x y: y
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Point class >> tag [
 	^ #point
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Point class >> unit [
 	^ self x: 1 y: 1
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Point class >> x: x y: y [
 	^ self new
 		x: x;
@@ -54,24 +56,24 @@ P3Point class >> x: x y: y [
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Point class >> zero [
 	^ self x: 0 y: 0
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Point >> = anotherPoint [
 	self == anotherPoint ifTrue: [ ^ true ].
 	self class = anotherPoint class ifFalse: [ ^ false ].
 	^ x = anotherPoint x and: [ y = anotherPoint y ]
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Point >> hash [
 	^ ( x hash hashMultiply + y hash) hashMultiply
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Point >> printOn: stream [
 	stream nextPut: $(.
 	x printOn: stream.
@@ -80,22 +82,22 @@ P3Point >> printOn: stream [
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Point >> x [
 	^ x
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Point >> x: number [
 	x := number
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Point >> y [
 	^ y
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Point >> y: number [
 	y := number
 ]

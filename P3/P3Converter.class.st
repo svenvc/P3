@@ -6,8 +6,8 @@ I convert field values to objects, taking into account their type.
 I known the character encoding and timezone of the current database connection.
 "
 Class {
-	#name : #P3Converter,
-	#superclass : #Object,
+	#name : 'P3Converter',
+	#superclass : 'Object',
 	#instVars : [
 		'encoder',
 		'timezone',
@@ -17,17 +17,19 @@ Class {
 		'asciiWriteStream',
 		'timestampClass'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter class >> supportedTypes [
 	"Return the list of PostgreSQL internal type names that we can convert to objects."
 	
 	^ self typeMap values collect: #first
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter class >> typeMap [
 	^ IdentityDictionary newFromPairs: #(
 			16 #(bool #convertBooleanFrom:length:description:) 
@@ -77,7 +79,7 @@ P3Converter class >> typeMap [
 		)
 ]
 
-{ #category : #'input/output' }
+{ #category : 'input/output' }
 P3Converter >> asciiCStringFrom: binaryStream [
 	| byte |
 	asciiWriteStream reset.
@@ -86,7 +88,7 @@ P3Converter >> asciiCStringFrom: binaryStream [
 	^ asciiWriteStream contents
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3Converter >> asciiStreamFor: bytes length: length [
 	| asciiString |
 	asciiString := asciiReadStream originalContents.
@@ -98,7 +100,7 @@ P3Converter >> asciiStreamFor: bytes length: length [
 	^ asciiReadStream 
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convert: bytes length: length description: description [
 	^ map 
 		at: description typeOid 
@@ -110,12 +112,12 @@ P3Converter >> convert: bytes length: length description: description [
 		ifAbsent: [ (P3Error cannotConvertTypeOid: description typeOid) signal ]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertBitStringFrom: bytes length: length description: description [
 	^ P3BitString readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-arrays' }
+{ #category : 'converting-arrays' }
 P3Converter >> convertBooleanArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -126,18 +128,18 @@ P3Converter >> convertBooleanArrayFrom: bytes length: length description: descri
 		next
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertBooleanFrom: bytes length: length description: description [
 	self assert: length = 1.
 	^ bytes next = $t charCode
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertBoxFrom: bytes length: length description: description [
 	^ P3Box readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertByteArrayFrom: bytes length: length description: description [
 	| size byteArray digitValues |
 	self assert: (bytes next: 2) = #[92 120]. "\x"
@@ -151,12 +153,12 @@ P3Converter >> convertByteArrayFrom: bytes length: length description: descripti
 	^ byteArray 
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertCircleFrom: bytes length: length description: description [
 	^ P3Circle readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-chronology' }
+{ #category : 'converting-chronology' }
 P3Converter >> convertDateAndTimeFrom: bytes length: length description: description [
 	"TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ) is stored internally in Postgres as UTC, but represented in the timezone of the connection, with a correct offset added. In other words, Postgres does the necessary shifting, we just have to read the result. For this to work, the connection output format must be ISO, the default."
 	
@@ -165,7 +167,7 @@ P3Converter >> convertDateAndTimeFrom: bytes length: length description: descrip
 			parseDateAndTime
 ]
 
-{ #category : #'converting-chronology' }
+{ #category : 'converting-chronology' }
 P3Converter >> convertDateAndTimeWithoutTimezoneFrom: bytes length: length description: description [
 	"TIMESTAMP WITHOUT TIME ZONE (TIMESTAMP) is stored internally in Postgres the way it was inserted, its representation remains constant, with no offset added. We use the timezone of the connection to do the necessary shifting. This assumes that the timezones used during insert/update and query are the same. For this to work, the connection output format must be ISO, the default."
 
@@ -179,19 +181,19 @@ P3Converter >> convertDateAndTimeWithoutTimezoneFrom: bytes length: length descr
 		ifFalse: [ timestamp translateTo: offset ]
 ]
 
-{ #category : #'converting-chronology' }
+{ #category : 'converting-chronology' }
 P3Converter >> convertDateFrom: bytes length: length description: description [
 	"For this to work, the connection output format must be ISO, the default"
 	
 	^ (P3ISO8601Parser on: (self asciiStreamFor: bytes length: length)) parseDate
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertFixedBitStringFrom: bytes length: length description: description [
 	^ P3FixedBitString readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-arrays' }
+{ #category : 'converting-arrays' }
 P3Converter >> convertFloatArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -202,12 +204,12 @@ P3Converter >> convertFloatArrayFrom: bytes length: length description: descript
 		next
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertFloatFrom: bytes length: length description: description [
 	^ Float readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-arrays' }
+{ #category : 'converting-arrays' }
 P3Converter >> convertIntegerArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -218,12 +220,12 @@ P3Converter >> convertIntegerArrayFrom: bytes length: length description: descri
 		next
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertIntegerFrom: bytes length: length description: description [
 	^ Integer readFrom: (self asciiStreamFor: bytes length: length) base: 10
 ]
 
-{ #category : #'converting-arrays' }
+{ #category : 'converting-arrays' }
 P3Converter >> convertIntegerVectorFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -233,12 +235,12 @@ P3Converter >> convertIntegerVectorFrom: bytes length: length description: descr
 		  next
 ]
 
-{ #category : #'converting-chronology' }
+{ #category : 'converting-chronology' }
 P3Converter >> convertIntervalFrom: bytes length: length description: description [
 	^ P3Interval readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-special' }
+{ #category : 'converting-special' }
 P3Converter >> convertJsonFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -249,37 +251,37 @@ P3Converter >> convertJsonFrom: bytes length: length description: description [
 			next
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertLineFrom: bytes length: length description: description [
 	^ P3Line readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertLineSegmentFrom: bytes length: length description: description [
 	^ P3LineSegment readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertPathFrom: bytes length: length description: description [
 	^ P3Path readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertPointFrom: bytes length: length description: description [
 	^ P3Point readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-geometric' }
+{ #category : 'converting-geometric' }
 P3Converter >> convertPolygonFrom: bytes length: length description: description [
 	^ P3Polygon readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertScaledDecimalFrom: bytes length: length description: description [
 	^ ScaledDecimal readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #'converting-arrays' }
+{ #category : 'converting-arrays' }
 P3Converter >> convertStringArrayFrom: bytes length: length description: description [
 	| input |
 	input := ZnLimitedReadStream on: bytes limit: length.
@@ -289,7 +291,7 @@ P3Converter >> convertStringArrayFrom: bytes length: length description: descrip
 		next
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertStringFrom: bytes length: length description: description [
 	| endPosition |
 	length = 0 ifTrue: [ ^ '' ].
@@ -300,12 +302,12 @@ P3Converter >> convertStringFrom: bytes length: length description: description 
 	^ stringWriteStream contents
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertSymbolFrom: bytes length: length description: description [
 	^ (self convertStringFrom: bytes length: length description: description) asSymbol
 ]
 
-{ #category : #'converting-chronology' }
+{ #category : 'converting-chronology' }
 P3Converter >> convertTimeFrom: bytes length: length description: description [
 	"TIME [ WITHOUT TIME ZONE ] corresponds to Time, i.e. 
 	both have no knowledge about the applicable time zone.
@@ -315,7 +317,7 @@ P3Converter >> convertTimeFrom: bytes length: length description: description [
 	^ (P3ISO8601Parser on: (self asciiStreamFor: bytes length: length)) parseTime
 ]
 
-{ #category : #'converting-chronology' }
+{ #category : 'converting-chronology' }
 P3Converter >> convertTimeWithTimezoneFrom: bytes length: length description: description [
 	"TIME WITH TIME ZONE corresponds to Time plus an offset. 
 	Time does not hold a time zone nor an offset.
@@ -337,19 +339,19 @@ P3Converter >> convertTimeWithTimezoneFrom: bytes length: length description: de
 				ifFalse: [ translatedTime ] ]
 ]
 
-{ #category : #'converting-special' }
+{ #category : 'converting-special' }
 P3Converter >> convertUuidFrom: bytes length: length description: description [
 	
 	^ UUID nilUUID readFrom: (self asciiStreamFor: bytes length: length)
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3Converter >> convertVoidFrom: bytes length: length description: description [
 	self assert: length = 0.
 	^ nil
 ]
 
-{ #category : #'input/output' }
+{ #category : 'input/output' }
 P3Converter >> encodedCStringFrom: binaryStream [
 	stringWriteStream reset.
 	[ binaryStream peekFor: 0 ]
@@ -357,17 +359,17 @@ P3Converter >> encodedCStringFrom: binaryStream [
 	^ stringWriteStream contents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> encoder [
 	^ encoder ifNil: [ encoder := ZnCharacterEncoder utf8 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> encoder: anObject [
 	encoder := anObject
 ]
 
-{ #category : #initialize }
+{ #category : 'initialize' }
 P3Converter >> initialize [
 	super initialize.
 	asciiReadStream := String new readStream.
@@ -377,7 +379,7 @@ P3Converter >> initialize [
 	self initializeTypeMap
 ]
 
-{ #category : #initialize }
+{ #category : 'initialize' }
 P3Converter >> initializeFrom: properties [
 	| serverTimezone serverEncoder |
 	"Try to resolve the session/connection timezone"
@@ -392,18 +394,18 @@ P3Converter >> initializeFrom: properties [
 	self encoder: serverEncoder
 ]
 
-{ #category : #initialize }
+{ #category : 'initialize' }
 P3Converter >> initializeTypeMap [
 	map := self class typeMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> mapOid: anOoid type: aTypename to: aBlockOrSymbol [
 
 	^ map at: anOoid put: { aTypename . aBlockOrSymbol }	
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Converter >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(.
@@ -413,22 +415,22 @@ P3Converter >> printOn: stream [
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> timestampClass [
 	^ timestampClass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> timestampClass: anObject [
 	timestampClass := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> timezone [
 	^ timezone
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Converter >> timezone: anObject [
 	timezone := anObject
 ]

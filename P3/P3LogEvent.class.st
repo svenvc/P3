@@ -14,8 +14,8 @@ I hold the following information:
 - a PostgreSQL session identifier <Integer> (backend process id) that represents a connection
 "
 Class {
-	#name : #P3LogEvent,
-	#superclass : #Announcement,
+	#name : 'P3LogEvent',
+	#superclass : 'Announcement',
 	#instVars : [
 		'timestamp',
 		'id',
@@ -25,17 +25,19 @@ Class {
 		'IdCounter',
 		'LogEventAnnouncer'
 	],
-	#category : #'P3-Logging'
+	#category : 'P3-Logging',
+	#package : 'P3',
+	#tag : 'Logging'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent class >> announcer [
 	"Return my Announcer, the object that I send my log events to"
 	
 	^ LogEventAnnouncer ifNil: [ LogEventAnnouncer := Announcer new ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3LogEvent class >> initialize [
 	IdCounter := 0.
 	self environment 
@@ -44,7 +46,7 @@ P3LogEvent class >> initialize [
 		ifAbsent: [ Smalltalk addToStartUpList: self ]
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3LogEvent class >> logToTranscript [
 	"Arrange for a textual representation of the log events sent to my announcer to be printed on the Transcript"
 	
@@ -55,7 +57,7 @@ P3LogEvent class >> logToTranscript [
 		for: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent class >> nextId [
 	"This should be thread safe because SmallInteger 
 	arithmetic primitives cannot be interrupted"
@@ -63,62 +65,62 @@ P3LogEvent class >> nextId [
 	^ IdCounter := IdCounter + 1
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3LogEvent class >> open [
 	"Open an inspector on my announcer, which should offer a UI to see log events"
 	
 	^ self announcer inspect
 ]
 
-{ #category : #'system startup' }
+{ #category : 'system startup' }
 P3LogEvent class >> startUp [
 	"Reset the id counter"
 	
 	IdCounter := 0
 ]
 
-{ #category : #convenience }
+{ #category : 'convenience' }
 P3LogEvent class >> stopLoggingToTranscript [
 	"Stop sending a textual representation of my log events to the Transcript (see #logToTranscript)"
 
 	self announcer unsubscribe: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent >> announcer [
 	^ self class announcer
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 P3LogEvent >> emit [
 	self announcer announce: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent >> id [
 	^ id
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3LogEvent >> initialize [
 	super initialize.
 	timestamp := DateAndTime now.
 	id := self nextId
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent >> nextId [
 	^ self class nextId
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3LogEvent >> printContentsOn: stream [
 	"Subclasses should implement this to add output"
 	
 	self subclassResponsibility 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3LogEvent >> printOn: stream [
 	timestamp printYMDOn: stream.
 	stream space.
@@ -130,17 +132,17 @@ P3LogEvent >> printOn: stream [
 	self printContentsOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent >> session [
 	^ session
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3LogEvent >> session: anObject [
 	session := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3LogEvent >> timestamp [
 	^ timestamp
 ]

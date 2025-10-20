@@ -1,10 +1,10 @@
-Extension { #name : #Object }
+Extension { #name : 'Object' }
 
-{ #category : #'*P3' }
+{ #category : '*P3' }
 Object >> p3PrintUsing: delegate on: stream [
 	"Print me on stream via double dispatch on delegate.
 	This is the default/fallback implementation.
-	Check the implementors of #p3PrintOn:using:"
+	Check the implementors of #p3PrintUsing:on:"
 	
 	delegate printObject: self on: stream
 ]

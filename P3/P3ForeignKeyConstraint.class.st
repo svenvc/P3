@@ -7,46 +7,48 @@ I implement SQL FOREIGN KEY.
 I know to table and columns that I reference.
 "
 Class {
-	#name : #P3ForeignKeyConstraint,
-	#superclass : #P3Constraint,
+	#name : 'P3ForeignKeyConstraint',
+	#superclass : 'P3Constraint',
 	#instVars : [
 		'foreignKeyTable',
 		'foreignKeyColumns'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint class >> handlesType: type [
 	^ type = 'FOREIGN KEY'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> constraintType [
 	^ 'FOREIGN KEY'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> foreignKeyColumns [
 	^ foreignKeyColumns
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> foreignKeyColumns: anObject [
 	foreignKeyColumns := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> foreignKeyTable [
 	^ foreignKeyTable
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> foreignKeyTable: anObject [
 	foreignKeyTable := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> loadDetailsUsing: client [
 	| statement result |
 	super loadDetailsUsing: client.
@@ -58,7 +60,7 @@ P3ForeignKeyConstraint >> loadDetailsUsing: client [
 	self foreignKeyTable: result firstFieldOfFirstRecord
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ForeignKeyConstraint >> sqlDescription [
 	^ String streamContents: [ :out |
 		out nextPutAll: 'FOREIGN KEY'.

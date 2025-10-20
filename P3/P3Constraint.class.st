@@ -16,8 +16,8 @@ Use me to get all constraints for a given table.
 My concrete subclasses implement actual constraint types. 
 "
 Class {
-	#name : #P3Constraint,
-	#superclass : #Object,
+	#name : 'P3Constraint',
+	#superclass : 'Object',
 	#instVars : [
 		'constraintSchema',
 		'constraintName',
@@ -28,10 +28,12 @@ Class {
 		'enforced',
 		'constraintColumns'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint class >> allForTable: tableName in: schemaName using: client [
 	| statement result specificClass constraint |
 	statement := client format: 'SELECT constraint_schema, constraint_name, constraint_type, is_deferrable, initially_deferred, enforced FROM information_schema.table_constraints WHERE table_schema = $1 AND table_name= $2'.
@@ -53,12 +55,12 @@ P3Constraint class >> allForTable: tableName in: schemaName using: client [
 		constraint ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint class >> handlesType: type [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint class >> referencingConstraintNamesForTable: tableName in: schemaName using: client [
 	"Return (table_name, constraint_name) pairs where the given schemaName:tableName is referenced.
 	Do not return the actual constraint object as this might be costly to compute."
@@ -71,92 +73,92 @@ WHERE ctu.table_schema = $1 AND ctu.table_name = $2 AND ctu.constraint_name = tc
 	^ result data
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintColumns [
 	^ constraintColumns
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintColumns: anObject [
 	constraintColumns := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintName [
 	^ constraintName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintName: anObject [
 	constraintName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintSchema [
 	^ constraintSchema
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintSchema: anObject [
 	constraintSchema := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> constraintType [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> enforced [
 	^ enforced
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> enforced: anObject [
 	enforced := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> initiallyDeferred [
 	^ initiallyDeferred
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> initiallyDeferred: anObject [
 	initiallyDeferred := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Constraint >> isCheck [
 	^ self constraintType = 'CHECK'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> isDeferrable [
 	^ isDeferrable
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> isDeferrable: anObject [
 	isDeferrable := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Constraint >> isForeignKey [
 	^ self constraintType = 'FOREIGN KEY'
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Constraint >> isPrimaryKey [
 	^ self constraintType = 'PRIMARY KEY'
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Constraint >> isUnique [
 	^ self constraintType = 'UNIQUE'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> loadDetailsUsing: client [
 	| statement result |
 	statement := client format: 'SELECT column_name FROM information_schema.key_column_usage WHERE constraint_schema = $1 AND constraint_name = $2'.
@@ -164,7 +166,7 @@ P3Constraint >> loadDetailsUsing: client [
 	self constraintColumns: result firstColumnData
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(. 
@@ -176,27 +178,27 @@ P3Constraint >> printOn: stream [
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> sqlDescription [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> tableName [
 	^ tableName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> tableName: anObject [
 	tableName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> tableSchema [
 	^ tableSchema
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Constraint >> tableSchema: anObject [
 	tableSchema := anObject
 ]

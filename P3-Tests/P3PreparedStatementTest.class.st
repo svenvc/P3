@@ -6,15 +6,16 @@ I reuse the configuration of P3ClientTests. Example:
   P3ClientTest url: 'psql://sven:secret@localhost:5432/database'.
 "
 Class {
-	#name : #P3PreparedStatementTest,
-	#superclass : #TestCase,
+	#name : 'P3PreparedStatementTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'client'
 	],
-	#category : #'P3-Tests'
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 P3PreparedStatementTest >> setUp [
 	super setUp.
 	client := P3Client new.
@@ -23,13 +24,13 @@ P3PreparedStatementTest >> setUp [
 	client connect
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 P3PreparedStatementTest >> tearDown [
 	client close.
 	super tearDown
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testBatchInsertStatement [
 
 	| statement result |
@@ -53,7 +54,7 @@ P3PreparedStatementTest >> testBatchInsertStatement [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testBinaryColumn [
 
 	| statement result |
@@ -76,7 +77,7 @@ P3PreparedStatementTest >> testBinaryColumn [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testBitString [
 	| statement bitString fixedBitString result |
 	
@@ -97,7 +98,7 @@ P3PreparedStatementTest >> testBitString [
 	client execute: 'DROP TABLE testBits'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testBulkInsertAndSelect [
 
 	| insertStatement result selectStatement |
@@ -127,7 +128,7 @@ P3PreparedStatementTest >> testBulkInsertAndSelect [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testChronology [
 	| result statement now |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -155,7 +156,7 @@ P3PreparedStatementTest >> testChronology [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testChronologyWithTimezone [
 	| result statement now |
 	client execute: 'DROP TABLE IF EXISTS table1'.
@@ -183,7 +184,7 @@ P3PreparedStatementTest >> testChronologyWithTimezone [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testChronologyZTimestamp [
 	| result statement |
 	client close; timestampClass: ZTimestamp.
@@ -206,7 +207,7 @@ P3PreparedStatementTest >> testChronologyZTimestamp [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testGeometricTypes [
 	| p1 p2 p3 points row1 row2 row3 statement result |
 	(client isServerVersionAtLeastMajor: 9 minor: 4) ifFalse: [ ^ self skip ].
@@ -234,7 +235,7 @@ P3PreparedStatementTest >> testGeometricTypes [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testInClause [
 	| statement result |
 	
@@ -250,20 +251,20 @@ P3PreparedStatementTest >> testInClause [
 	
 	statement := client prepare: 'SELECT id, name FROM table1 WHERE id = ANY ($1) ORDER BY id'.
 
-	result := statement query: { P3ValuesArray withAll: #( 2 3 ) }.
+	result := statement query: { #( 2 3 ) }.
 	self assert: result records equals: #( (2 'Greetings') (3 'From Mars') ).
 	
-	result := statement query: { P3ValuesArray withAll: #( 3 ) }.
+	result := statement query: { #( 3 ) }.
 	self assert: result records equals: #( (3 'From Mars') ).
 	
-	result := statement query: { P3ValuesArray withAll: #( 666 ) }.
+	result := statement query: { #( 666 ) }.
 	self assert: result records equals: #( ).
 	
 	statement close.
 	client execute: 'DROP TABLE table1'.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testInsertNull [
 
 	| statement result |
@@ -286,7 +287,7 @@ P3PreparedStatementTest >> testInsertNull [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testInterval [
 	| statement intervals result |
 	
@@ -304,7 +305,7 @@ P3PreparedStatementTest >> testInterval [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testLongQueries [
 	"Test fix for issue: Prepared statements error when query is long and differs slightly at the end
 	https://github.com/svenvc/P3/issues/20"
@@ -338,7 +339,7 @@ P3PreparedStatementTest >> testLongQueries [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testMultipleInsertStatements [
 
 	| statement1 statement2 |
@@ -362,7 +363,7 @@ P3PreparedStatementTest >> testMultipleInsertStatements [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testNamedPreparedStatement [
 	| result |
 	
@@ -397,7 +398,7 @@ P3PreparedStatementTest >> testNamedPreparedStatement [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testScaledDecimal [
 
 	| statement result |
@@ -425,7 +426,7 @@ P3PreparedStatementTest >> testScaledDecimal [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testSelectStatement [
 
 	| statement result |
@@ -456,7 +457,7 @@ P3PreparedStatementTest >> testSelectStatement [
 	client execute: 'DROP TABLE table1'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PreparedStatementTest >> testSimpleInsertStatement [
 
 	| statement result |

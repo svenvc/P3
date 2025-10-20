@@ -7,35 +7,37 @@ I implement SQL CHECK.
 I know my check clause.
 "
 Class {
-	#name : #P3CheckConstraint,
-	#superclass : #P3Constraint,
+	#name : 'P3CheckConstraint',
+	#superclass : 'P3Constraint',
 	#instVars : [
 		'checkClause'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3CheckConstraint class >> handlesType: type [
 	^ type = 'CHECK'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3CheckConstraint >> checkClause [
 	^ checkClause
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3CheckConstraint >> checkClause: anObject [
 	checkClause := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3CheckConstraint >> constraintType [
 	^ 'CHECK'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3CheckConstraint >> loadDetailsUsing: client [
 	| statement result |
 	super loadDetailsUsing: client.
@@ -44,7 +46,7 @@ P3CheckConstraint >> loadDetailsUsing: client [
 	self checkClause: result firstFieldOfFirstRecord
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3CheckConstraint >> sqlDescription [
 	^ String streamContents: [ :out |
 		out nextPutAll: 'CHECK'.

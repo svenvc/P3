@@ -10,22 +10,24 @@ I inherit my representation and add the option to be open instead of closed
 
 "
 Class {
-	#name : #P3Path,
-	#superclass : #P3Polygon,
+	#name : 'P3Path',
+	#superclass : 'P3Polygon',
 	#instVars : [
 		'open'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Path class >> openPoints: collectionOfPoints [
 	^ (self points: collectionOfPoints)
 		beOpen;
 		yourself
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3Path class >> readFrom: stream [
 	| points closer path |
 	points := OrderedCollection new.
@@ -49,43 +51,43 @@ P3Path class >> readFrom: stream [
 	^ path
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3Path class >> tag [
 	^ #path
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Path >> = anotherPath [
 	^ super = anotherPath and: [ open = anotherPath isOpen ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3Path >> beOpen [
 	open := true
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 P3Path >> hash [
 	^ super hash xor: open hash
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3Path >> initialize [
 	super initialize.
 	open := false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Path >> isClosed [
 	^ open not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3Path >> isOpen [
 	^ open
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3Path >> printOn: stream [
 	stream nextPut: (self isOpen ifTrue: [ $[ ] ifFalse: [ $( ]).
 	self printPointsOn: stream.

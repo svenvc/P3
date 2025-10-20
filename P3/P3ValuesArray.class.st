@@ -15,55 +15,57 @@ statement query: { P3ValuesArray withAll: #(1 2) }.
 
 "
 Class {
-	#name : #P3ValuesArray,
-	#superclass : #Object,
+	#name : 'P3ValuesArray',
+	#superclass : 'Object',
 	#instVars : [
 		'array'
 	],
-	#category : #'P3-Objects'
+	#category : 'P3-Objects',
+	#package : 'P3',
+	#tag : 'Objects'
 }
 
-{ #category : #requirements }
+{ #category : 'requirements' }
 P3ValuesArray class >> empty [
 	^ self withAll: #()
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 P3ValuesArray class >> withAll: collection [
 	^ self new
 		values: collection asArray;
 		yourself
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 P3ValuesArray >> do: block [
 	array do: block
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 P3ValuesArray >> isEmpty [
 	^ array isNil or: [ array isEmpty ]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3ValuesArray >> p3PrintUsing: delegate on: stream [
 	"Print me on stream via double dispatch on delegate.
-	Check the implementors of #p3PrintOn:using:"
+	Check the implementors of #p3PrintUsing:on:"
 
 	delegate printValuesArray: self on: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ValuesArray >> size [
 	^ array ifNil: [ 0 ] ifNotNil: [ array size ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ValuesArray >> values [
 	^ array
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3ValuesArray >> values: anArray [
 	array := anArray
 ]

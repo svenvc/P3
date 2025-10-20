@@ -2,12 +2,13 @@
 P3ISO8601ParserTest holds tests for P3ISO8601Parser
 "
 Class {
-	#name : #P3ISO8601ParserTest,
-	#superclass : #TestCase,
-	#category : #'P3-Tests'
+	#name : 'P3ISO8601ParserTest',
+	#superclass : 'TestCase',
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ISO8601ParserTest >> testDate [
 	self 
 		assert: (P3ISO8601Parser on: '2020-10-12') parseDate 
@@ -23,7 +24,7 @@ P3ISO8601ParserTest >> testDate [
 		equals: (Date year: 2020 month: 12 day: 31).
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ISO8601ParserTest >> testDateAndTime [
 	self 
 		assert: (P3ISO8601Parser on: '2020-10-13 10:49:48.251174+02') parseDateAndTime
@@ -34,7 +35,7 @@ P3ISO8601ParserTest >> testDateAndTime [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ISO8601ParserTest >> testTime [
 	self 
 		assert: (P3ISO8601Parser on: '07:08:09') parseTime
@@ -45,7 +46,7 @@ P3ISO8601ParserTest >> testTime [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3ISO8601ParserTest >> testZTimestamp [
 	self 
 		assert: ((P3ISO8601Parser on: '2020-10-13 10:49:48.251174+02') timestampClass: ZTimestamp; parseDateAndTime)

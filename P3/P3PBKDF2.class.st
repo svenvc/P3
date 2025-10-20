@@ -12,18 +12,20 @@ https://tools.ietf.org/html/rfc2898
 		deriveKey.
 "
 Class {
-	#name : #P3PBKDF2,
-	#superclass : #Object,
+	#name : 'P3PBKDF2',
+	#superclass : 'Object',
 	#instVars : [
 		'password',
 		'salt',
 		'pseudoRandom',
 		'iterations'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #public }
+{ #category : 'public' }
 P3PBKDF2 >> deriveKey [
 	"Derive and return a key based on my settings.
 	The size will conform with the block size of my pseudo random function."
@@ -31,7 +33,7 @@ P3PBKDF2 >> deriveKey [
 	^ self deriveKeyBlock: 1
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3PBKDF2 >> deriveKeyBlock: blockNumber [
 	| data derivedKeyBlock |
 	data := self pseudoRandom: password with: (self saltFor: blockNumber).
@@ -42,7 +44,7 @@ P3PBKDF2 >> deriveKeyBlock: blockNumber [
 	^ derivedKeyBlock  
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3PBKDF2 >> deriveKeyOfSize: byteSize [
 	"Derive and return a byteSize key based on my settings."
 
@@ -58,64 +60,64 @@ P3PBKDF2 >> deriveKeyOfSize: byteSize [
 			bytesProduced := bytesProduced + count ] ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3PBKDF2 >> hmacSHA1 [
 	self pseudoRandom: [ :key :message | 
 		SHA1 new hmac key: key; digestMessage: message ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3PBKDF2 >> hmacSHA256 [
 	self pseudoRandom: [ :key :message | 
 		SHA256 new hmac key: key; digestMessage: message ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> iterations [
 	^ iterations
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> iterations: numberOfRounds [
 	iterations := numberOfRounds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> password [
 	^ password
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> password: anObject [
 	password := anObject asByteArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> pseudoRandom [
 	^ pseudoRandom
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> pseudoRandom: block [
 	pseudoRandom := block
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3PBKDF2 >> pseudoRandom: key with: message [
 	^ pseudoRandom value: key value: message
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> salt [
 	^ salt
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3PBKDF2 >> salt: anObject [
 	salt := anObject asByteArray
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3PBKDF2 >> saltFor: blockNumber [
 	^ salt , (blockNumber asByteArrayOfSize: 4)
 ]

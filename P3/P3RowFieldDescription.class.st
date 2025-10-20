@@ -6,8 +6,8 @@ I hold meta data regarding the result of an SQL query. I describe one field/colu
 I know how to interpret and convert raw bytes with the help of a P3Converter (see #convert:length:using:) into objects.
 "
 Class {
-	#name : #P3RowFieldDescription,
-	#superclass : #Object,
+	#name : 'P3RowFieldDescription',
+	#superclass : 'Object',
 	#instVars : [
 		'fieldName',
 		'tableOid',
@@ -17,45 +17,47 @@ Class {
 		'typeModifier',
 		'format'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> attributeNumber [
 	^ attributeNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> attributeNumber: anObject [
 	attributeNumber := anObject
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 P3RowFieldDescription >> convert: bytes length: length using: converter [
 	^ converter convert: bytes length: length description: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> fieldName [
 	^ fieldName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> fieldName: anObject [
 	fieldName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> format [
 	^ format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> format: anObject [
 	format := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 P3RowFieldDescription >> printOn: stream [
 	super printOn: stream.
 	stream nextPut: $(.
@@ -65,47 +67,47 @@ P3RowFieldDescription >> printOn: stream [
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> tableOid [
 	^ tableOid
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> tableOid: anObject [
 	tableOid := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeModifier [
 	^ typeModifier
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeModifier: anObject [
 	typeModifier := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeName [
 	^ (P3Converter typeMap at: self typeOid ifAbsent: [ ^ self typeOid ]) first
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeOid [
 	^ typeOid
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeOid: anObject [
 	typeOid := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeSize [
 	^ typeSize
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3RowFieldDescription >> typeSize: anObject [
 	typeSize := anObject
 ]

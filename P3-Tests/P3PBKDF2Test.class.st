@@ -5,21 +5,22 @@ https://tools.ietf.org/html/rfc6070
 https://stackoverflow.com/questions/5130513/pbkdf2-hmac-sha2-test-vectors
 "
 Class {
-	#name : #P3PBKDF2Test,
-	#superclass : #TestCase,
+	#name : 'P3PBKDF2Test',
+	#superclass : 'TestCase',
 	#instVars : [
 		'pbkdf2'
 	],
-	#category : #'P3-Tests'
+	#category : 'P3-Tests',
+	#package : 'P3-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 P3PBKDF2Test >> setUp [
 	super setUp.
 	pbkdf2 := P3PBKDF2 new
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA1Vector1 [
 	| dk expected |
 	pbkdf2 
@@ -34,7 +35,7 @@ P3PBKDF2Test >> testHMACSHA1Vector1 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA1Vector2 [
 	| dk expected |
 	pbkdf2 
@@ -49,7 +50,7 @@ P3PBKDF2Test >> testHMACSHA1Vector2 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA1Vector3 [
 	| dk expected |
 	pbkdf2 
@@ -64,7 +65,7 @@ P3PBKDF2Test >> testHMACSHA1Vector3 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA1Vector4 [
 	"This takes several minutes, but it does pass"
 	
@@ -81,7 +82,7 @@ expected := ByteArray readHexFrom: ('ee fe 3d 61 cd 4d a4 e4
 self assert: dk = expected"
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA1Vector5 [
 	| dk expected |
 	pbkdf2 
@@ -97,7 +98,7 @@ P3PBKDF2Test >> testHMACSHA1Vector5 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA1Vector6 [
 	| dk expected |
 	pbkdf2 
@@ -111,7 +112,7 @@ P3PBKDF2Test >> testHMACSHA1Vector6 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA256Vector1 [
 	| dk expected |
 	pbkdf2 
@@ -127,7 +128,7 @@ P3PBKDF2Test >> testHMACSHA256Vector1 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA256Vector2 [
 	| dk expected |
 	pbkdf2 
@@ -143,7 +144,7 @@ P3PBKDF2Test >> testHMACSHA256Vector2 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA256Vector3 [
 	| dk expected |
 	pbkdf2 
@@ -159,7 +160,7 @@ P3PBKDF2Test >> testHMACSHA256Vector3 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA256Vector4 [
 	"This takes several minutes, but it does pass"
 	
@@ -177,7 +178,7 @@ expected := ByteArray readHexFrom: ('cf 81 c6 6f e8 cf c0 4d
 self assert: dk = expected"
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA256Vector5 [
 	| dk expected |
 	pbkdf2 
@@ -194,7 +195,7 @@ P3PBKDF2Test >> testHMACSHA256Vector5 [
 	self assert: dk equals: expected  
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 P3PBKDF2Test >> testHMACSHA256Vector6 [
 	| dk expected |
 	pbkdf2 

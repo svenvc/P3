@@ -58,8 +58,8 @@ Using iterations and salt, and of course the password itself, constitutes
 enough information to calculate everything that does not depend on the nounces.
 "
 Class {
-	#name : #P3SCRAM,
-	#superclass : #Object,
+	#name : 'P3SCRAM',
+	#superclass : 'Object',
 	#instVars : [
 		'user',
 		'password',
@@ -74,10 +74,12 @@ Class {
 	#classVars : [
 		'Store'
 	],
-	#category : #'P3-Support'
+	#category : 'P3-Support',
+	#package : 'P3',
+	#tag : 'Support'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 P3SCRAM class >> initialize [
 	self environment 
 		at: #SessionManager 
@@ -85,7 +87,7 @@ P3SCRAM class >> initialize [
 		ifAbsent: [ Smalltalk addToShutDownList: self ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM class >> parseMessage: string [
 	"Expected format: [k=v],[k=v],... with empty (,,) and single elements (n=) being ignored"
 	
@@ -101,28 +103,28 @@ P3SCRAM class >> parseMessage: string [
 	^ info
 ]
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 P3SCRAM class >> reset [
 	"Completely throw away my store. It contains sensitive information."
 	
 	Store := nil
 ]
 
-{ #category : #'system startup' }
+{ #category : 'system startup' }
 P3SCRAM class >> shutDown [
 	"Prevent my store of sensitive information to be saved with an image"
 	
 	self reset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM class >> store [
 	"I maintain a store with instances registered under a key, using a TTLCache of 1 hour"
 	
 	^ Store ifNil: [ Store := TTLCache new timeToLive: 1 hour; yourself ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM class >> storeAt: key ifAbsentPut: block [
 	"If my store holds a previously registered and used instance, return it,
 	else evaluate block, which should return a newly created instance, that I store and return.
@@ -133,24 +135,24 @@ P3SCRAM class >> storeAt: key ifAbsentPut: block [
 		ifAbsentPut: block
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> authMessage [
 	^ self clientFirstMessageBare , ',' 
 		, self serverFirstMessage , ',' 
 		, self clientFinalMessageWithoutProof 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> channelBinding [
 	^ 'n,,'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> clearSaltedPassword [
 	saltedPassword := nil
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3SCRAM >> clientFinalMessage [
 	"This is the response message that the client sends to the server,
 	answering a previously received serverFirstMessage with a proof"
@@ -159,13 +161,13 @@ P3SCRAM >> clientFinalMessage [
 		, ',p=' , self clientProof base64Encoded
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> clientFinalMessageWithoutProof [
 	^ 'c=' , self channelBinding asByteArray base64Encoded 
 		, ',r=' , self fullNounce 
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3SCRAM >> clientFirstMessage [
 	"This is the first message that the client sends to the server 
 	to start the authentication process. You have to initialize me
@@ -174,52 +176,52 @@ P3SCRAM >> clientFirstMessage [
 	^ self channelBinding , self clientFirstMessageBare
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> clientFirstMessageBare [
 	^ 'n=' , (self user ifNil: [ '' ])
 		, ',r=' , self clientNounce
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> clientKey [
 	^ hmac 
 		key: self saltedPassword; 
 		digestMessage: 'Client Key'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> clientNounce [
 	^ clientNounce ifNil: [ clientNounce := UUID new asString36 first: 16 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> clientNounce: string [
 	clientNounce := string
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> clientProof [
 	^ self clientKey bitXor: self clientSignature 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> clientSignature [
 	^ hmac 
 		key: self storedKey; 
 		digestMessage: self authMessage 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> fullNounce [
 	^ self clientNounce , self serverNounce 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> iterations [
 	^ iteratedHash iterations
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> iterations: count [
 	self iterations = count
 		ifTrue: [ ^ self ].
@@ -227,12 +229,12 @@ P3SCRAM >> iterations: count [
 	self clearSaltedPassword 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> password [
 	^ password
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> password: string [
 	password = string
 		ifTrue: [ ^ self ].
@@ -240,12 +242,12 @@ P3SCRAM >> password: string [
 	self clearSaltedPassword
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> salt [
 	^ salt
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> salt: byteArray [
 	salt = byteArray
 		ifTrue: [ ^ self ].
@@ -253,7 +255,7 @@ P3SCRAM >> salt: byteArray [
 	self clearSaltedPassword 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> saltedPassword [
 	"Cached to improve performance"
 	
@@ -264,7 +266,7 @@ P3SCRAM >> saltedPassword [
 				deriveKey ]
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3SCRAM >> serverFinalMessage: string [
 	"This is the response message that the server sends to the client
 	answering a previous clientFinalMessage. If there is no error,
@@ -277,14 +279,14 @@ P3SCRAM >> serverFinalMessage: string [
 	self assert: (info at: #v) base64Decoded = self serverSignature
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> serverFirstMessage [
 	^ 'r=' , self fullNounce 
 		, ',s=' , self salt base64Encoded 
 		, ',i=' , iteratedHash iterations asString
 ]
 
-{ #category : #public }
+{ #category : 'public' }
 P3SCRAM >> serverFirstMessage: string [
 	"This is the challenge message that the server sends to the client 
 	in response to my clientFirstMessage. Parse it and process its contents."
@@ -298,55 +300,55 @@ P3SCRAM >> serverFirstMessage: string [
 	self serverNounce: (r allButFirst: self clientNounce size)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> serverKey [
 	^ hmac
 		key: self saltedPassword;
 		digestMessage: 'Server Key'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> serverNounce [
 	^ serverNounce ifNil: [ serverNounce := UUID new asString36 last: 16 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> serverNounce: string [
 	serverNounce := string
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> serverSignature [
 	^ hmac
 		key: self serverKey;
 		digestMessage: self authMessage 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3SCRAM >> sha1 [
 	hash := SHA1 new.
 	hmac := hash hmac.
 	iteratedHash := P3PBKDF2 new hmacSHA1.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 P3SCRAM >> sha256 [
 	hash := SHA256 new.
 	hmac := hash hmac.
 	iteratedHash := P3PBKDF2 new hmacSHA256.
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 P3SCRAM >> storedKey [
 	^ hash hashMessage: self clientKey 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> user [
 	^ user
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 P3SCRAM >> user: string [
 	user := string
 ]
