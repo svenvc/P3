@@ -144,13 +144,15 @@ P3Client >> clearTextPasswordMessage [
 P3Client >> close [
 	"Cleanly close my connection with the server"
 
-	connection ifNotNil: [ 
+	connection ifNotNil: [
+		self logDisconnected. 
 		[ 
 			self writeMessage: #[] tag: $X.
 			connection close ] on: Error do: [  ].
+		
 		self clearSession.
-		connection := nil.
-		self logDisconnected ]
+		connection := nil
+		 ]
 ]
 
 { #category : 'accessing' }
