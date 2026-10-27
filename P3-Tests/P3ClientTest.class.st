@@ -444,14 +444,14 @@ P3ClientTest >> testJsonConversion [
 	(client isServerVersionAtLeastMajor: 9 minor: 5) ifFalse: [ ^ self skip ].
 	data := NeoJSONObject new 
 		x: 1; 
-		str: 'les élève Français'; 
+		str: 'les élèves Français'; 
 		foo: 'tab' , Character tab asString; 
 		bar: #(true nil -123); 
 		yourself.
 	result := client query: ('SELECT ''{1}''::json' format: { data printString }).
-	self assert: result firstFieldOfFirstRecord equals: data.
+	self assertCollection: result firstFieldOfFirstRecord hasSameElements: data.
 	result := client query: ('SELECT ''{1}''::jsonb' format: { data printString }).
-	self assert: result firstFieldOfFirstRecord equals: data
+	self assertCollection: result firstFieldOfFirstRecord hasSameElements: data
 ]
 
 { #category : 'tests' }
