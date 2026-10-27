@@ -449,9 +449,9 @@ P3ClientTest >> testJsonConversion [
 		bar: #(true nil -123); 
 		yourself.
 	result := client query: ('SELECT ''{1}''::json' format: { data printString }).
-	self assertCollection: result firstFieldOfFirstRecord hasSameElements: data.
+	self assert: result firstFieldOfFirstRecord asDictionary equals: data asDictionary .
 	result := client query: ('SELECT ''{1}''::jsonb' format: { data printString }).
-	self assertCollection: result firstFieldOfFirstRecord hasSameElements: data
+	self assert: result firstFieldOfFirstRecord asDictionary equals: data asDictionary 
 ]
 
 { #category : 'tests' }
