@@ -22,6 +22,37 @@ P3SCRAMTest >> setUp [
 ]
 
 { #category : 'tests' }
+P3SCRAMTest >> testConcurrentAuthenticationRaceCondition [
+	"Demonstrates that concurrent authentications against the same URL must not share mutable state machine nonces."
+
+	| client1 client2 scram1 scram2 challenge1 challenge2 final1 |
+	client1 := P3Client url: 'psql://user:pencil@localhost:5432/db'.
+	client2 := P3Client url: 'psql://user:pencil@localhost:5432/db'.
+
+	scram1 := client1 scramSHA256.
+	scram2 := client2 scramSHA256.
+
+	scram1 clientFirstMessage.
+	scram2 clientFirstMessage.
+
+	challenge1 := 'r=' , scram1 clientNounce , 'sn1,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=10'.
+	scram1 serverFirstMessage: challenge1.
+
+	challenge2 := 'r=' , scram2 clientNounce , 'sn2,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=10'.
+	scram2 serverFirstMessage: challenge2.
+
+	final1 := scram1 clientFinalMessage.
+
+	self deny: scram1 identicalTo: scram2.
+	self
+		assert: (final1 includesSubstring: 'sn1')
+		description: 'Client 1 final message must contain its own server nonce'.
+	self
+		deny: (final1 includesSubstring: 'sn2')
+		description: 'Client 1 final message must not contain Client 2 server nonce'
+]
+
+{ #category : 'tests' }
 P3SCRAMTest >> testSHA1 [
 	scram sha1.
 	scram user: 'user'.

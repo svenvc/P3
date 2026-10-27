@@ -1019,14 +1019,12 @@ P3Client >> saslSCRAMSHA256FirstMessage: scram [
 
 { #category : 'private - authentication' }
 P3Client >> scramSHA256 [
+
 	self password ifNil: [ P3Error passwordRequired signal ].
-	^ P3SCRAM
-		storeAt: self url
-		ifAbsentPut: [ 
-			P3SCRAM new
-				sha256;
-				password: self password;
-				yourself ]
+	^ P3SCRAM new
+		  sha256;
+		  password: self password;
+		  yourself
 ]
 
 { #category : 'accessing' }

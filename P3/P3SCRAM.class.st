@@ -36,11 +36,6 @@ The computation of the saltedPasssword takes a noticeable amount of time,
 especially with SHA-256 and the conventional 4096 iterations.
 For this reason this computation is cached.
 
-Furthermore, to save time between usages, clients can store my instances
-in my store, under a key, so they can reuse them, potentially gaining
-speed by using a cached result. See P3SCRAM class>>#storeAt:ifAbsentPut:
-This speedup is for all but the first execution of a particular authentication.
-
 Security note
 
 The information held in my instances is sensitive.
@@ -72,12 +67,23 @@ Class {
 		'saltedPassword'
 	],
 	#classVars : [
-		'Store'
+		'SaltedPasswordCache'
 	],
 	#category : 'P3-Support',
 	#package : 'P3',
 	#tag : 'Support'
 }
+
+{ #category : 'private' }
+P3SCRAM class >> cache [
+	"I maintain a thread-safe TTLCache with salted passwords for 1 hour."
+
+	^ SaltedPasswordCache ifNil: [
+			  SaltedPasswordCache := TTLCache new
+				                         beThreadSafe;
+				                         timeToLive: 1 hour;
+				                         yourself ]
+]
 
 { #category : 'class initialization' }
 P3SCRAM class >> initialize [
@@ -105,9 +111,9 @@ P3SCRAM class >> parseMessage: string [
 
 { #category : 'class initialization' }
 P3SCRAM class >> reset [
-	"Completely throw away my store. It contains sensitive information."
+	"Completely throw away my cache. It contains sensitive information."
 	
-	Store := nil
+	SaltedPasswordCache := nil
 ]
 
 { #category : 'system startup' }
@@ -115,24 +121,6 @@ P3SCRAM class >> shutDown [
 	"Prevent my store of sensitive information to be saved with an image"
 	
 	self reset
-]
-
-{ #category : 'accessing' }
-P3SCRAM class >> store [
-	"I maintain a store with instances registered under a key, using a TTLCache of 1 hour"
-	
-	^ Store ifNil: [ Store := TTLCache new timeToLive: 1 hour; yourself ]
-]
-
-{ #category : 'accessing' }
-P3SCRAM class >> storeAt: key ifAbsentPut: block [
-	"If my store holds a previously registered and used instance, return it,
-	else evaluate block, which should return a newly created instance, that I store and return.
-	Used instances cache their saltedPassword for improved performance for 1 hour."
-
-	^ self store 
-		at: key 
-		ifAbsentPut: block
 ]
 
 { #category : 'private' }
@@ -257,13 +245,20 @@ P3SCRAM >> salt: byteArray [
 
 { #category : 'private' }
 P3SCRAM >> saltedPassword [
-	"Cached to improve performance"
-	
-	^ saltedPassword ifNil: [ 
-			saltedPassword := iteratedHash 
-				password: self password utf8Encoded; 
-				salt: self salt; 
-				deriveKey ]
+	"Cached across instances thread-safely by password, salt, and iterations to prevent
+	 race conditions while keeping 0ms subsequent connection performance."
+
+	^ saltedPassword ifNil: [
+			  | cacheKey |
+			  cacheKey := {
+				              self password.
+				              self salt.
+				              self iterations }.
+			  saltedPassword := self class cache at: cacheKey ifAbsentPut: [
+					                    iteratedHash
+						                    password: self password utf8Encoded;
+						                    salt: self salt;
+						                    deriveKey ] ]
 ]
 
 { #category : 'public' }
